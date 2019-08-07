@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "build": "npm i && npm run cprjs && tsc",
+    "cprjs": "cp node_modules/requirejs/*.js bin",
+    "webfsd": "killall -q webfsd; sudo webfsd -F -l - -p 80 -r . -f index.html"
+  },
+  "devDependencies": {
+    "requirejs": "2.3.6",
+    "typescript": "3.5.3"
+  }
+}
