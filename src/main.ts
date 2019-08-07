@@ -1,9 +1,11 @@
-import { TaggedLogger } from './log';
+import { TaggedLogger, logs } from './log';
 import * as gps from './gps';
 import * as pwa from './pwa';
 
 const ID_MAP = 'map';
 const ID_SEND = 'send';
+const ID_LOGS = 'logs';
+const ID_SHOW_LOGS = 'show-logs';
 
 const log = new TaggedLogger('main');
 
@@ -35,6 +37,24 @@ async function init() {
 
   $('#' + ID_SEND).addEventListener('click', () => {
     log.i('#send:click');
+  });
+
+  $('#' + ID_SHOW_LOGS).addEventListener('click', () => {
+    log.i('#logs:click');
+    let div = $<HTMLDivElement>('#' + ID_LOGS);
+
+    if (!div.style.display) {
+      log.i('Hiding the logs.');
+      div.style.display = 'none';
+      return;
+    }
+
+    let text = logs
+      .map(args => args.join(' ').trim())
+      .join('\n');
+    
+    div.textContent = text;
+    div.style.display = '';
   });
 }
 

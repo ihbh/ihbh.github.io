@@ -3,6 +3,8 @@ define(["require", "exports", "./log", "./gps", "./pwa"], function (require, exp
     Object.defineProperty(exports, "__esModule", { value: true });
     const ID_MAP = 'map';
     const ID_SEND = 'send';
+    const ID_LOGS = 'logs';
+    const ID_SHOW_LOGS = 'show-logs';
     const log = new log_1.TaggedLogger('main');
     init();
     async function init() {
@@ -29,6 +31,20 @@ define(["require", "exports", "./log", "./gps", "./pwa"], function (require, exp
         }
         $('#' + ID_SEND).addEventListener('click', () => {
             log.i('#send:click');
+        });
+        $('#' + ID_SHOW_LOGS).addEventListener('click', () => {
+            log.i('#logs:click');
+            let div = $('#' + ID_LOGS);
+            if (!div.style.display) {
+                log.i('Hiding the logs.');
+                div.style.display = 'none';
+                return;
+            }
+            let text = log_1.logs
+                .map(args => args.join(' ').trim())
+                .join('\n');
+            div.textContent = text;
+            div.style.display = '';
         });
     }
     function isDomLoaded() {

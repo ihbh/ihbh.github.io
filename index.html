@@ -11,7 +11,7 @@
       img-src 'self';
       frame-src https://www.openstreetmap.org;
       script-src 'self';
-      style-src 'self'">
+      style-src 'self' 'unsafe-inline'">
 
   <title>I've Been Here</title>
 
@@ -27,6 +27,9 @@
     referrerpolicy="noreferrer"></iframe>
 
   <button id="send">I've Been Here!</button>
+
+  <div id="logs" style="display:none"></div>
+  <button id="show-logs">Logs</button>
 </body>
 
 </html>
