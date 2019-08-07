@@ -30,7 +30,7 @@ async function init() {
     iframe.src = osmurl;
   } catch (err) {
     log.e(err);
-    document.body.textContent = 'Hm.. the app\'s failed to initialize for some reason.';
+    document.body.textContent = 'Hm.. ' + err;
   }
 
   $('#' + ID_SEND).addEventListener('click', () => {

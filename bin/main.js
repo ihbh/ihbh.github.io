@@ -25,7 +25,7 @@ define(["require", "exports", "./log", "./gps", "./pwa"], function (require, exp
         }
         catch (err) {
             log.e(err);
-            document.body.textContent = 'Hm.. the app\'s failed to initialize for some reason.';
+            document.body.textContent = 'Hm.. ' + err;
         }
         $('#' + ID_SEND).addEventListener('click', () => {
             log.i('#send:click');
