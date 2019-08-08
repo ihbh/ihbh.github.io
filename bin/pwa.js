@@ -10,15 +10,17 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     // Must be called inside window:load event.
     async function init() {
         let svc = navigator.serviceWorker;
-        await svc.register('bin/service-worker.js');
-        log.i('service worker regitered');
+        if (svc)
+            await svc.register('/bin/sw.js');
+        log.i('service worker registered');
     }
     exports.init = init;
-    async function showInstallPrompt() {
+    function showInstallPrompt() {
         if (deferredPrompt) {
             deferredPrompt.prompt();
-            let result = await deferredPrompt.userChoice;
-            log.i('user choice:', result);
+            deferredPrompt.userChoice.then(result => {
+                log.i('user choice:', result);
+            });
         }
         else {
             log.i('window:beforeinstallprompt wasn\'t fired, so can\'t trigger the prompt.');
