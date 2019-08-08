@@ -24,13 +24,13 @@ body {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: -1;
 }
 
 #no-gps {
   align-self: center;
   margin-top: auto;
   margin-bottom: auto;
+  z-index: 1;
 }
 
 #send {
@@ -43,6 +43,7 @@ body {
   color: #fff;
   background: #400;
   box-shadow: 0 0 7pt 1pt #000;
+  z-index: 1;
 }
 
 #show-logs {
@@ -51,6 +52,7 @@ body {
   right: 0;
   font-size: 12pt;
   padding: 0.5em;
+  z-index: 1;
 }
 
 #logs {
@@ -65,4 +67,5 @@ body {
   white-space: pre-wrap;
   overflow-y: scroll;
   word-break: break-word;
+  z-index: 1;
 }

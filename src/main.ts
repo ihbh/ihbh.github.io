@@ -28,7 +28,18 @@ async function init() {
 }
 
 async function initMap() {
+  $(ID_NOGPS).addEventListener('click', async () => {
+    let res = await (navigator as any).permissions.query({ name: 'geolocation' });
+    log.i('navigator.permissions.query:', res.state);
+    if (res.state != 'denied')
+      await loadMap();
+  });
+  await loadMap();
+}
+
+async function loadMap() {
   try {
+    $(ID_NOGPS).textContent = '';
     let gps = await import('./gps');
     let pos = await gps.getGeoLocation();
     let { latitude: lat, longitude: lng } = pos.coords;
