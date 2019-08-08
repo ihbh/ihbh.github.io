@@ -3,17 +3,18 @@ import { TaggedLogger } from './log';
 let log = new TaggedLogger('pwa');
 let deferredPrompt;
 
-window.addEventListener('beforeinstallprompt', event => {
-  event.preventDefault();
-  log.i('window:beforeinstallprompt', event);
-  deferredPrompt = event;
-});
-
 // Must be called inside window:load event.
-export async function init() {
+export function init() {
   let svc = navigator.serviceWorker;
-  if (svc) await svc.register('/bin/sw.js');
-  log.i('service worker registered');
+  svc && svc.register('/bin/sw.js').then(
+    res => log.i('service worker registered'),
+    err => log.i('service worker failed to register', err));
+
+  window.addEventListener('beforeinstallprompt', event => {
+    event.preventDefault();
+    log.i('window:beforeinstallprompt', event);
+    deferredPrompt = event;
+  });
 }
 
 export function showInstallPrompt() {

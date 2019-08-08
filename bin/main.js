@@ -6,6 +6,7 @@ define(["require", "exports", "./log", "./gps", "./pwa"], function (require, exp
     const ID_LOGS = 'logs';
     const ID_SHOW_LOGS = 'show-logs';
     const log = new log_1.TaggedLogger('main');
+    pwa.init();
     init();
     async function init() {
         log.i('init()');
@@ -16,7 +17,6 @@ define(["require", "exports", "./log", "./gps", "./pwa"], function (require, exp
             return;
         }
         try {
-            await pwa.init();
             let pos = await gps.getGeoLocation();
             log.i('gps coords:', pos);
             let { latitude: lat, longitude: lng } = pos.coords;

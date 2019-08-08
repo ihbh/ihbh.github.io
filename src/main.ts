@@ -9,6 +9,7 @@ const ID_SHOW_LOGS = 'show-logs';
 
 const log = new TaggedLogger('main');
 
+pwa.init();
 init();
 
 async function init() {
@@ -22,7 +23,6 @@ async function init() {
   }
 
   try {
-    await pwa.init();
     let pos = await gps.getGeoLocation();
     log.i('gps coords:', pos);
     let { latitude: lat, longitude: lng } = pos.coords;

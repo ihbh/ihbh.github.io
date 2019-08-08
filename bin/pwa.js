@@ -3,17 +3,15 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('pwa');
     let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', event => {
-        event.preventDefault();
-        log.i('window:beforeinstallprompt', event);
-        deferredPrompt = event;
-    });
     // Must be called inside window:load event.
-    async function init() {
+    function init() {
         let svc = navigator.serviceWorker;
-        if (svc)
-            await svc.register('/bin/sw.js');
-        log.i('service worker registered');
+        svc && svc.register('/bin/sw.js').then(res => log.i('service worker registered'), err => log.i('service worker failed to register', err));
+        window.addEventListener('beforeinstallprompt', event => {
+            event.preventDefault();
+            log.i('window:beforeinstallprompt', event);
+            deferredPrompt = event;
+        });
     }
     exports.init = init;
     function showInstallPrompt() {
