@@ -1,8 +1,14 @@
 import * as config from './config';
+import { TaggedLogger } from './log';
+
+const log = new TaggedLogger('gps');
 
 export function getGeoLocation() {
   return new Promise<Position>((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(resolve, reject);
+  }).then(pos => {
+    log.i('gps coords:', pos);
+    return pos;
   });
 }
 

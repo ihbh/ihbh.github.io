@@ -19,7 +19,6 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         try {
             let gps = await new Promise((resolve_1, reject_1) => { require(['./gps'], resolve_1, reject_1); });
             let pos = await gps.getGeoLocation();
-            log.i('gps coords:', pos);
             let { latitude: lat, longitude: lng } = pos.coords;
             let osmurl = gps.makeOsmUrl(lat, lng);
             log.i('osm url:', osmurl);

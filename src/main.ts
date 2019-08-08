@@ -25,7 +25,6 @@ async function init() {
   try {
     let gps = await import('./gps');
     let pos = await gps.getGeoLocation();
-    log.i('gps coords:', pos);
     let { latitude: lat, longitude: lng } = pos.coords;
     let osmurl = gps.makeOsmUrl(lat, lng);
     log.i('osm url:', osmurl);

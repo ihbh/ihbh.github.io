@@ -1,9 +1,13 @@
-define(["require", "exports", "./config"], function (require, exports, config) {
+define(["require", "exports", "./config", "./log"], function (require, exports, config, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const log = new log_1.TaggedLogger('gps');
     function getGeoLocation() {
         return new Promise((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject);
+        }).then(pos => {
+            log.i('gps coords:', pos);
+            return pos;
         });
     }
     exports.getGeoLocation = getGeoLocation;

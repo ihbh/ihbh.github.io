@@ -12,7 +12,7 @@ export function init() {
 
   window.addEventListener('beforeinstallprompt', event => {
     event.preventDefault();
-    log.i('window:beforeinstallprompt', event);
+    log.i('window:beforeinstallprompt');
     deferredPrompt = event;
   });
 }
