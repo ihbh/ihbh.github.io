@@ -13,16 +13,29 @@ body {
   height: 100%;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 #map {
   width: 100%;
   height: 100%;
   border: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: -1;
+}
+
+#no-gps {
+  align-self: center;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 #send {
   position: fixed;
+  font-size: 18pt;
   bottom: 10%;
   left: 15%;
   right: 15%;
@@ -30,7 +43,7 @@ body {
   padding: 1em;
   border: none;
   color: #fff;
-  background: #a00;
+  background: #400;
   box-shadow: 0 0 7pt 1pt #000;
 }
 

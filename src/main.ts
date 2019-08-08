@@ -1,15 +1,16 @@
 import { TaggedLogger, logs } from './log';
-import * as gps from './gps';
-import * as pwa from './pwa';
 
 const ID_MAP = 'map';
 const ID_SEND = 'send';
 const ID_LOGS = 'logs';
 const ID_SHOW_LOGS = 'show-logs';
+const ID_NOGPS = 'no-gps';
 
 const log = new TaggedLogger('main');
 
-init();
+init().then(
+  res => log.i('init() succeeded'),
+  err => log.i('init() failed:', err));
 
 async function init() {
   log.i('init()');
@@ -22,7 +23,7 @@ async function init() {
   }
 
   try {
-    pwa.init();
+    let gps = await import('./gps');
     let pos = await gps.getGeoLocation();
     log.i('gps coords:', pos);
     let { latitude: lat, longitude: lng } = pos.coords;
@@ -33,13 +34,20 @@ async function init() {
   } catch (err) {
     // PositionError means that the phone has location turned off.
     log.e(err);
-    document.body.textContent = 'Hm.. ' + err;
+    $('#' + ID_NOGPS).textContent = err.message;
   }
 
-  $('#' + ID_SEND).addEventListener('click', () => {
-    log.i('#send:click');
-    pwa.showInstallPrompt();
-  });
+  try {
+    let pwa = await import('./pwa');
+    await pwa.init();
+
+    $('#' + ID_SEND).addEventListener('click', () => {
+      log.i('#send:click');
+      pwa.showInstallPrompt();
+    });
+  } catch (err) {
+    log.e('pwa.init() failed:', err);
+  }
 
   $('#' + ID_SHOW_LOGS).addEventListener('click', () => {
     log.i('#logs:click');
@@ -54,7 +62,7 @@ async function init() {
     let text = logs
       .map(args => args.join(' ').trim())
       .join('\n');
-    
+
     div.textContent = text;
     div.style.display = '';
   });

@@ -1,12 +1,13 @@
-define(["require", "exports", "./log", "./gps", "./pwa"], function (require, exports, log_1, gps, pwa) {
+define(["require", "exports", "./log"], function (require, exports, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const ID_MAP = 'map';
     const ID_SEND = 'send';
     const ID_LOGS = 'logs';
     const ID_SHOW_LOGS = 'show-logs';
+    const ID_NOGPS = 'no-gps';
     const log = new log_1.TaggedLogger('main');
-    init();
+    init().then(res => log.i('init() succeeded'), err => log.i('init() failed:', err));
     async function init() {
         log.i('init()');
         log.i('document.readyState:', document.readyState);
@@ -16,7 +17,7 @@ define(["require", "exports", "./log", "./gps", "./pwa"], function (require, exp
             return;
         }
         try {
-            pwa.init();
+            let gps = await new Promise((resolve_1, reject_1) => { require(['./gps'], resolve_1, reject_1); });
             let pos = await gps.getGeoLocation();
             log.i('gps coords:', pos);
             let { latitude: lat, longitude: lng } = pos.coords;
@@ -28,12 +29,19 @@ define(["require", "exports", "./log", "./gps", "./pwa"], function (require, exp
         catch (err) {
             // PositionError means that the phone has location turned off.
             log.e(err);
-            document.body.textContent = 'Hm.. ' + err;
+            $('#' + ID_NOGPS).textContent = err.message;
         }
-        $('#' + ID_SEND).addEventListener('click', () => {
-            log.i('#send:click');
-            pwa.showInstallPrompt();
-        });
+        try {
+            let pwa = await new Promise((resolve_2, reject_2) => { require(['./pwa'], resolve_2, reject_2); });
+            await pwa.init();
+            $('#' + ID_SEND).addEventListener('click', () => {
+                log.i('#send:click');
+                pwa.showInstallPrompt();
+            });
+        }
+        catch (err) {
+            log.e('pwa.init() failed:', err);
+        }
         $('#' + ID_SHOW_LOGS).addEventListener('click', () => {
             log.i('#logs:click');
             let div = $('#' + ID_LOGS);
