@@ -32,6 +32,7 @@ define(["require", "exports", "./log", "./gps", "./pwa"], function (require, exp
         }
         $('#' + ID_SEND).addEventListener('click', () => {
             log.i('#send:click');
+            pwa.showInstallPrompt();
         });
         $('#' + ID_SHOW_LOGS).addEventListener('click', () => {
             log.i('#logs:click');
