@@ -4,6 +4,7 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     let log = new log_1.TaggedLogger('pwa');
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', event => {
+        event.preventDefault();
         log.i('window:beforeinstallprompt', event);
         deferredPrompt = event;
     });

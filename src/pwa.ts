@@ -4,6 +4,7 @@ let log = new TaggedLogger('pwa');
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', event => {
+  event.preventDefault();
   log.i('window:beforeinstallprompt', event);
   deferredPrompt = event;
 });
