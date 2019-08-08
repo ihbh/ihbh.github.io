@@ -26,6 +26,7 @@ define(["require", "exports", "./log", "./gps", "./pwa"], function (require, exp
             iframe.src = osmurl;
         }
         catch (err) {
+            // PositionError means that the phone has location turned off.
             log.e(err);
             document.body.textContent = 'Hm.. ' + err;
         }

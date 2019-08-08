@@ -31,6 +31,7 @@ async function init() {
     let iframe = $<HTMLIFrameElement>('#' + ID_MAP);
     iframe.src = osmurl;
   } catch (err) {
+    // PositionError means that the phone has location turned off.
     log.e(err);
     document.body.textContent = 'Hm.. ' + err;
   }
