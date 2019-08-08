@@ -1,5 +1,5 @@
 * {
-  font-size: 48pt;
+  font-size: 24pt;
 }
 
 html {
@@ -28,9 +28,10 @@ body {
   right: 15%;
   width: 70%;
   padding: 1em;
+  border: none;
   color: #fff;
-  background: #800;
-  box-shadow: 0 0 3pt 1pt #000;
+  background: #a00;
+  box-shadow: 0 0 7pt 1pt #000;
 }
 
 #show-logs {

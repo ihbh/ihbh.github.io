@@ -2,7 +2,7 @@
   "name": "I've Been Here",
   "short_name": "BeenHere",
   "start_url": "/",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#000",
   "theme_color": "#800",
   "icons": [
