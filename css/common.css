@@ -47,8 +47,7 @@ body {
   width: 100%;
   height: 100%;
   background: #fff;
-  font-size: 24pt;
+  font-size: 8pt;
   font-family: monospace;
-  padding: 1em;
   white-space: pre-wrap;
 }
