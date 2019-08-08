@@ -1,11 +1,11 @@
 define(["require", "exports", "./log"], function (require, exports, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const ID_MAP = 'map';
-    const ID_SEND = 'send';
-    const ID_LOGS = 'logs';
-    const ID_SHOW_LOGS = 'show-logs';
-    const ID_NOGPS = 'no-gps';
+    const ID_MAP = '#map';
+    const ID_SEND = '#send';
+    const ID_LOGS = '#logs';
+    const ID_SHOW_LOGS = '#show-logs';
+    const ID_NOGPS = '#no-gps';
     const log = new log_1.TaggedLogger('main');
     init().then(res => log.i('init() succeeded'), err => log.i('init() failed:', err));
     async function init() {
@@ -16,24 +16,31 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             window.addEventListener('onload', () => init());
             return;
         }
+        initLogs();
+        await initMap();
+        await initPwa();
+    }
+    async function initMap() {
         try {
             let gps = await new Promise((resolve_1, reject_1) => { require(['./gps'], resolve_1, reject_1); });
             let pos = await gps.getGeoLocation();
             let { latitude: lat, longitude: lng } = pos.coords;
             let osmurl = gps.makeOsmUrl(lat, lng);
             log.i('osm url:', osmurl);
-            let iframe = $('#' + ID_MAP);
+            let iframe = $(ID_MAP);
             iframe.src = osmurl;
         }
         catch (err) {
             // PositionError means that the phone has location turned off.
             log.e(err);
-            $('#' + ID_NOGPS).textContent = err.message;
+            $(ID_NOGPS).textContent = err.message;
         }
+    }
+    async function initPwa() {
         try {
             let pwa = await new Promise((resolve_2, reject_2) => { require(['./pwa'], resolve_2, reject_2); });
             await pwa.init();
-            $('#' + ID_SEND).addEventListener('click', () => {
+            $(ID_SEND).addEventListener('click', () => {
                 log.i('#send:click');
                 pwa.showInstallPrompt();
             });
@@ -41,9 +48,11 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         catch (err) {
             log.e('pwa.init() failed:', err);
         }
-        $('#' + ID_SHOW_LOGS).addEventListener('click', () => {
+    }
+    function initLogs() {
+        $(ID_SHOW_LOGS).addEventListener('click', () => {
             log.i('#logs:click');
-            let div = $('#' + ID_LOGS);
+            let div = $(ID_LOGS);
             if (!div.style.display) {
                 log.i('Hiding the logs.');
                 div.style.display = 'none';

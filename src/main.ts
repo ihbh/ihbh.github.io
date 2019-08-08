@@ -1,10 +1,10 @@
 import { TaggedLogger, logs } from './log';
 
-const ID_MAP = 'map';
-const ID_SEND = 'send';
-const ID_LOGS = 'logs';
-const ID_SHOW_LOGS = 'show-logs';
-const ID_NOGPS = 'no-gps';
+const ID_MAP = '#map';
+const ID_SEND = '#send';
+const ID_LOGS = '#logs';
+const ID_SHOW_LOGS = '#show-logs';
+const ID_NOGPS = '#no-gps';
 
 const log = new TaggedLogger('main');
 
@@ -22,35 +22,45 @@ async function init() {
     return;
   }
 
+  initLogs();
+  await initMap();
+  await initPwa();
+}
+
+async function initMap() {
   try {
     let gps = await import('./gps');
     let pos = await gps.getGeoLocation();
     let { latitude: lat, longitude: lng } = pos.coords;
     let osmurl = gps.makeOsmUrl(lat, lng);
     log.i('osm url:', osmurl);
-    let iframe = $<HTMLIFrameElement>('#' + ID_MAP);
+    let iframe = $<HTMLIFrameElement>(ID_MAP);
     iframe.src = osmurl;
   } catch (err) {
     // PositionError means that the phone has location turned off.
     log.e(err);
-    $('#' + ID_NOGPS).textContent = err.message;
+    $(ID_NOGPS).textContent = err.message;
   }
+}
 
+async function initPwa() {
   try {
     let pwa = await import('./pwa');
     await pwa.init();
 
-    $('#' + ID_SEND).addEventListener('click', () => {
+    $(ID_SEND).addEventListener('click', () => {
       log.i('#send:click');
       pwa.showInstallPrompt();
     });
   } catch (err) {
     log.e('pwa.init() failed:', err);
   }
+}
 
-  $('#' + ID_SHOW_LOGS).addEventListener('click', () => {
+function initLogs() {
+  $(ID_SHOW_LOGS).addEventListener('click', () => {
     log.i('#logs:click');
-    let div = $<HTMLDivElement>('#' + ID_LOGS);
+    let div = $<HTMLDivElement>(ID_LOGS);
 
     if (!div.style.display) {
       log.i('Hiding the logs.');
