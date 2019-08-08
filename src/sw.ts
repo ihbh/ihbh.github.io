@@ -1,3 +1,4 @@
+// sw.js must be placed next to index.html
 // developers.google.com/web/fundamentals/primers/service-workers/
 console.log('sw loaded');
 
@@ -6,6 +7,7 @@ self.addEventListener('install', (event: any) => {
   event.waitUntil(
     caches.open('store').then(cache => {
       return cache.addAll([
+        '/',
         '/index.html',
       ]);
     })

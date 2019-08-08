@@ -6,7 +6,7 @@ let deferredPrompt;
 // Must be called inside window:load event.
 export function init() {
   let svc = navigator.serviceWorker;
-  svc && svc.register('/bin/sw.js').then(
+  svc && svc.register('/sw.js').then(
     res => log.i('service worker registered'),
     err => log.i('service worker failed to register', err));
 

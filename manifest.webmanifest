@@ -1,11 +1,16 @@
 {
   "name": "I've Been Here",
   "short_name": "BeenHere",
-  "start_url": "/index.html",
+  "start_url": "/",
   "display": "fullscreen",
   "background_color": "#000",
   "theme_color": "#800",
   "icons": [
+    {
+      "src": "icons/512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
     {
       "src": "icons/192.png",
       "sizes": "192x192",

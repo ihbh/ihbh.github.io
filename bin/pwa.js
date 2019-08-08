@@ -6,7 +6,7 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     // Must be called inside window:load event.
     function init() {
         let svc = navigator.serviceWorker;
-        svc && svc.register('/bin/sw.js').then(res => log.i('service worker registered'), err => log.i('service worker failed to register', err));
+        svc && svc.register('/sw.js').then(res => log.i('service worker registered'), err => log.i('service worker failed to register', err));
         window.addEventListener('beforeinstallprompt', event => {
             event.preventDefault();
             log.i('window:beforeinstallprompt', event);
