@@ -1,4 +1,6 @@
 import { TaggedLogger, logs } from './log';
+import * as ls from './ls';
+import * as page from './page';
 
 const ID_MAP = '#map';
 const ID_SEND = '#send';
@@ -23,17 +25,30 @@ async function init() {
   }
 
   initLogs();
-  await initMap();
-  await initPwa();
+
+  if (isUserRegistered()) {
+    await initMap();
+    await initPwa();
+  } else {
+    await initReg();
+  }
+}
+
+async function initReg() {
+  log.i('user not registered');
+  page.set('p-reg');
 }
 
 async function initMap() {
+  page.set('p-map');
+
   $(ID_NOGPS).addEventListener('click', async () => {
     let res = await (navigator as any).permissions.query({ name: 'geolocation' });
     log.i('navigator.permissions.query:', res.state);
     if (res.state != 'denied')
       await loadMap();
   });
+
   await loadMap();
 }
 
@@ -90,6 +105,10 @@ function initLogs() {
 
 function isDomLoaded() {
   return /^(complete|interactive)$/.test(document.readyState);
+}
+
+function isUserRegistered() {
+  return !!ls.username.get();
 }
 
 function $<T extends Element>(selector: string) {

@@ -25,11 +25,25 @@
 </head>
 
 <body>
-  <iframe id="map" sandbox="allow-scripts" referrerpolicy="noreferrer"></iframe>
-  <span id="no-gps"></span>
-  <button id="send">I've Been Here!</button>
-  <div id="logs" style="display:none"></div>
-  <button id="show-logs">Logs</button>
+  <div id="p-reg">
+    <div id="pic">
+      <video></video>
+    </div>
+    <div id="btn">
+      <button id="take-photo">Take Photo</button>
+      <button id="upload-pic">Upload Pic</button>
+    </div>
+    <div id="name-tag">Your Name:</div>
+    <input id="name" type="text">
+  </div>
+
+  <div id="p-map">
+    <iframe id="map" sandbox="allow-scripts" referrerpolicy="noreferrer"></iframe>
+    <span id="no-gps"></span>
+    <button id="send">I've Been Here!</button>
+    <div id="logs" style="display:none"></div>
+    <button id="show-logs">Logs</button>
+  </div>
 </body>
 
 </html>
