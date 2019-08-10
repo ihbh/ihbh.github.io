@@ -1,8 +1,12 @@
 import { TaggedLogger } from "./log";
+import * as page from './page';
 import {
   $, ID_TAKE_PHOTO, ID_REG_VIDEO,
   ID_UPLOAD_PHOTO, ID_UPLOAD_PHOTO_INPUT,
   ID_REG_PHOTO,
+  ID_CAM_CAPTURE,
+  ID_REG_DONE,
+  ID_REG_NAME,
 } from './dom';
 
 const MP4_SAMPLE = '/test/sample.mp4';
@@ -10,16 +14,19 @@ const MP4_SAMPLE = '/test/sample.mp4';
 const log = new TaggedLogger('reg');
 
 export function init() {
-  $(ID_TAKE_PHOTO).addEventListener('click',
-    () => initWebCam());
-
-  $(ID_UPLOAD_PHOTO).addEventListener('click',
-    () => uploadPhoto());
+  $<HTMLButtonElement>(ID_TAKE_PHOTO).onclick =
+    () => initWebCam();
+  $<HTMLButtonElement>(ID_UPLOAD_PHOTO).onclick =
+    () => uploadPhoto();
+  $<HTMLButtonElement>(ID_REG_DONE).onclick =
+    () => registerProfile();
 }
 
 async function initWebCam() {
   try {
     log.i('initWebCam()');
+    page.set('p-cam');
+
     let video = $<HTMLVideoElement>(ID_REG_VIDEO);
 
     try {
@@ -35,16 +42,24 @@ async function initWebCam() {
     }
 
     await video.play();
-    
+
     video.oncanplay = () => {
       video.oncanplay = null;
       let w = video.videoWidth;
       let h = video.videoHeight;
       log.i('streaming video:', w, 'x', h);
     };
+
+    let capture = $<HTMLButtonElement>(ID_CAM_CAPTURE);
+    capture.onclick = () => {
+      let url = takePhoto();
+      video.srcObject = null;
+      page.set('p-reg');
+      let img = $<HTMLImageElement>(ID_REG_PHOTO);
+      img.src = url;
+    };
   } catch (err) {
     log.e('initWebCam() failed:', err.message);
-    $(ID_REG_VIDEO).textContent = err.message;
   }
 }
 
@@ -52,8 +67,7 @@ function takePhoto() {
   let video = $<HTMLVideoElement>(ID_REG_VIDEO);
   let w = video.videoWidth;
   let h = video.videoHeight;
-
-  log.i('taking photo:', w, 'x', h);
+  log.i('capturing video frame:', w, 'x', h);
 
   let canvas = document.createElement('canvas');
   canvas.width = w;
@@ -78,4 +92,12 @@ function uploadPhoto() {
     let img = $<HTMLImageElement>(ID_REG_PHOTO);
     img.src = url;
   };
+}
+
+function registerProfile() {
+  let imgsrc = $<HTMLImageElement>(ID_REG_PHOTO).src || '';
+  let username = $<HTMLInputElement>(ID_REG_NAME).value;
+  log.i('Registering user:',
+    JSON.stringify(username),
+    imgsrc.slice(0, 20));
 }

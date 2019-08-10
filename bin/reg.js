@@ -1,16 +1,21 @@
-define(["require", "exports", "./log", "./dom"], function (require, exports, log_1, dom_1) {
+define(["require", "exports", "./log", "./page", "./dom"], function (require, exports, log_1, page, dom_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const MP4_SAMPLE = '/test/sample.mp4';
     const log = new log_1.TaggedLogger('reg');
     function init() {
-        dom_1.$(dom_1.ID_TAKE_PHOTO).addEventListener('click', () => initWebCam());
-        dom_1.$(dom_1.ID_UPLOAD_PHOTO).addEventListener('click', () => uploadPhoto());
+        dom_1.$(dom_1.ID_TAKE_PHOTO).onclick =
+            () => initWebCam();
+        dom_1.$(dom_1.ID_UPLOAD_PHOTO).onclick =
+            () => uploadPhoto();
+        dom_1.$(dom_1.ID_REG_DONE).onclick =
+            () => registerProfile();
     }
     exports.init = init;
     async function initWebCam() {
         try {
             log.i('initWebCam()');
+            page.set('p-cam');
             let video = dom_1.$(dom_1.ID_REG_VIDEO);
             try {
                 let stream = await navigator.mediaDevices
@@ -30,17 +35,24 @@ define(["require", "exports", "./log", "./dom"], function (require, exports, log
                 let h = video.videoHeight;
                 log.i('streaming video:', w, 'x', h);
             };
+            let capture = dom_1.$(dom_1.ID_CAM_CAPTURE);
+            capture.onclick = () => {
+                let url = takePhoto();
+                video.srcObject = null;
+                page.set('p-reg');
+                let img = dom_1.$(dom_1.ID_REG_PHOTO);
+                img.src = url;
+            };
         }
         catch (err) {
             log.e('initWebCam() failed:', err.message);
-            dom_1.$(dom_1.ID_REG_VIDEO).textContent = err.message;
         }
     }
     function takePhoto() {
         let video = dom_1.$(dom_1.ID_REG_VIDEO);
         let w = video.videoWidth;
         let h = video.videoHeight;
-        log.i('taking photo:', w, 'x', h);
+        log.i('capturing video frame:', w, 'x', h);
         let canvas = document.createElement('canvas');
         canvas.width = w;
         canvas.height = h;
@@ -61,6 +73,11 @@ define(["require", "exports", "./log", "./dom"], function (require, exports, log
             let img = dom_1.$(dom_1.ID_REG_PHOTO);
             img.src = url;
         };
+    }
+    function registerProfile() {
+        let imgsrc = dom_1.$(dom_1.ID_REG_PHOTO).src || '';
+        let username = dom_1.$(dom_1.ID_REG_NAME).value;
+        log.i('Registering user:', JSON.stringify(username), imgsrc.slice(0, 20));
     }
 });
 //# sourceMappingURL=reg.js.map

@@ -20,10 +20,10 @@ async function init() {
   }
 
   initLogs();
+  initPwa();
 
   if (isUserRegistered()) {
     await initMap();
-    await initPwa();
   } else {
     await initReg();
   }

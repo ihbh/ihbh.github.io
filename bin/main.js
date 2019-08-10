@@ -12,9 +12,9 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page"], function (req
             return;
         }
         initLogs();
+        initPwa();
         if (isUserRegistered()) {
             await initMap();
-            await initPwa();
         }
         else {
             await initReg();
