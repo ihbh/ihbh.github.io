@@ -74,10 +74,24 @@ define(["require", "exports", "./log", "./page", "./dom"], function (require, ex
             img.src = url;
         };
     }
-    function registerProfile() {
-        let imgsrc = dom_1.$(dom_1.ID_REG_PHOTO).src || '';
-        let username = dom_1.$(dom_1.ID_REG_NAME).value;
-        log.i('Registering user:', JSON.stringify(username), imgsrc.slice(0, 20));
+    async function registerProfile() {
+        try {
+            let imgsrc = dom_1.$(dom_1.ID_REG_PHOTO).src || '';
+            let username = dom_1.$(dom_1.ID_REG_NAME).value;
+            log.i('Registering user:', JSON.stringify(username), imgsrc.slice(0, 20));
+            if (!imgsrc)
+                throw new Error('no photo');
+            if (!username)
+                throw new Error('no username');
+            let ls = await new Promise((resolve_1, reject_1) => { require(['./ls'], resolve_1, reject_1); });
+            ls.userimg.set(imgsrc);
+            ls.username.set(username);
+            log.i('Registered!');
+            page.set('p-map');
+        }
+        catch (err) {
+            log.e('Failed to register profile:', err);
+        }
     }
 });
 //# sourceMappingURL=reg.js.map

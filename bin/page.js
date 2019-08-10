@@ -5,7 +5,10 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     function set(id) {
         log.i('current page: #' + id);
         let pages = document.querySelectorAll('body > *');
-        pages.forEach((p) => p.style.display = 'none');
+        pages.forEach((p) => {
+            if (/^p-/.test(p.id))
+                p.style.display = 'none';
+        });
         let page = document.querySelector('body > #' + id);
         if (!page)
             throw new Error('No such page: #' + id);

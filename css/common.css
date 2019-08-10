@@ -27,7 +27,7 @@ button {
   user-select: none;
 }
 
-body > * {
+.page {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -129,6 +129,10 @@ body > * {
   font-size: 12pt;
   padding: 0.5em;
   z-index: 1;
+  box-shadow: none;
+  background: none;
+  color: #888;
+  text-decoration: underline;
 }
 
 #logs {

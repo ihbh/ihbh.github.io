@@ -26,10 +26,12 @@
 </head>
 
 <body>
+  <div id="logs" style="display:none"></div>
+  <button id="show-logs">Logs</button>
 
   <!-- The registration page. -->
 
-  <div id="p-reg">
+  <div id="p-reg" class="page">
     <img>
     <div id="buttons">
       <button id="take-photo">Take Photo</button>
@@ -45,19 +47,17 @@
 
   <!-- The full screen take photo page. -->
 
-  <div id="p-cam">
+  <div id="p-cam" class="page">
     <video></video>
     <button>Looks good!</button>
   </div>
 
   <!-- The main page with the map. -->
 
-  <div id="p-map">
+  <div id="p-map" class="page">
     <iframe id="map" sandbox="allow-scripts" referrerpolicy="noreferrer"></iframe>
     <span id="no-gps"></span>
     <button id="send">I've Been Here!</button>
-    <div id="logs" style="display:none"></div>
-    <button id="show-logs">Logs</button>
   </div>
 </body>
 

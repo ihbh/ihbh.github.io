@@ -94,10 +94,24 @@ function uploadPhoto() {
   };
 }
 
-function registerProfile() {
-  let imgsrc = $<HTMLImageElement>(ID_REG_PHOTO).src || '';
-  let username = $<HTMLInputElement>(ID_REG_NAME).value;
-  log.i('Registering user:',
-    JSON.stringify(username),
-    imgsrc.slice(0, 20));
+async function registerProfile() {
+  try {
+    let imgsrc = $<HTMLImageElement>(ID_REG_PHOTO).src || '';
+    let username = $<HTMLInputElement>(ID_REG_NAME).value;
+    log.i('Registering user:',
+      JSON.stringify(username),
+      imgsrc.slice(0, 20));
+
+    if (!imgsrc) throw new Error('no photo');
+    if (!username) throw new Error('no username');
+
+    let ls = await import('./ls');
+    ls.userimg.set(imgsrc);
+    ls.username.set(username);
+
+    log.i('Registered!');
+    page.set('p-map');
+  } catch (err) {
+    log.e('Failed to register profile:', err);
+  }
 }
