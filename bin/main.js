@@ -1,11 +1,6 @@
-define(["require", "exports", "./log", "./ls", "./page"], function (require, exports, log_1, ls, page) {
+define(["require", "exports", "./dom", "./log", "./ls", "./page"], function (require, exports, dom_1, log_1, ls, page) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const ID_MAP = '#map';
-    const ID_SEND = '#send';
-    const ID_LOGS = '#logs';
-    const ID_SHOW_LOGS = '#show-logs';
-    const ID_NOGPS = '#no-gps';
     const log = new log_1.TaggedLogger('main');
     init().then(res => log.i('init() succeeded'), err => log.i('init() failed:', err));
     async function init() {
@@ -28,10 +23,12 @@ define(["require", "exports", "./log", "./ls", "./page"], function (require, exp
     async function initReg() {
         log.i('user not registered');
         page.set('p-reg');
+        let reg = await new Promise((resolve_1, reject_1) => { require(['./reg'], resolve_1, reject_1); });
+        reg.init();
     }
     async function initMap() {
         page.set('p-map');
-        $(ID_NOGPS).addEventListener('click', async () => {
+        dom_1.$(dom_1.ID_NOGPS).addEventListener('click', async () => {
             let res = await navigator.permissions.query({ name: 'geolocation' });
             log.i('navigator.permissions.query:', res.state);
             if (res.state != 'denied')
@@ -41,26 +38,26 @@ define(["require", "exports", "./log", "./ls", "./page"], function (require, exp
     }
     async function loadMap() {
         try {
-            $(ID_NOGPS).textContent = '';
-            let gps = await new Promise((resolve_1, reject_1) => { require(['./gps'], resolve_1, reject_1); });
+            dom_1.$(dom_1.ID_NOGPS).textContent = '';
+            let gps = await new Promise((resolve_2, reject_2) => { require(['./gps'], resolve_2, reject_2); });
             let pos = await gps.getGeoLocation();
             let { latitude: lat, longitude: lng } = pos.coords;
             let osmurl = gps.makeOsmUrl(lat, lng);
             log.i('osm url:', osmurl);
-            let iframe = $(ID_MAP);
+            let iframe = dom_1.$(dom_1.ID_MAP);
             iframe.src = osmurl;
         }
         catch (err) {
             // PositionError means that the phone has location turned off.
             log.e(err);
-            $(ID_NOGPS).textContent = err.message;
+            dom_1.$(dom_1.ID_NOGPS).textContent = err.message;
         }
     }
     async function initPwa() {
         try {
-            let pwa = await new Promise((resolve_2, reject_2) => { require(['./pwa'], resolve_2, reject_2); });
+            let pwa = await new Promise((resolve_3, reject_3) => { require(['./pwa'], resolve_3, reject_3); });
             await pwa.init();
-            $(ID_SEND).addEventListener('click', () => {
+            dom_1.$(dom_1.ID_SEND).addEventListener('click', () => {
                 log.i('#send:click');
                 pwa.showInstallPrompt();
             });
@@ -70,9 +67,9 @@ define(["require", "exports", "./log", "./ls", "./page"], function (require, exp
         }
     }
     function initLogs() {
-        $(ID_SHOW_LOGS).addEventListener('click', () => {
+        dom_1.$(dom_1.ID_SHOW_LOGS).addEventListener('click', () => {
             log.i('#logs:click');
-            let div = $(ID_LOGS);
+            let div = dom_1.$(dom_1.ID_LOGS);
             if (!div.style.display) {
                 log.i('Hiding the logs.');
                 div.style.display = 'none';
@@ -90,9 +87,6 @@ define(["require", "exports", "./log", "./ls", "./page"], function (require, exp
     }
     function isUserRegistered() {
         return !!ls.username.get();
-    }
-    function $(selector) {
-        return document.querySelector(selector);
     }
 });
 //# sourceMappingURL=main.js.map

@@ -1,12 +1,7 @@
-import { TaggedLogger, logs } from './log';
+import { $, ID_LOGS, ID_MAP, ID_NOGPS, ID_SEND, ID_SHOW_LOGS } from './dom';
+import { logs, TaggedLogger } from './log';
 import * as ls from './ls';
 import * as page from './page';
-
-const ID_MAP = '#map';
-const ID_SEND = '#send';
-const ID_LOGS = '#logs';
-const ID_SHOW_LOGS = '#show-logs';
-const ID_NOGPS = '#no-gps';
 
 const log = new TaggedLogger('main');
 
@@ -37,6 +32,8 @@ async function init() {
 async function initReg() {
   log.i('user not registered');
   page.set('p-reg');
+  let reg = await import('./reg');
+  reg.init();
 }
 
 async function initMap() {
@@ -111,6 +108,4 @@ function isUserRegistered() {
   return !!ls.username.get();
 }
 
-function $<T extends Element>(selector: string) {
-  return document.querySelector(selector) as T;
-}
+
