@@ -39,22 +39,26 @@ function selectPhoto() {
 }
 
 async function savePhotoFromFile(file: File) {
-  log.i('selected file:', file.type, file.size, 'bytes');
-  let bitmap = await createImageBitmap(file, {
-    resizeWidth: PHOTO_SIZE,
-    resizeHeight: PHOTO_SIZE,
-    resizeQuality: 'high',
-  });
-  log.i('bitmap:', bitmap);
-  let canvas = document.createElement('canvas');
-  canvas.width = bitmap.width;
-  canvas.height = bitmap.height;
-  let context = canvas.getContext('2d');
-  context.drawImage(bitmap, 0, 0);
-  let dataUrl = canvas.toDataURL();
-  log.i('Data URL:', strDataUrl(dataUrl), dataUrl.length, 'chars');
-  let img = $<HTMLImageElement>(ID_REG_PHOTO);
-  img.src = dataUrl;
+  try {
+    log.i('selected file:', file.type, file.size, 'bytes');
+    let bitmap = await createImageBitmap(file, {
+      resizeWidth: PHOTO_SIZE,
+      resizeHeight: PHOTO_SIZE,
+      resizeQuality: 'high',
+    });
+    log.i('bitmap:', bitmap);
+    let canvas = document.createElement('canvas');
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    let context = canvas.getContext('2d');
+    context.drawImage(bitmap, 0, 0);
+    let dataUrl = canvas.toDataURL();
+    log.i('Data URL:', strDataUrl(dataUrl), dataUrl.length, 'chars');
+    let img = $<HTMLImageElement>(ID_REG_PHOTO);
+    img.src = dataUrl;
+  } catch (err) {
+    log.e('Failed to save photo:', err);
+  }
 }
 
 async function registerProfile() {

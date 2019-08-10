@@ -23,22 +23,27 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (r
         };
     }
     async function savePhotoFromFile(file) {
-        log.i('selected file:', file.type, file.size, 'bytes');
-        let bitmap = await createImageBitmap(file, {
-            resizeWidth: config_1.PHOTO_SIZE,
-            resizeHeight: config_1.PHOTO_SIZE,
-            resizeQuality: 'high',
-        });
-        log.i('bitmap:', bitmap);
-        let canvas = document.createElement('canvas');
-        canvas.width = bitmap.width;
-        canvas.height = bitmap.height;
-        let context = canvas.getContext('2d');
-        context.drawImage(bitmap, 0, 0);
-        let dataUrl = canvas.toDataURL();
-        log.i('Data URL:', strDataUrl(dataUrl), dataUrl.length, 'chars');
-        let img = dom_1.$(dom_1.ID_REG_PHOTO);
-        img.src = dataUrl;
+        try {
+            log.i('selected file:', file.type, file.size, 'bytes');
+            let bitmap = await createImageBitmap(file, {
+                resizeWidth: config_1.PHOTO_SIZE,
+                resizeHeight: config_1.PHOTO_SIZE,
+                resizeQuality: 'high',
+            });
+            log.i('bitmap:', bitmap);
+            let canvas = document.createElement('canvas');
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+            let context = canvas.getContext('2d');
+            context.drawImage(bitmap, 0, 0);
+            let dataUrl = canvas.toDataURL();
+            log.i('Data URL:', strDataUrl(dataUrl), dataUrl.length, 'chars');
+            let img = dom_1.$(dom_1.ID_REG_PHOTO);
+            img.src = dataUrl;
+        }
+        catch (err) {
+            log.e('Failed to save photo:', err);
+        }
     }
     async function registerProfile() {
         try {
