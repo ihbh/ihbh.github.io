@@ -7,5 +7,7 @@ define(["require", "exports"], function (require, exports) {
     exports.GPS_DIGITS = 7;
     exports.MAP_BOX_SIZE = 20 * exports.MAP_1M;
     exports.OSM_URL = 'https://www.openstreetmap.org/export/embed.html';
+    exports.VALID_USERNAME_REGEX = /^[a-z]{3,15}$/i;
+    exports.PHOTO_SIZE = 64;
 });
 //# sourceMappingURL=config.js.map

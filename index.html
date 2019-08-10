@@ -27,29 +27,28 @@
 
 <body>
   <div id="logs" style="display:none"></div>
-  <button id="show-logs">Logs</button>
+  <div id="debug">
+    <button id="show-logs">Logs</button>
+    <button id="reset-ls">Reset</button>
+  </div>
 
   <!-- The registration page. -->
 
   <div id="p-reg" class="page">
-    <img>
-    <div id="buttons">
-      <button id="take-photo">Take Photo</button>
-      <button id="upload-pic">Upload</button>
-      <input id="upload-pic-input" type="file" accept="image/*">
+    <div id="photo-frame">
+      <button>Upload Photo</button>
+      <img id="photo">
+      <!-- This hidden <input> is used to upload a file. -->
+      <input id="upload-input" type="file" accept="image/*">
     </div>
-    <div id="name-tag">Your name:</div>
-    <input id="reg-name" type="text">
+    <div id="reg-name-group">
+      <div id="name-tag">Your name:</div>
+      <input id="reg-name" type="text">
+    </div>
+    <div id="reg-err"></div>
     <div id="reg-nav">
       <button id="reg-done">Next</button>
     </div>
-  </div>
-
-  <!-- The full screen take photo page. -->
-
-  <div id="p-cam" class="page">
-    <video></video>
-    <button>Looks good!</button>
   </div>
 
   <!-- The main page with the map. -->

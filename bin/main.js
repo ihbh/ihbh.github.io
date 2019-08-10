@@ -11,7 +11,7 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page"], function (req
             window.addEventListener('onload', () => init());
             return;
         }
-        initLogs();
+        initDebugPanel();
         initPwa();
         if (isUserRegistered()) {
             await initMap();
@@ -66,9 +66,14 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page"], function (req
             log.e('pwa.init() failed:', err);
         }
     }
-    function initLogs() {
+    function initDebugPanel() {
+        dom_1.$(dom_1.ID_RESET_LS).addEventListener('click', () => {
+            log.i('#reset-logs:click');
+            localStorage.clear();
+            log.i('LS cleared.');
+        });
         dom_1.$(dom_1.ID_SHOW_LOGS).addEventListener('click', () => {
-            log.i('#logs:click');
+            log.i('#show-logs:click');
             let div = dom_1.$(dom_1.ID_LOGS);
             if (!div.style.display) {
                 log.i('Hiding the logs.');

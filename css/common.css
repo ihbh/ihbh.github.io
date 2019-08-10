@@ -27,6 +27,10 @@ button {
   user-select: none;
 }
 
+button:focus {
+  outline: none;
+}
+
 .page {
   display: flex;
   flex-direction: column;
@@ -34,43 +38,50 @@ button {
   height: 100%;
 }
 
-#p-reg > * {
-  margin-top: 1em;
-}
-
-#p-reg > img {
-  align-self: center;
-  width: 200pt;
-  height: 200pt;
-  margin-top: 50pt;
-  position: relative;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #ccc;
-}
-
-#p-cam > video {
-  object-fit: cover;
-}
-
-#p-cam button {
-  position: fixed;  
-  bottom: 1em;
-  left: 25%;
-  right: 25%;
-}
-
-#buttons {
-  display: flex;
+#p-reg {
   justify-content: space-evenly;
 }
 
-#buttons button {
-  background-color: #008;
+#photo-frame {
+  position: relative;
+  align-self: center;
+  width: 200pt;
+  height: 200pt;
 }
 
-#upload-pic-input {
+#photo-frame > button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: #888;
+  background: none;
+  box-shadow: none;
+  text-decoration: underline;
+  font-size: 0.5em;
+  font-weight: bold;
+}
+
+#photo-frame > img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #0004;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+#upload-input {
   display: none;
+}
+
+#reg-name-group {
+  display: flex;
+  flex-direction: column;
 }
 
 #name-tag {
@@ -93,6 +104,14 @@ button {
 
 #reg-nav {
   display: flex;
+}
+
+#reg-err {
+  font-size: 0.5em;
+  padding: 1em;
+  color: #800;
+  text-align: center;
+  word-wrap: break-word;
 }
 
 #reg-done {
@@ -122,16 +141,21 @@ button {
   z-index: 1;
 }
 
-#show-logs {
+#debug {
   position: fixed;
   top: 0;
   right: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#debug button {
+  color: #888;
   font-size: 12pt;
   padding: 0.5em;
-  z-index: 1;
   box-shadow: none;
   background: none;
-  color: #888;
   text-decoration: underline;
 }
 

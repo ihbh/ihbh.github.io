@@ -1,96 +1,64 @@
-define(["require", "exports", "./log", "./page", "./dom"], function (require, exports, log_1, page, dom_1) {
+define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (require, exports, config_1, dom_1, log_1, ls) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const MP4_SAMPLE = '/test/sample.mp4';
     const log = new log_1.TaggedLogger('reg');
+    const strDataUrl = url => url.slice(0, 30) + '...' + url.slice(-10);
     function init() {
-        dom_1.$(dom_1.ID_TAKE_PHOTO).onclick =
-            () => initWebCam();
-        dom_1.$(dom_1.ID_UPLOAD_PHOTO).onclick =
-            () => uploadPhoto();
+        dom_1.$(dom_1.ID_REG_PHOTO).onclick =
+            () => selectPhoto();
         dom_1.$(dom_1.ID_REG_DONE).onclick =
             () => registerProfile();
     }
     exports.init = init;
-    async function initWebCam() {
-        try {
-            log.i('initWebCam()');
-            page.set('p-cam');
-            let video = dom_1.$(dom_1.ID_REG_VIDEO);
-            try {
-                let stream = await navigator.mediaDevices
-                    .getUserMedia({ video: true, audio: false });
-                log.i('Local video stream:', video.id);
-                video.srcObject = stream;
-            }
-            catch (err) {
-                log.i('getUserMedia() failed:', err.message);
-                video.src = MP4_SAMPLE;
-                video.loop = true;
-            }
-            await video.play();
-            video.oncanplay = () => {
-                video.oncanplay = null;
-                let w = video.videoWidth;
-                let h = video.videoHeight;
-                log.i('streaming video:', w, 'x', h);
-            };
-            let capture = dom_1.$(dom_1.ID_CAM_CAPTURE);
-            capture.onclick = () => {
-                let url = takePhoto();
-                video.srcObject = null;
-                page.set('p-reg');
-                let img = dom_1.$(dom_1.ID_REG_PHOTO);
-                img.src = url;
-            };
-        }
-        catch (err) {
-            log.e('initWebCam() failed:', err.message);
-        }
-    }
-    function takePhoto() {
-        let video = dom_1.$(dom_1.ID_REG_VIDEO);
-        let w = video.videoWidth;
-        let h = video.videoHeight;
-        log.i('capturing video frame:', w, 'x', h);
-        let canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        let context = canvas.getContext('2d');
-        context.drawImage(video, 0, 0, w, h);
-        let dataUrl = canvas.toDataURL('image/png');
-        log.i('photo:', dataUrl.slice(0, 20));
-        return dataUrl;
-    }
-    function uploadPhoto() {
-        log.i('clicked "upload photo"');
+    function selectPhoto() {
+        log.i('Asking the user to select a profile pic.');
         let input = dom_1.$(dom_1.ID_UPLOAD_PHOTO_INPUT);
         input.click();
         input.onchange = () => {
             let file = input.files[0];
-            log.i('selected file:', file.type, (file.size / 2 ** 20).toFixed(1), 'MB');
-            let url = URL.createObjectURL(file);
-            let img = dom_1.$(dom_1.ID_REG_PHOTO);
-            img.src = url;
+            if (file)
+                savePhotoFromFile(file);
+            else
+                log.e('No file selected.');
         };
+    }
+    async function savePhotoFromFile(file) {
+        log.i('selected file:', file.type, file.size, 'bytes');
+        let bitmap = await createImageBitmap(file, {
+            resizeWidth: config_1.PHOTO_SIZE,
+            resizeHeight: config_1.PHOTO_SIZE,
+            resizeQuality: 'high',
+        });
+        log.i('bitmap:', bitmap);
+        let canvas = document.createElement('canvas');
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        let context = canvas.getContext('2d');
+        context.drawImage(bitmap, 0, 0);
+        let dataUrl = canvas.toDataURL();
+        log.i('Data URL:', strDataUrl(dataUrl), dataUrl.length, 'chars');
+        let img = dom_1.$(dom_1.ID_REG_PHOTO);
+        img.src = dataUrl;
     }
     async function registerProfile() {
         try {
             let imgsrc = dom_1.$(dom_1.ID_REG_PHOTO).src || '';
-            let username = dom_1.$(dom_1.ID_REG_NAME).value;
+            let username = dom_1.$(dom_1.ID_REG_NAME).value || '';
             log.i('Registering user:', JSON.stringify(username), imgsrc.slice(0, 20));
             if (!imgsrc)
-                throw new Error('no photo');
+                throw new Error('Need to set user photo.');
             if (!username)
-                throw new Error('no username');
-            let ls = await new Promise((resolve_1, reject_1) => { require(['./ls'], resolve_1, reject_1); });
+                throw new Error('Need to set user name.');
+            if (!config_1.VALID_USERNAME_REGEX.test(username))
+                throw new Error(`Username "${username}" doesn't match ${config_1.VALID_USERNAME_REGEX} regex.`);
             ls.userimg.set(imgsrc);
             ls.username.set(username);
             log.i('Registered!');
-            page.set('p-map');
+            location.reload();
         }
         catch (err) {
             log.e('Failed to register profile:', err);
+            dom_1.$(dom_1.ID_REG_ERROR).textContent = err.message;
         }
     }
 });

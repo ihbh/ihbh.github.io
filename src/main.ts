@@ -1,4 +1,4 @@
-import { $, ID_LOGS, ID_MAP, ID_NOGPS, ID_SEND, ID_SHOW_LOGS } from './dom';
+import { $, ID_LOGS, ID_MAP, ID_NOGPS, ID_SEND, ID_SHOW_LOGS, ID_RESET_LS } from './dom';
 import { logs, TaggedLogger } from './log';
 import * as ls from './ls';
 import * as page from './page';
@@ -19,7 +19,7 @@ async function init() {
     return;
   }
 
-  initLogs();
+  initDebugPanel();
   initPwa();
 
   if (isUserRegistered()) {
@@ -80,9 +80,15 @@ async function initPwa() {
   }
 }
 
-function initLogs() {
+function initDebugPanel() {
+  $(ID_RESET_LS).addEventListener('click', () => {
+    log.i('#reset-logs:click');
+    localStorage.clear();
+    log.i('LS cleared.');
+  });
+
   $(ID_SHOW_LOGS).addEventListener('click', () => {
-    log.i('#logs:click');
+    log.i('#show-logs:click');
     let div = $<HTMLDivElement>(ID_LOGS);
 
     if (!div.style.display) {

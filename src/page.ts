@@ -2,7 +2,7 @@ import { TaggedLogger } from "./log";
 
 const log = new TaggedLogger('page');
 
-type PageId = 'p-map' | 'p-reg' | 'p-cam';
+type PageId = 'p-map' | 'p-reg';
 
 export function set(id: PageId) {
   log.i('current page: #' + id);
