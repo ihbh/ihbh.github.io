@@ -3,9 +3,9 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('page');
     function set(id) {
-        log.i('set: #' + id);
+        log.i('current page: #' + id);
         let pages = document.querySelectorAll('body > *');
-        pages.forEach((p) => p.style.visibility = 'none');
+        pages.forEach((p) => p.style.visibility = 'hidden');
         let page = document.querySelector('body > #' + id);
         if (!page)
             throw new Error('No such page: #' + id);

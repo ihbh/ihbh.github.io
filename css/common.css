@@ -17,6 +17,15 @@ body {
   flex-direction: column;
 }
 
+button {
+  font-size: 0.75em;
+  padding: 1em;
+  background: #800;
+  color: #fff;
+  border: none;
+  box-shadow: 0 0 7pt 1pt #000;
+}
+
 body > * {
   display: flex;
   flex-direction: column;
@@ -24,12 +33,47 @@ body > * {
   height: 100%;
 }
 
-#p-reg > #pic {
+#p-reg > * {
+  margin-top: 1em;
+}
+
+#pic {
   align-self: center;
   width: 200pt;
   height: 200pt;
-  margin-top: 100pt;
+  margin-top: 50pt;
   outline: 1px dashed red;
+}
+
+#buttons {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#buttons button {
+  background-color: #008;
+}
+
+#name-tag {
+  display: flex;
+  justify-content: space-evenly;
+  color: #444;
+  font-size: 0.75em;
+}
+
+#name {
+  border: none;
+  border-bottom: 1px solid #444;
+  width: 50%;
+  margin: 0 auto;
+}
+
+#reg-nav {
+  display: flex;
+}
+
+#reg-done {
+  margin: 0 auto;
 }
 
 #map {
@@ -52,12 +96,6 @@ body > * {
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 3em;
-  font-size: 18pt;
-  padding: 1em;
-  border: none;
-  color: #fff;
-  background: #400;
-  box-shadow: 0 0 7pt 1pt #000;
   z-index: 1;
 }
 
