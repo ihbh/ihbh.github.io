@@ -3,7 +3,7 @@ import { $, ID_REG_DONE, ID_REG_NAME, ID_REG_PHOTO, ID_UPLOAD_PHOTO_INPUT, ID_RE
 import { TaggedLogger } from "./log";
 import * as ls from './ls';
 
-const IMG_MAXSIZE = 512;
+const IMG_MAXSIZE = 4096;
 
 const log = new TaggedLogger('reg');
 const strDataUrl = url => url.slice(0, 30) + '...' + url.slice(-10);

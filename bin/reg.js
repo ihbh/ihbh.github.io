@@ -1,7 +1,7 @@
 define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (require, exports, config_1, dom_1, log_1, ls) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const IMG_MAXSIZE = 512;
+    const IMG_MAXSIZE = 4096;
     const log = new log_1.TaggedLogger('reg');
     const strDataUrl = url => url.slice(0, 30) + '...' + url.slice(-10);
     function init() {
