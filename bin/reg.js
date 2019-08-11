@@ -25,17 +25,19 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (r
     async function savePhotoFromFile(file) {
         try {
             log.i('selected file:', file.type, file.size, 'bytes');
-            let bitmap = await createImageBitmap(file, {
-                resizeWidth: config_1.PHOTO_SIZE,
-                resizeHeight: config_1.PHOTO_SIZE,
-                resizeQuality: 'high',
-            });
+            let bitmap = await createImageBitmap(file);
             log.i('bitmap:', bitmap);
+            let w = bitmap.width;
+            let h = bitmap.height;
             let canvas = document.createElement('canvas');
-            canvas.width = bitmap.width;
-            canvas.height = bitmap.height;
+            canvas.width = w;
+            canvas.height = h;
             let context = canvas.getContext('2d');
-            context.drawImage(bitmap, 0, 0);
+            let wh = Math.min(w, h);
+            let dx = (w - wh) / 2;
+            let dy = (h - wh) / 2;
+            log.i('cropped size:', wh, 'x', wh);
+            context.drawImage(bitmap, dx, dy, wh, wh);
             let dataUrl = canvas.toDataURL();
             log.i('Data URL:', strDataUrl(dataUrl), dataUrl.length, 'chars');
             let img = dom_1.$(dom_1.ID_REG_PHOTO);
@@ -45,18 +47,35 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (r
             log.e('Failed to save photo:', err);
         }
     }
+    function getResizedPhoto() {
+        let img = dom_1.$(dom_1.ID_REG_PHOTO);
+        if (!img.src)
+            return null;
+        let w = img.width;
+        let h = img.height;
+        let s = config_1.PHOTO_SIZE;
+        log.i('resizing image:', w, 'x', h, '->', s, 'x', s);
+        let canvas = document.createElement('canvas');
+        canvas.width = s;
+        canvas.height = s;
+        let context = canvas.getContext('2d');
+        context.drawImage(img, 0, 0, w, h, 0, 0, s, s);
+        let newDataUrl = canvas.toDataURL();
+        log.i('resized photo:', strDataUrl(newDataUrl));
+        return newDataUrl;
+    }
     async function registerProfile() {
         try {
-            let imgsrc = dom_1.$(dom_1.ID_REG_PHOTO).src || '';
+            log.i('updating profile');
             let username = dom_1.$(dom_1.ID_REG_NAME).value || '';
-            log.i('Registering user:', JSON.stringify(username), imgsrc.slice(0, 20));
-            if (!imgsrc)
-                throw new Error('Need to set user photo.');
             if (!username)
                 throw new Error('Need to set user name.');
             if (!config_1.VALID_USERNAME_REGEX.test(username))
                 throw new Error(`Username "${username}" doesn't match ${config_1.VALID_USERNAME_REGEX} regex.`);
-            ls.userimg.set(imgsrc);
+            let imgurl = getResizedPhoto();
+            if (!imgurl)
+                throw new Error('Need to set user photo.');
+            ls.userimg.set(imgurl);
             ls.username.set(username);
             log.i('Registered!');
             location.reload();
