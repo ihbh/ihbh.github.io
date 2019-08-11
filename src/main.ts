@@ -39,6 +39,9 @@ async function initReg() {
 
 function initUserPic() {
   let img = $<HTMLImageElement>(ID_USERPIC);
+  img.onerror = () => log.e('failed to load user pic');
+  img.onload = () => log.i('user pic loaded:',
+    img.width, 'x', img.height);
   img.src = ls.userimg.get();
   img.title = ls.username.get();
 }

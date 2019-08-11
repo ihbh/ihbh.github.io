@@ -29,6 +29,8 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page"], function (req
     }
     function initUserPic() {
         let img = dom_1.$(dom_1.ID_USERPIC);
+        img.onerror = () => log.e('failed to load user pic');
+        img.onload = () => log.i('user pic loaded:', img.width, 'x', img.height);
         img.src = ls.userimg.get();
         img.title = ls.username.get();
     }
