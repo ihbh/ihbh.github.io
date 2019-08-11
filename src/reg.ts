@@ -3,6 +3,8 @@ import { $, ID_REG_DONE, ID_REG_NAME, ID_REG_PHOTO, ID_UPLOAD_PHOTO_INPUT, ID_RE
 import { TaggedLogger } from "./log";
 import * as ls from './ls';
 
+const IMG_MAXSIZE = 512;
+
 const log = new TaggedLogger('reg');
 const strDataUrl = url => url.slice(0, 30) + '...' + url.slice(-10);
 
@@ -37,7 +39,7 @@ async function savePhotoFromFile(file: File) {
     canvas.width = w;
     canvas.height = h;
     let context = canvas.getContext('2d');
-    let wh = Math.min(w, h);
+    let wh = Math.min(w, h, IMG_MAXSIZE);
     let dx = (w - wh) / 2;
     let dy = (h - wh) / 2;
     log.i('cropped size:', wh, 'x', wh);

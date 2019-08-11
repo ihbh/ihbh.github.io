@@ -1,6 +1,7 @@
 define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (require, exports, config_1, dom_1, log_1, ls) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const IMG_MAXSIZE = 512;
     const log = new log_1.TaggedLogger('reg');
     const strDataUrl = url => url.slice(0, 30) + '...' + url.slice(-10);
     function init() {
@@ -33,7 +34,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (r
             canvas.width = w;
             canvas.height = h;
             let context = canvas.getContext('2d');
-            let wh = Math.min(w, h);
+            let wh = Math.min(w, h, IMG_MAXSIZE);
             let dx = (w - wh) / 2;
             let dy = (h - wh) / 2;
             log.i('cropped size:', wh, 'x', wh);
