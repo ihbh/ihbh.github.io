@@ -12,6 +12,7 @@ define(["require", "exports"], function (require, exports) {
     exports.ID_REG_ERROR = '#reg-err';
     exports.ID_REG_DONE = '#reg-done';
     exports.ID_UPLOAD_PHOTO_INPUT = '#upload-input';
+    exports.ID_USERPIC = '#userpic';
     function $(selector) {
         return document.querySelector(selector);
     }

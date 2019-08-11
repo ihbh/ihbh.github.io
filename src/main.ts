@@ -1,4 +1,4 @@
-import { $, ID_LOGS, ID_MAP, ID_NOGPS, ID_SEND, ID_SHOW_LOGS, ID_RESET_LS } from './dom';
+import { $, ID_LOGS, ID_MAP, ID_NOGPS, ID_SEND, ID_SHOW_LOGS, ID_RESET_LS, ID_USERPIC } from './dom';
 import { logs, TaggedLogger } from './log';
 import * as ls from './ls';
 import * as page from './page';
@@ -23,6 +23,7 @@ async function init() {
   initPwa();
 
   if (isUserRegistered()) {
+    await initUserPic();
     await initMap();
   } else {
     await initReg();
@@ -34,6 +35,12 @@ async function initReg() {
   page.set('p-reg');
   let reg = await import('./reg');
   reg.init();
+}
+
+function initUserPic() {
+  let img = $<HTMLImageElement>(ID_USERPIC);
+  img.src = ls.userimg.get();
+  img.title = ls.username.get();
 }
 
 async function initMap() {

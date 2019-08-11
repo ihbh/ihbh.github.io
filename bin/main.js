@@ -14,6 +14,7 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page"], function (req
         initDebugPanel();
         initPwa();
         if (isUserRegistered()) {
+            await initUserPic();
             await initMap();
         }
         else {
@@ -25,6 +26,11 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page"], function (req
         page.set('p-reg');
         let reg = await new Promise((resolve_1, reject_1) => { require(['./reg'], resolve_1, reject_1); });
         reg.init();
+    }
+    function initUserPic() {
+        let img = dom_1.$(dom_1.ID_USERPIC);
+        img.src = ls.userimg.get();
+        img.title = ls.username.get();
     }
     async function initMap() {
         page.set('p-map');

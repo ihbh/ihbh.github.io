@@ -9,6 +9,7 @@ export const ID_REG_NAME = '#reg-name';
 export const ID_REG_ERROR = '#reg-err';
 export const ID_REG_DONE = '#reg-done';
 export const ID_UPLOAD_PHOTO_INPUT = '#upload-input';
+export const ID_USERPIC = '#userpic';
 
 export function $<T extends Element>(selector: string) {
   return document.querySelector(selector) as T;
