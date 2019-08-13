@@ -9,5 +9,7 @@ define(["require", "exports"], function (require, exports) {
     exports.OSM_URL = 'https://www.openstreetmap.org/export/embed.html';
     exports.VALID_USERNAME_REGEX = /^[a-z]{3,15}$/i;
     exports.PHOTO_SIZE = 64;
+    exports.RPC_URL = 'http://localhost';
+    exports.RPC_DELAY = 1.5;
 });
 //# sourceMappingURL=config.js.map

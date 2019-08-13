@@ -154,6 +154,11 @@ button:focus {
   z-index: 1;
 }
 
+#send:disabled {
+  background: #888;
+  box-shadow: none;
+}
+
 #debug {
   position: fixed;
   top: 0;

@@ -28,5 +28,9 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     exports.username = prop('user.name');
     /** Data URL */
     exports.userimg = prop('user.img');
+    exports.places = {
+        pending: prop('places.pending'),
+        sent: prop('places.sent'),
+    };
 });
 //# sourceMappingURL=ls.js.map

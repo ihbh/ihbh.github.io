@@ -2,6 +2,7 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page"], function (req
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('main');
+    let displayedGpsCoords = null;
     init().then(res => log.i('init() succeeded'), err => log.i('init() failed:', err));
     async function init() {
         log.i('init()');
@@ -54,6 +55,7 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page"], function (req
             log.i('osm url:', osmurl);
             let iframe = dom_1.$(dom_1.ID_MAP);
             iframe.src = osmurl;
+            displayedGpsCoords = pos;
         }
         catch (err) {
             // PositionError means that the phone has location turned off.
@@ -65,14 +67,32 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page"], function (req
         try {
             let pwa = await new Promise((resolve_3, reject_3) => { require(['./pwa'], resolve_3, reject_3); });
             await pwa.init();
-            dom_1.$(dom_1.ID_SEND).addEventListener('click', () => {
+            let button = dom_1.$(dom_1.ID_SEND);
+            button.onclick = async () => {
                 log.i('#send:click');
                 pwa.showInstallPrompt();
-            });
+                button.disabled = true;
+                try {
+                    await shareDisplayedLocation();
+                }
+                catch (err) {
+                    log.e(err);
+                }
+                finally {
+                    button.disabled = false;
+                }
+            };
         }
         catch (err) {
             log.e('pwa.init() failed:', err);
         }
+    }
+    async function shareDisplayedLocation() {
+        let loc = await new Promise((resolve_4, reject_4) => { require(['./loc'], resolve_4, reject_4); });
+        if (!displayedGpsCoords)
+            throw new Error('No GPS!');
+        let { latitude: lat, longitude: lng } = displayedGpsCoords.coords;
+        await loc.shareLocation({ lat, lng });
     }
     function initDebugPanel() {
         dom_1.$(dom_1.ID_RESET_LS).addEventListener('click', () => {

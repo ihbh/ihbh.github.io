@@ -5,6 +5,8 @@ import * as page from './page';
 
 const log = new TaggedLogger('main');
 
+let displayedGpsCoords = null;
+
 init().then(
   res => log.i('init() succeeded'),
   err => log.i('init() failed:', err));
@@ -69,6 +71,7 @@ async function loadMap() {
     log.i('osm url:', osmurl);
     let iframe = $<HTMLIFrameElement>(ID_MAP);
     iframe.src = osmurl;
+    displayedGpsCoords = pos;
   } catch (err) {
     // PositionError means that the phone has location turned off.
     log.e(err);
@@ -80,14 +83,31 @@ async function initPwa() {
   try {
     let pwa = await import('./pwa');
     await pwa.init();
+    let button = $<HTMLButtonElement>(ID_SEND);
 
-    $(ID_SEND).addEventListener('click', () => {
+    button.onclick = async () => {
       log.i('#send:click');
       pwa.showInstallPrompt();
-    });
+      button.disabled = true;
+
+      try {
+        await shareDisplayedLocation();
+      } catch (err) {
+        log.e(err);
+      } finally {
+        button.disabled = false;
+      }
+    };
   } catch (err) {
     log.e('pwa.init() failed:', err);
   }
+}
+
+async function shareDisplayedLocation() {
+  let loc = await import('./loc');
+  if (!displayedGpsCoords) throw new Error('No GPS!');
+  let { latitude: lat, longitude: lng } = displayedGpsCoords.coords;
+  await loc.shareLocation({ lat, lng });
 }
 
 function initDebugPanel() {

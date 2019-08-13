@@ -29,3 +29,11 @@ export const username = prop<string>('user.name');
 
 /** Data URL */
 export const userimg = prop<string>('user.img');
+
+export type Place = [number, number]; // [lat, lng]
+export interface Places { [time: string]: Place } // time = Date.now()/1000
+
+export const places = {
+  pending: prop<Places>('places.pending'),
+  sent: prop<Places>('places.sent'),
+};
