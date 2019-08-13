@@ -40,12 +40,31 @@ async function initReg() {
 }
 
 function initUserPic() {
-  let img = $<HTMLImageElement>(ID_USERPIC);
-  img.onerror = () => log.e('failed to load user pic');
-  img.onload = () => log.i('user pic loaded:',
-    img.width, 'x', img.height);
-  img.src = ls.userimg.get();
-  img.title = ls.username.get();
+  try {
+    let img = $<HTMLImageElement>(ID_USERPIC);
+    img.onerror = () => log.e('Failed to load user pic.');
+    img.onload = () => log.i('user pic loaded:',
+      img.width, 'x', img.height);
+    let time = Date.now();
+    let datauri = ls.userimg.get();
+    let blob = dataUriToBlob(datauri);
+    let bloburi = URL.createObjectURL(blob);
+    log.i('img.src:', bloburi, Date.now() - time, 'ms');
+    img.src = bloburi;
+    img.title = ls.username.get();
+  } catch (err) {
+    log.e(err);
+  }
+}
+
+function dataUriToBlob(datauri: string) {
+  let [, mime, b64] = /^data:(.+);base64,(.+)$/.exec(datauri);
+  let data = atob(b64);
+  let bytes = new Uint8Array(data.length);
+  for (let i = 0; i < data.length; i++)
+    bytes[i] = data.charCodeAt(i);
+  let blob = new Blob([bytes.buffer], { type: mime });
+  return blob;
 }
 
 async function initMap() {
