@@ -45,7 +45,7 @@ async function savePhotoFromFile(file: File) {
     log.i('cropped size:', wh, 'x', wh);
     context.drawImage(bitmap, dx, dy, wh, wh);
     let dataUrl = canvas.toDataURL();
-    log.i('Data URL:', strDataUrl(dataUrl), dataUrl.length, 'chars');
+    log.i('Data URL:', strDataUrl(dataUrl));
     let img = $<HTMLImageElement>(ID_REG_PHOTO);
     img.src = dataUrl;
   } catch (err) {
@@ -56,8 +56,8 @@ async function savePhotoFromFile(file: File) {
 function getResizedPhoto() {
   let img = $<HTMLImageElement>(ID_REG_PHOTO);
   if (!img.src) return null;
-  let w = img.width;
-  let h = img.height;
+  let w = img.naturalWidth;
+  let h = img.naturalHeight;
   let s = PHOTO_SIZE;
   log.i('resizing image:', w, 'x', h, '->', s, 'x', s);
   let canvas = document.createElement('canvas');

@@ -40,7 +40,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (r
             log.i('cropped size:', wh, 'x', wh);
             context.drawImage(bitmap, dx, dy, wh, wh);
             let dataUrl = canvas.toDataURL();
-            log.i('Data URL:', strDataUrl(dataUrl), dataUrl.length, 'chars');
+            log.i('Data URL:', strDataUrl(dataUrl));
             let img = dom_1.$(dom_1.ID_REG_PHOTO);
             img.src = dataUrl;
         }
@@ -52,8 +52,8 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (r
         let img = dom_1.$(dom_1.ID_REG_PHOTO);
         if (!img.src)
             return null;
-        let w = img.width;
-        let h = img.height;
+        let w = img.naturalWidth;
+        let h = img.naturalHeight;
         let s = config_1.PHOTO_SIZE;
         log.i('resizing image:', w, 'x', h, '->', s, 'x', s);
         let canvas = document.createElement('canvas');
