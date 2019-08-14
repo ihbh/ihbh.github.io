@@ -2,6 +2,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (r
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const IMG_MAXSIZE = 4096;
+    const IMG_MIME = 'image/jpeg';
     const log = new log_1.TaggedLogger('reg');
     const strDataUrl = url => url.slice(0, 30) + '...' + url.slice(-10);
     function init() {
@@ -61,7 +62,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (r
         canvas.height = s;
         let context = canvas.getContext('2d');
         context.drawImage(img, 0, 0, w, h, 0, 0, s, s);
-        let newDataUrl = canvas.toDataURL();
+        let newDataUrl = canvas.toDataURL(IMG_MIME);
         log.i('resized photo:', strDataUrl(newDataUrl));
         return newDataUrl;
     }

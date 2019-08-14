@@ -4,6 +4,7 @@ import { TaggedLogger } from "./log";
 import * as ls from './ls';
 
 const IMG_MAXSIZE = 4096;
+const IMG_MIME = 'image/jpeg';
 
 const log = new TaggedLogger('reg');
 const strDataUrl = url => url.slice(0, 30) + '...' + url.slice(-10);
@@ -67,7 +68,7 @@ function getResizedPhoto() {
   context.drawImage(img,
       0, 0, w, h,
       0, 0, s, s);
-  let newDataUrl = canvas.toDataURL();
+  let newDataUrl = canvas.toDataURL(IMG_MIME);
   log.i('resized photo:', strDataUrl(newDataUrl));
   return newDataUrl;
 }
