@@ -2,6 +2,7 @@ import * as config from './config';
 import { TaggedLogger } from './log';
 
 export const MAP_SHARE_LOCATION = 'Map.ShareLocation';
+export const USER_SET_DETAILS = 'User.SetDetails';
 
 const log = new TaggedLogger('rpc');
 

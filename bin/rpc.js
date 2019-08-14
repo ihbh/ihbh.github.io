@@ -2,6 +2,7 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MAP_SHARE_LOCATION = 'Map.ShareLocation';
+    exports.USER_SET_DETAILS = 'User.SetDetails';
     const log = new log_1.TaggedLogger('rpc');
     class RpcError extends Error {
         constructor(method, response) {

@@ -79,7 +79,18 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (r
                 throw new Error('Need to set user photo.');
             ls.userimg.set(imgurl);
             ls.username.set(username);
-            log.i('Registered!');
+            try {
+                let usr = await new Promise((resolve_1, reject_1) => { require(['./usr'], resolve_1, reject_1); });
+                await usr.setDetails({
+                    photo: imgurl,
+                    name: username,
+                });
+                log.i('Registered!');
+            }
+            catch (err) {
+                log.e('Failed to register user info:', err);
+            }
+            log.i('Redirecting to the main page.');
             location.reload();
         }
         catch (err) {

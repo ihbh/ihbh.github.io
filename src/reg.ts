@@ -66,8 +66,8 @@ function getResizedPhoto() {
   canvas.height = s;
   let context = canvas.getContext('2d');
   context.drawImage(img,
-      0, 0, w, h,
-      0, 0, s, s);
+    0, 0, w, h,
+    0, 0, s, s);
   let newDataUrl = canvas.toDataURL(IMG_MIME);
   log.i('resized photo:', strDataUrl(newDataUrl));
   return newDataUrl;
@@ -87,7 +87,20 @@ async function registerProfile() {
     ls.userimg.set(imgurl);
     ls.username.set(username);
 
-    log.i('Registered!');
+    try {
+      let usr = await import('./usr');
+
+      await usr.setDetails({
+        photo: imgurl,
+        name: username,
+      });
+
+      log.i('Registered!');
+    } catch (err) {
+      log.e('Failed to register user info:', err);
+    }
+
+    log.i('Redirecting to the main page.');
     location.reload();
   } catch (err) {
     log.e('Failed to register profile:', err);
