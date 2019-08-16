@@ -11,5 +11,5 @@ export interface UserDetails {
 
 export async function setDetails(details: UserDetails) {
   log.i('details:', details);
-  await rpc.invoke(rpc.USER_SET_DETAILS, details);
+  await rpc.schedule(rpc.USER_SET_DETAILS, details);
 }

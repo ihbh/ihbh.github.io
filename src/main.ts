@@ -116,6 +116,9 @@ async function initPwa() {
       } finally {
         button.disabled = false;
       }
+
+      let rpc = await import('./rpc');
+      rpc.sendall();
     };
   } catch (err) {
     log.e('pwa.init() failed:', err);

@@ -100,6 +100,8 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page"], function (req
                 finally {
                     button.disabled = false;
                 }
+                let rpc = await new Promise((resolve_4, reject_4) => { require(['./rpc'], resolve_4, reject_4); });
+                rpc.sendall();
             };
         }
         catch (err) {
@@ -107,7 +109,7 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page"], function (req
         }
     }
     async function shareDisplayedLocation() {
-        let loc = await new Promise((resolve_4, reject_4) => { require(['./loc'], resolve_4, reject_4); });
+        let loc = await new Promise((resolve_5, reject_5) => { require(['./loc'], resolve_5, reject_5); });
         if (!displayedGpsCoords)
             throw new Error('No GPS!');
         let { latitude: lat, longitude: lng } = displayedGpsCoords.coords;

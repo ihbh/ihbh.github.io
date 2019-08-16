@@ -4,11 +4,11 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     const log = new log_1.TaggedLogger('ls');
     const strval = s => (s || '').slice(0, 20) +
         ' (' + (s || '').length + ' chars)';
-    function prop(name) {
+    function prop(name, defval = null) {
         return {
             get() {
                 let json = localStorage.getItem(name);
-                let val = json ? JSON.parse(json) : null;
+                let val = json ? JSON.parse(json) : defval;
                 log.i(name, '->', strval(json));
                 return val;
             },
@@ -23,14 +23,19 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
                     localStorage.setItem(name, json);
                 }
             },
+            modify(fn) {
+                this.set(fn(this.get()));
+            },
         };
     }
     exports.username = prop('user.name');
-    /** Data URL */
+    // data:image/jpeg;base64,...
     exports.userimg = prop('user.img');
-    exports.places = {
-        pending: prop('places.pending'),
-        sent: prop('places.sent'),
+    exports.places = prop('places', {});
+    exports.rpcs = {
+        infos: prop('rpcs.info', {}),
+        unsent: prop('rpcs.unsent', {}),
+        failed: prop('rpcs.failed', {}),
     };
 });
 //# sourceMappingURL=ls.js.map
