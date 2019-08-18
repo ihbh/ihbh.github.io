@@ -1,14 +1,12 @@
 {
   "scripts": {
-    "build": "npm i && npm run cprjs && npm run cpsha1 && tsc && npm run cpsw",
-    "cprjs": "cp node_modules/requirejs/*.js bin",
+    "build": "npm i && npm run cpsha1 && tsc && npm run cpsw",
     "cpsha1": "cp node_modules/js-sha1/src/*.js bin",
     "cpsw": "cp -f bin/sw.js sw.js",
     "webfsd": "killall -q webfsd; sudo webfsd -F -l - -p 80 -r . -f index.html"
   },
   "devDependencies": {
     "js-sha1": "0.6.0",
-    "requirejs": "2.3.6",
     "typescript": "3.5.3"
   }
 }
