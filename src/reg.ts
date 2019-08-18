@@ -2,6 +2,7 @@ import { VALID_USERNAME_REGEX, PHOTO_SIZE } from "./config";
 import { $, ID_REG_DONE, ID_REG_NAME, ID_REG_PHOTO, ID_UPLOAD_PHOTO_INPUT, ID_REG_ERROR } from './dom';
 import { TaggedLogger } from "./log";
 import * as ls from './ls';
+import * as page from './page';
 
 const IMG_MAXSIZE = 4096;
 const IMG_MIME = 'image/jpeg';
@@ -100,8 +101,7 @@ async function registerProfile() {
       log.e('Failed to register user info:', err);
     }
 
-    log.i('Redirecting to the main page.');
-    location.reload();
+    page.set('map');
   } catch (err) {
     log.e('Failed to register profile:', err);
     $(ID_REG_ERROR).textContent = err.message;

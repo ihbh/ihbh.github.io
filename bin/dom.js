@@ -17,5 +17,22 @@ define(["require", "exports"], function (require, exports) {
         return document.querySelector(selector);
     }
     exports.$ = $;
+    function $$(selector) {
+        return document.querySelectorAll(selector);
+    }
+    exports.$$ = $$;
+    function isLoaded() {
+        return /^(complete|interactive)$/.test(document.readyState);
+    }
+    exports.isLoaded = isLoaded;
+    function whenLoaded() {
+        return new Promise(resolve => {
+            if (isLoaded())
+                resolve();
+            else
+                window.addEventListener('load', () => resolve());
+        });
+    }
+    exports.whenLoaded = whenLoaded;
 });
 //# sourceMappingURL=dom.js.map

@@ -1,47 +1,21 @@
-import { $, ID_LOGS, ID_MAP, ID_NOGPS, ID_SEND, ID_SHOW_LOGS, ID_RESET_LS, ID_USERPIC } from './dom';
-import { logs, TaggedLogger } from './log';
+import * as dom from './dom';
+import { TaggedLogger } from './log';
 import * as ls from './ls';
-import * as page from './page';
 
 const log = new TaggedLogger('main');
+const { $ } = dom;
 
 let displayedGpsCoords = null;
 
-init().then(
-  res => log.i('init() succeeded'),
-  err => log.i('init() failed:', err));
-
-async function init() {
-  log.i('init()');
-  log.i('document.readyState:', document.readyState);
-
-  if (!isDomLoaded()) {
-    log.i('Waiting for window:load event.');
-    window.addEventListener('onload', () => init());
-    return;
-  }
-
-  initDebugPanel();
-  initPwa();
-
-  if (isUserRegistered()) {
-    await initUserPic();
-    await initMap();
-  } else {
-    await initReg();
-  }
-}
-
-async function initReg() {
-  log.i('user not registered');
-  page.set('p-reg');
-  let reg = await import('./reg');
-  reg.init();
+export async function init() {
+  await initUserPic();
+  await initMap();
+  await initSendButton();
 }
 
 function initUserPic() {
   try {
-    let img = $<HTMLImageElement>(ID_USERPIC);
+    let img = $<HTMLImageElement>(dom.ID_USERPIC);
     img.onerror = () => log.e('Failed to load user pic.');
     img.onload = () => log.i('user pic loaded:',
       img.width, 'x', img.height);
@@ -68,9 +42,7 @@ function dataUriToBlob(datauri: string) {
 }
 
 async function initMap() {
-  page.set('p-map');
-
-  $(ID_NOGPS).addEventListener('click', async () => {
+  $(dom.ID_NOGPS).addEventListener('click', async () => {
     let res = await (navigator as any).permissions.query({ name: 'geolocation' });
     log.i('navigator.permissions.query:', res.state);
     if (res.state != 'denied')
@@ -82,30 +54,29 @@ async function initMap() {
 
 async function loadMap() {
   try {
-    $(ID_NOGPS).textContent = '';
+    $(dom.ID_NOGPS).textContent = '';
     let gps = await import('./gps');
     let pos = await gps.getGeoLocation();
     let { latitude: lat, longitude: lng } = pos.coords;
     let osmurl = gps.makeOsmUrl(lat, lng);
     log.i('osm url:', osmurl);
-    let iframe = $<HTMLIFrameElement>(ID_MAP);
+    let iframe = $<HTMLIFrameElement>(dom.ID_MAP);
     iframe.src = osmurl;
     displayedGpsCoords = pos;
   } catch (err) {
     // PositionError means that the phone has location turned off.
     log.e(err);
-    $(ID_NOGPS).textContent = err.message;
+    $(dom.ID_NOGPS).textContent = err.message;
   }
 }
 
-async function initPwa() {
+async function initSendButton() {
   try {
-    let pwa = await import('./pwa');
-    await pwa.init();
-    let button = $<HTMLButtonElement>(ID_SEND);
+    let button = $<HTMLButtonElement>(dom.ID_SEND);
 
     button.onclick = async () => {
       log.i('#send:click');
+      let pwa = await import('./pwa');
       pwa.showInstallPrompt();
       button.disabled = true;
 
@@ -131,39 +102,3 @@ async function shareDisplayedLocation() {
   let { latitude: lat, longitude: lng } = displayedGpsCoords.coords;
   await loc.shareLocation({ lat, lng });
 }
-
-function initDebugPanel() {
-  $(ID_RESET_LS).addEventListener('click', () => {
-    log.i('#reset-logs:click');
-    localStorage.clear();
-    log.i('LS cleared.');
-  });
-
-  $(ID_SHOW_LOGS).addEventListener('click', () => {
-    log.i('#show-logs:click');
-    let div = $<HTMLDivElement>(ID_LOGS);
-
-    if (!div.style.display) {
-      log.i('Hiding the logs.');
-      div.style.display = 'none';
-      return;
-    }
-
-    let text = logs
-      .map(args => args.join(' ').trim())
-      .join('\n');
-
-    div.textContent = text;
-    div.style.display = '';
-  });
-}
-
-function isDomLoaded() {
-  return /^(complete|interactive)$/.test(document.readyState);
-}
-
-function isUserRegistered() {
-  return !!ls.username.get();
-}
-
-

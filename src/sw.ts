@@ -17,7 +17,6 @@ self.addEventListener('install', (event: any) => {
 
 self.addEventListener('fetch', (event: any) => {
   let request: Request = event.request;
-  log.i('fetch', request.url);
 
   if (request.method != 'GET') {
     event.respondWith(fetch(request));
@@ -30,7 +29,6 @@ self.addEventListener('fetch', (event: any) => {
         if (response.ok) {
           let clonedResponse = response.clone();
           openCache().then(cache => {
-            log.i('cache.put', request.url, clonedResponse.status);
             cache.put(request, clonedResponse);
           });
         }
@@ -39,7 +37,6 @@ self.addEventListener('fetch', (event: any) => {
       });
 
       if (cachedResponse) {
-        log.i('cached response:', request.url, cachedResponse.status);
         return cachedResponse;
       } else {
         return newResponse;

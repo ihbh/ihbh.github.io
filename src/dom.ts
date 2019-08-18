@@ -14,3 +14,20 @@ export const ID_USERPIC = '#userpic';
 export function $<T extends Element>(selector: string) {
   return document.querySelector(selector) as T;
 }
+
+export function $$(selector: string) {
+  return document.querySelectorAll(selector);
+}
+
+export function isLoaded() {
+  return /^(complete|interactive)$/.test(document.readyState);
+}
+
+export function whenLoaded() {
+  return new Promise(resolve => {
+    if (isLoaded())
+      resolve();
+    else
+      window.addEventListener('load', () => resolve());
+  });
+}

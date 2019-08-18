@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (require, exports, config_1, dom_1, log_1, ls) {
+define(["require", "exports", "./config", "./dom", "./log", "./ls", "./page"], function (require, exports, config_1, dom_1, log_1, ls, page) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const IMG_MAXSIZE = 4096;
@@ -90,8 +90,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls"], function (r
             catch (err) {
                 log.e('Failed to register user info:', err);
             }
-            log.i('Redirecting to the main page.');
-            location.reload();
+            page.set('map');
         }
         catch (err) {
             log.e('Failed to register profile:', err);
