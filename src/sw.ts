@@ -2,35 +2,56 @@
 // developers.google.com/web/fundamentals/primers/service-workers/
 
 const log = { i: (...args) => console.log('[sw] I', ...args) };
+const openCache = () => caches.open('store');
 
-log.i('sw loaded');
+log.i('loaded');
 
 self.addEventListener('install', (event: any) => {
-  log.i('sw:install');
+  log.i('install');
   event.waitUntil(
-    caches.open('store').then(cache => {
-      return cache.addAll([
-        '/',
-        '/index.html',
-        '/bin/require.js',
-        '/icons/512.png',
-        '/icons/192.png',
-        '/favicon.ico',
-      ]);
+    openCache().then(cache => {
+      return cache.add('/');
     })
   );
 });
 
 self.addEventListener('fetch', (event: any) => {
+  let request: Request = event.request;
+  log.i('fetch', request.url);
+
+  if (request.method != 'GET') {
+    event.respondWith(fetch(request));
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request).then(response => {
-      log.i('sw:fetch', event.request.url,
-        'cached:', response ? response.status : false);
-      return /* response || */ fetch(event.request);
+    caches.match(request).then(cachedResponse => {
+      let newResponse = fetch(request).then(response => {
+        if (response.ok) {
+          let clonedResponse = response.clone();
+          openCache().then(cache => {
+            log.i('cache.put', request.url, clonedResponse.status);
+            cache.put(request, clonedResponse);
+          });
+        }
+
+        return response;
+      });
+
+      if (cachedResponse) {
+        log.i('cached response:', request.url, cachedResponse.status);
+        return cachedResponse;
+      } else {
+        return newResponse;
+      }
     })
   );
 });
 
-self.addEventListener('activate', event => {
-  log.i('sw:activate');
+self.addEventListener('activate', () => {
+  log.i('activate');
+});
+
+self.addEventListener('message', event => {
+  log.i('message', event);
 });
