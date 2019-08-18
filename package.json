@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "npm i && npm run cprjs && npm run cpsha1 && npm run cpsw && tsc",
+    "build": "npm i && npm run cprjs && npm run cpsha1 && tsc && npm run cpsw",
     "cprjs": "cp node_modules/requirejs/*.js bin",
     "cpsha1": "cp node_modules/js-sha1/src/*.js bin",
     "cpsw": "cp -f bin/sw.js sw.js",
