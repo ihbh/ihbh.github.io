@@ -78,7 +78,7 @@
             'bin' + dep.slice(1) + '.js' : dep;
     }
     function log(...args) {
-        console.log('[amd] I', ...args);
+        // console.log('[amd] I', ...args);
     }
     window['define'] = define;
     define.amd = true;

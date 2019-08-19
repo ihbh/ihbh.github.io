@@ -92,7 +92,7 @@
   }
 
   function log(...args) {
-    console.log('[amd] I', ...args);
+    // console.log('[amd] I', ...args);
   }
 
   window['define'] = define;
