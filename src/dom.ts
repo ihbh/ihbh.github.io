@@ -31,3 +31,14 @@ export function whenLoaded() {
       window.addEventListener('load', () => resolve());
   });
 }
+
+export async function loadScript(url: string) {
+  return new Promise<void>((resolve, reject) => {
+    let script = document.createElement('script');
+    script.src = url;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Failed to load script: ' + url));
+    document.head.append(script);
+  });
+}

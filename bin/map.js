@@ -1,4 +1,4 @@
-define(["require", "exports", "./dom", "./log", "./ls"], function (require, exports, dom, log_1, ls) {
+define(["require", "exports", "./dom", "./log", "./ls", "./config"], function (require, exports, dom, log_1, ls, config_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('main');
@@ -51,10 +51,7 @@ define(["require", "exports", "./dom", "./log", "./ls"], function (require, expo
             let gps = await new Promise((resolve_1, reject_1) => { require(['./gps'], resolve_1, reject_1); });
             let pos = await gps.getGeoLocation();
             let { latitude: lat, longitude: lng } = pos.coords;
-            let osmurl = gps.makeOsmUrl(lat, lng);
-            log.i('osm url:', osmurl);
-            let iframe = $(dom.ID_MAP);
-            iframe.src = osmurl;
+            renderMap(pos);
             displayedGpsCoords = pos;
         }
         catch (err) {
@@ -62,6 +59,23 @@ define(["require", "exports", "./dom", "./log", "./ls"], function (require, expo
             log.e(err);
             $(dom.ID_NOGPS).textContent = err.message;
         }
+    }
+    async function renderMap(pos) {
+        let mapid = dom.ID_MAP.replace('#', '');
+        let { latitude, longitude } = pos.coords;
+        log.i('Rendering OSM in #' + mapid, 'lat:', latitude, 'lng:', longitude);
+        await dom.loadScript(config_1.OSM_LIB);
+        let map = new OpenLayers.Map(mapid);
+        map.addLayer(new OpenLayers.Layer.OSM());
+        let smppos = new OpenLayers.LonLat(longitude, latitude)
+            .transform(new OpenLayers.Projection('EPSG:4326'), // transform from WGS 1984
+        map.getProjectionObject() // to Spherical Mercator Projection
+        );
+        let markers = new OpenLayers.Layer.Markers('Markers');
+        map.addLayer(markers);
+        markers.addMarker(new OpenLayers.Marker(smppos));
+        let zoom = 16;
+        map.setCenter(smppos, zoom);
     }
     async function initSendButton() {
         try {

@@ -10,11 +10,12 @@
   <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
       connect-src 'self';
-      img-src 'self' data: blob:;
+      img-src 'self' data: blob: openlayers.org *.openstreetmap.org;
       media-src 'self' blob:;
-      frame-src https://www.openstreetmap.org;
-      script-src 'self';
-      style-src 'self' 'unsafe-inline'">
+      script-src 'self' https://openlayers.org;
+      worker-src 'self';
+      style-src 'self' 'unsafe-inline' https://openlayers.org;
+  ">
 
   <title>I've Been Here</title>
 
@@ -54,7 +55,7 @@
   <!-- The main page with the map. -->
 
   <div id="p-map" class="page">
-    <iframe id="map" sandbox="allow-scripts" referrerpolicy="noreferrer"></iframe>
+    <div id="map"></div>
     <span id="no-gps"></span>
     <img id="userpic">
     <button id="send">I've Been Here!</button>

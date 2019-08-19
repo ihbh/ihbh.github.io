@@ -3,8 +3,12 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('gps');
     function getGeoLocation() {
+        let options = {
+            enableHighAccuracy: true,
+        };
         return new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject);
+            navigator.geolocation
+                .getCurrentPosition(resolve, reject, options);
         }).then(pos => {
             log.i('gps coords:', pos);
             return pos;

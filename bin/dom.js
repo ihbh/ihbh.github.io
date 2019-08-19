@@ -34,5 +34,16 @@ define(["require", "exports"], function (require, exports) {
         });
     }
     exports.whenLoaded = whenLoaded;
+    async function loadScript(url) {
+        return new Promise((resolve, reject) => {
+            let script = document.createElement('script');
+            script.src = url;
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Failed to load script: ' + url));
+            document.head.append(script);
+        });
+    }
+    exports.loadScript = loadScript;
 });
 //# sourceMappingURL=dom.js.map

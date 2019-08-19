@@ -4,8 +4,12 @@ import { TaggedLogger } from './log';
 const log = new TaggedLogger('gps');
 
 export function getGeoLocation() {
+  let options: PositionOptions = {
+    enableHighAccuracy: true,
+  };
   return new Promise<Position>((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(resolve, reject);
+    navigator.geolocation
+      .getCurrentPosition(resolve, reject, options);
   }).then(pos => {
     log.i('gps coords:', pos);
     return pos;

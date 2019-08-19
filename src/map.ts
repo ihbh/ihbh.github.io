@@ -1,6 +1,9 @@
 import * as dom from './dom';
 import { TaggedLogger } from './log';
 import * as ls from './ls';
+import { OSM_LIB } from './config';
+
+declare const OpenLayers;
 
 const log = new TaggedLogger('main');
 const { $ } = dom;
@@ -58,16 +61,39 @@ async function loadMap() {
     let gps = await import('./gps');
     let pos = await gps.getGeoLocation();
     let { latitude: lat, longitude: lng } = pos.coords;
-    let osmurl = gps.makeOsmUrl(lat, lng);
-    log.i('osm url:', osmurl);
-    let iframe = $<HTMLIFrameElement>(dom.ID_MAP);
-    iframe.src = osmurl;
+    renderMap(pos);
     displayedGpsCoords = pos;
   } catch (err) {
     // PositionError means that the phone has location turned off.
     log.e(err);
     $(dom.ID_NOGPS).textContent = err.message;
   }
+}
+
+async function renderMap(pos: Position) {
+  let mapid = dom.ID_MAP.replace('#', '');
+  let { latitude, longitude } = pos.coords;
+
+  log.i('Rendering OSM in #' + mapid,
+    'lat:', latitude, 'lng:', longitude);
+
+  await dom.loadScript(OSM_LIB);
+
+  let map = new OpenLayers.Map(mapid);
+  map.addLayer(new OpenLayers.Layer.OSM());
+
+  let smppos = new OpenLayers.LonLat(longitude, latitude)
+    .transform(
+      new OpenLayers.Projection('EPSG:4326'), // transform from WGS 1984
+      map.getProjectionObject() // to Spherical Mercator Projection
+    );
+
+  let markers = new OpenLayers.Layer.Markers('Markers');
+  map.addLayer(markers);
+  markers.addMarker(new OpenLayers.Marker(smppos));
+
+  let zoom = 16;
+  map.setCenter(smppos, zoom);
 }
 
 async function initSendButton() {

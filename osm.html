@@ -1,0 +1,41 @@
+<html>
+
+<head>
+  <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+</head>
+
+<body>
+  <div id="mapdiv"></div>
+
+  <script>
+    function getLonLat(options) {
+      return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, options);
+      });
+    }
+
+    (async () => {
+      map = new OpenLayers.Map("mapdiv");
+      map.addLayer(new OpenLayers.Layer.OSM());
+
+      let pos = await getLonLat({ enableHighAccuracy: true });
+      let { latitude, longitude } = pos.coords;
+
+      console.log('lat:', latitude, 'lng:', longitude);
+
+      let lonLat = new OpenLayers.LonLat(longitude, latitude)
+        .transform(
+          new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+          map.getProjectionObject() // to Spherical Mercator Projection
+        );
+
+      let markers = new OpenLayers.Layer.Markers("Markers");
+      map.addLayer(markers);
+      markers.addMarker(new OpenLayers.Marker(lonLat));
+      var zoom = 16;
+      map.setCenter(lonLat, zoom);
+    })();
+  </script>
+</body>
+
+</html>
