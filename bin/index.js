@@ -10,7 +10,7 @@ define(["require", "exports", "./dbg", "./dom", "./log", "./ls", "./page", "./pw
         if (page.get()) {
             await page.init();
         }
-        if (isUserRegistered) {
+        else if (isUserRegistered) {
             page.set('map');
         }
         else {

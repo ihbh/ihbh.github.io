@@ -16,7 +16,7 @@ dom.whenLoaded().then(async () => {
 
   if (page.get()) {
     await page.init();
-  } if (isUserRegistered) {
+  } else if (isUserRegistered) {
     page.set('map');
   } else {
     page.set('reg');

@@ -1,20 +1,26 @@
 import * as dom from './dom';
 import { TaggedLogger } from './log';
 import * as ls from './ls';
-import * as config from './config';
+import * as page from './page';
+import { MAP_BOX_SIZE } from './config';
 
-declare const ol; // OSM v5.3
-
-const log = new TaggedLogger('main');
+const log = new TaggedLogger('map');
 const { $ } = dom;
 
-let map = null; // ol.Map
 let displayedGpsCoords = null;
 
 export async function init() {
   await initUserPic();
+  await initShowPlaces();
   await initMap();
   await initSendButton();
+}
+
+function initShowPlaces() {
+  let img = $<HTMLImageElement>(dom.ID_SHOW_PLACES);
+  img.addEventListener('click', () => {
+    page.set('places');
+  });
 }
 
 function initUserPic() {
@@ -61,89 +67,23 @@ async function loadMap() {
     $(dom.ID_NOGPS).textContent = '';
     let gps = await import('./gps');
     let pos = await gps.getGeoLocation();
-    let { latitude: lat, longitude: lng } = pos.coords;
-    renderMap(pos);
+    let { latitude: lat, longitude: lon } = pos.coords;
+    let { OSM } = await import('./osm');
+    let osm = new OSM(dom.ID_MAP);
+    let s = MAP_BOX_SIZE;
+
+    await osm.render({
+      min: { lat: lat - s, lon: lon - s },
+      max: { lat: lat + s, lon: lon + s },
+    });
+
+    osm.addMarker({ lat, lon });
     displayedGpsCoords = pos;
   } catch (err) {
     // PositionError means that the phone has location turned off.
     log.e(err);
     $(dom.ID_NOGPS).textContent = err.message;
   }
-}
-
-async function renderMap(pos: Position) {
-  let mapid = dom.ID_MAP.replace('#', '');
-  let { latitude, longitude } = pos.coords;
-
-  log.i('Rendering OSM in #' + mapid,
-    'lat:', latitude, 'lng:', longitude);
-
-  await dom.loadScript(config.OSM_LIB);
-  dom.loadStyles(config.OSM_CSS);
-
-  map = new ol.Map({
-    target: mapid,
-    layers: [
-      new ol.layer.Tile({
-        source: new ol.source.OSM()
-      })
-    ],
-  });
-
-  setMapViewBox({
-    lat: latitude,
-    lon: longitude,
-    size: config.MAP_BOX_SIZE,
-  });
-
-  addMarker({
-    lat: latitude,
-    lon: longitude,
-  });
-
-  log.i('Done with OSM map.');
-}
-
-function setMapViewBox({ lat, lon, size }) {
-  let minpos = ol.proj.fromLonLat([
-    lon - size,
-    lat - size,
-  ]);
-
-  let maxpos = ol.proj.fromLonLat([
-    lon + size,
-    lat + size,
-  ]);
-
-  let bbox = [...minpos, ...maxpos];
-
-  map.getView().setCenter(
-    ol.proj.fromLonLat([lon, lat]));
-  map.getView().fit(bbox);
-}
-
-function addMarker({ lat, lon }) {
-  let layer = new ol.layer.Vector({
-    source: new ol.source.Vector({
-      features: [
-        new ol.Feature({
-          geometry: new ol.geom.Circle(
-            ol.proj.fromLonLat([lon, lat]), 10)
-        })
-      ]
-    }),
-    style: new ol.style.Style({
-      stroke: new ol.style.Stroke({
-        color: 'blue',
-        width: 1,
-      }),
-      fill: new ol.style.Fill({
-        color: 'red'
-      }),
-    }),
-  });
-
-  map.addLayer(layer);
 }
 
 async function initSendButton() {

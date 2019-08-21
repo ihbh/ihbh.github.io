@@ -1,4 +1,5 @@
 export const ID_MAP = '#map';
+export const ID_MAP_ALL_PLACES = '#all-places';
 export const ID_SEND = '#send';
 export const ID_LOGS = '#logs';
 export const ID_SHOW_LOGS = '#show-logs';
@@ -10,6 +11,7 @@ export const ID_REG_ERROR = '#reg-err';
 export const ID_REG_DONE = '#reg-done';
 export const ID_UPLOAD_PHOTO_INPUT = '#upload-input';
 export const ID_USERPIC = '#userpic';
+export const ID_SHOW_PLACES = '#show-places';
 
 export function $<T extends Element>(selector: string) {
   return document.querySelector(selector) as T;
@@ -39,7 +41,6 @@ export async function loadScript(url: string) {
     script.async = true;
     script.onload = () => resolve();
     script.onerror = () => reject(new Error('Failed to load script: ' + url));
-    window['define'] = null;
     document.head.append(script);
   });
 }

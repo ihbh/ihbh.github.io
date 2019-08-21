@@ -1,4 +1,4 @@
-type ArgId = 'page';
+type ArgId = 'page' | 'vpt';
 
 let args: Map<string, string> = null;
 

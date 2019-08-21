@@ -4,7 +4,7 @@ import { $, $$ } from './dom';
 
 const log = new TaggedLogger('page');
 
-type PageId = 'map' | 'reg';
+type PageId = 'map' | 'reg' | 'places';
 
 export async function init() {
   let id = get();

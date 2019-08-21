@@ -2,6 +2,7 @@ define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ID_MAP = '#map';
+    exports.ID_MAP_ALL_PLACES = '#all-places';
     exports.ID_SEND = '#send';
     exports.ID_LOGS = '#logs';
     exports.ID_SHOW_LOGS = '#show-logs';
@@ -13,6 +14,7 @@ define(["require", "exports"], function (require, exports) {
     exports.ID_REG_DONE = '#reg-done';
     exports.ID_UPLOAD_PHOTO_INPUT = '#upload-input';
     exports.ID_USERPIC = '#userpic';
+    exports.ID_SHOW_PLACES = '#show-places';
     function $(selector) {
         return document.querySelector(selector);
     }
@@ -41,7 +43,6 @@ define(["require", "exports"], function (require, exports) {
             script.async = true;
             script.onload = () => resolve();
             script.onerror = () => reject(new Error('Failed to load script: ' + url));
-            window['define'] = null;
             document.head.append(script);
         });
     }

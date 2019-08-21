@@ -118,7 +118,7 @@ button.btn:focus {
   margin: 0 auto;
 }
 
-#map {
+#map, #all-places {
   width: 100%;
   height: 100%;
   border: none;
@@ -128,13 +128,13 @@ button.btn:focus {
   z-index: 0;
 }
 
-#map .ol-attribution {
+body .page .ol-attribution {
   bottom: 0;
   right: 0;
   font-size: 10pt;
 }
 
-#map .ol-attribution * {
+body .page .ol-attribution * {
   font-size: 10pt;
 }
 
@@ -150,6 +150,19 @@ button.btn:focus {
   position: fixed;
   right: 0.5em;
   top: 0.5em;
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  border: none;
+  background: #ccc;
+  box-shadow: 0 0 7pt 1pt #000;
+}
+
+#show-places {
+  z-index: 1;
+  position: fixed;
+  right: 0.5em;
+  top: 3.5em;
   width: 2em;
   height: 2em;
   border-radius: 50%;

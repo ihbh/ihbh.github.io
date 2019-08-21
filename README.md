@@ -6,4 +6,4 @@ This web app is meant to work as a Progressive Web App (PWA) to avoid hurdles wi
 
 # Credits
 
-Icon made by Prosymbols from flaticon.com.
+Icons made by Prosymbols and Freepik from flaticon.com.

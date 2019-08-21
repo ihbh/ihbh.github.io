@@ -32,19 +32,18 @@
       source: new ol.source.Vector({
         features: [
           new ol.Feature({
-            geometry: new ol.geom.Circle(
-              ol.proj.fromLonLat([lon, lat]), 50)
+            geometry: new ol.geom.Point(
+              ol.proj.fromLonLat([lon, lat]))
           })
         ]
       }),
       style: new ol.style.Style({
-        stroke: new ol.style.Stroke({
-          color: 'red',
-          width: 3,
-        }),
-        fill: new ol.style.Fill({
-          color: 'blue'
-        }),
+        image: new ol.style.Icon({
+          opacity: 1,
+          src: '/favicon.ico',
+          size: [32, 32],
+          scale: 1,
+        })
       }),
     });
 
