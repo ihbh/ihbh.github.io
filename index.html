@@ -10,11 +10,11 @@
   <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
       connect-src 'self';
-      img-src 'self' data: blob: openlayers.org http://*.tile.openstreetmap.org;
+      img-src 'self' data: blob: *.tile.openstreetmap.org;
       media-src 'self' blob:;
-      script-src 'self' https://openlayers.org;
+      script-src 'self' cdn.rawgit.com;
       worker-src 'self';
-      style-src 'self' 'unsafe-inline' https://openlayers.org;
+      style-src 'self' 'unsafe-inline' cdn.rawgit.com;
       upgrade-insecure-requests;
   ">
 
@@ -30,15 +30,15 @@
 <body>
   <div id="logs" style="display:none"></div>
   <div id="debug">
-    <button id="show-logs">Logs</button>
-    <button id="reset-ls">Reset</button>
+    <button class="btn" id="show-logs">Logs</button>
+    <button class="btn" id="reset-ls">Reset</button>
   </div>
 
   <!-- The registration page. -->
 
   <div id="p-reg" class="page">
     <div id="photo-frame">
-      <button>Upload Photo</button>
+      <button class="btn">Upload Photo</button>
       <img id="photo">
       <!-- This hidden <input> is used to upload a file. -->
       <input id="upload-input" type="file" accept="image/*">
@@ -49,7 +49,7 @@
     </div>
     <div id="reg-err"></div>
     <div id="reg-nav">
-      <button id="reg-done">Next</button>
+      <button class="btn" id="reg-done">Next</button>
     </div>
   </div>
 
@@ -59,7 +59,7 @@
     <div id="map"></div>
     <span id="no-gps"></span>
     <img id="userpic">
-    <button id="send">I've Been Here!</button>
+    <button class="btn" id="send">I've Been Here!</button>
   </div>
 </body>
 

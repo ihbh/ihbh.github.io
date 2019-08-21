@@ -1,13 +1,14 @@
 import * as dom from './dom';
 import { TaggedLogger } from './log';
 import * as ls from './ls';
-import { OSM_LIB } from './config';
+import * as config from './config';
 
-declare const OpenLayers;
+declare const ol; // OSM v5.3
 
 const log = new TaggedLogger('main');
 const { $ } = dom;
 
+let map = null; // ol.Map
 let displayedGpsCoords = null;
 
 export async function init() {
@@ -77,23 +78,72 @@ async function renderMap(pos: Position) {
   log.i('Rendering OSM in #' + mapid,
     'lat:', latitude, 'lng:', longitude);
 
-  await dom.loadScript(OSM_LIB);
+  await dom.loadScript(config.OSM_LIB);
+  dom.loadStyles(config.OSM_CSS);
 
-  let map = new OpenLayers.Map(mapid);
-  map.addLayer(new OpenLayers.Layer.OSM());
+  map = new ol.Map({
+    target: mapid,
+    layers: [
+      new ol.layer.Tile({
+        source: new ol.source.OSM()
+      })
+    ],
+  });
 
-  let smppos = new OpenLayers.LonLat(longitude, latitude)
-    .transform(
-      new OpenLayers.Projection('EPSG:4326'), // transform from WGS 1984
-      map.getProjectionObject() // to Spherical Mercator Projection
-    );
+  setMapViewBox({
+    lat: latitude,
+    lon: longitude,
+    size: config.MAP_BOX_SIZE,
+  });
 
-  let markers = new OpenLayers.Layer.Markers('Markers');
-  map.addLayer(markers);
-  markers.addMarker(new OpenLayers.Marker(smppos));
+  addMarker({
+    lat: latitude,
+    lon: longitude,
+  });
 
-  let zoom = 16;
-  map.setCenter(smppos, zoom);
+  log.i('Done with OSM map.');
+}
+
+function setMapViewBox({ lat, lon, size }) {
+  let minpos = ol.proj.fromLonLat([
+    lon - size,
+    lat - size,
+  ]);
+
+  let maxpos = ol.proj.fromLonLat([
+    lon + size,
+    lat + size,
+  ]);
+
+  let bbox = [...minpos, ...maxpos];
+
+  map.getView().setCenter(
+    ol.proj.fromLonLat([lon, lat]));
+  map.getView().fit(bbox);
+}
+
+function addMarker({ lat, lon }) {
+  let layer = new ol.layer.Vector({
+    source: new ol.source.Vector({
+      features: [
+        new ol.Feature({
+          geometry: new ol.geom.Circle(
+            ol.proj.fromLonLat([lon, lat]), 10)
+        })
+      ]
+    }),
+    style: new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: 'blue',
+        width: 1,
+      }),
+      fill: new ol.style.Fill({
+        color: 'red'
+      }),
+    }),
+  });
+
+  map.addLayer(layer);
 }
 
 async function initSendButton() {

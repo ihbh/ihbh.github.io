@@ -1,8 +1,9 @@
-define(["require", "exports", "./dom", "./log", "./ls", "./config"], function (require, exports, dom, log_1, ls, config_1) {
+define(["require", "exports", "./dom", "./log", "./ls", "./config"], function (require, exports, dom, log_1, ls, config) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('main');
     const { $ } = dom;
+    let map = null; // ol.Map
     let displayedGpsCoords = null;
     async function init() {
         await initUserPic();
@@ -64,18 +65,60 @@ define(["require", "exports", "./dom", "./log", "./ls", "./config"], function (r
         let mapid = dom.ID_MAP.replace('#', '');
         let { latitude, longitude } = pos.coords;
         log.i('Rendering OSM in #' + mapid, 'lat:', latitude, 'lng:', longitude);
-        await dom.loadScript(config_1.OSM_LIB);
-        let map = new OpenLayers.Map(mapid);
-        map.addLayer(new OpenLayers.Layer.OSM());
-        let smppos = new OpenLayers.LonLat(longitude, latitude)
-            .transform(new OpenLayers.Projection('EPSG:4326'), // transform from WGS 1984
-        map.getProjectionObject() // to Spherical Mercator Projection
-        );
-        let markers = new OpenLayers.Layer.Markers('Markers');
-        map.addLayer(markers);
-        markers.addMarker(new OpenLayers.Marker(smppos));
-        let zoom = 16;
-        map.setCenter(smppos, zoom);
+        await dom.loadScript(config.OSM_LIB);
+        dom.loadStyles(config.OSM_CSS);
+        map = new ol.Map({
+            target: mapid,
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+        });
+        setMapViewBox({
+            lat: latitude,
+            lon: longitude,
+            size: config.MAP_BOX_SIZE,
+        });
+        addMarker({
+            lat: latitude,
+            lon: longitude,
+        });
+        log.i('Done with OSM map.');
+    }
+    function setMapViewBox({ lat, lon, size }) {
+        let minpos = ol.proj.fromLonLat([
+            lon - size,
+            lat - size,
+        ]);
+        let maxpos = ol.proj.fromLonLat([
+            lon + size,
+            lat + size,
+        ]);
+        let bbox = [...minpos, ...maxpos];
+        map.getView().setCenter(ol.proj.fromLonLat([lon, lat]));
+        map.getView().fit(bbox);
+    }
+    function addMarker({ lat, lon }) {
+        let layer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: [
+                    new ol.Feature({
+                        geometry: new ol.geom.Circle(ol.proj.fromLonLat([lon, lat]), 10)
+                    })
+                ]
+            }),
+            style: new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: 'blue',
+                    width: 1,
+                }),
+                fill: new ol.style.Fill({
+                    color: 'red'
+                }),
+            }),
+        });
+        map.addLayer(layer);
     }
     async function initSendButton() {
         try {

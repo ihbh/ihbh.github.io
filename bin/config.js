@@ -7,7 +7,8 @@ define(["require", "exports"], function (require, exports) {
     exports.GPS_DIGITS = 7;
     exports.MAP_BOX_SIZE = 250 * exports.MAP_1M;
     exports.OSM_URL = 'https://www.openstreetmap.org/export/embed.html';
-    exports.OSM_LIB = 'https://openlayers.org/api/OpenLayers.js';
+    exports.OSM_LIB = 'https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js';
+    exports.OSM_CSS = 'https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css';
     exports.VALID_USERNAME_REGEX = /^[a-z]{3,15}$/i;
     exports.PHOTO_SIZE = 64;
     exports.RPC_URL = 'http://localhost';

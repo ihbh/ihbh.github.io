@@ -17,7 +17,7 @@ body {
   flex-direction: column;
 }
 
-button {
+button.btn {
   font-size: 0.75em;
   padding: 1em;
   background: #800;
@@ -27,7 +27,7 @@ button {
   user-select: none;
 }
 
-button:focus {
+button.btn:focus {
   outline: none;
 }
 
@@ -128,13 +128,13 @@ button:focus {
   z-index: 0;
 }
 
-#map .olControlAttribution {
+#map .ol-attribution {
   bottom: 0;
   right: 0;
   font-size: 10pt;
 }
 
-#map .olControlAttribution * {
+#map .ol-attribution * {
   font-size: 10pt;
 }
 

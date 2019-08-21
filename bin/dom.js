@@ -41,9 +41,21 @@ define(["require", "exports"], function (require, exports) {
             script.async = true;
             script.onload = () => resolve();
             script.onerror = () => reject(new Error('Failed to load script: ' + url));
+            window['define'] = null;
             document.head.append(script);
         });
     }
     exports.loadScript = loadScript;
+    async function loadStyles(url) {
+        return new Promise((resolve, reject) => {
+            let link = document.createElement('link');
+            link.href = url;
+            link.rel = 'stylesheet';
+            link.onload = () => resolve();
+            link.onerror = () => reject(new Error('Failed to load CSS: ' + url));
+            document.head.append(link);
+        });
+    }
+    exports.loadStyles = loadStyles;
 });
 //# sourceMappingURL=dom.js.map
