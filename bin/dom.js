@@ -15,6 +15,8 @@ define(["require", "exports"], function (require, exports) {
     exports.ID_UPLOAD_PHOTO_INPUT = '#upload-input';
     exports.ID_USERPIC = '#userpic';
     exports.ID_SHOW_PLACES = '#show-places';
+    exports.ID_VISITORS = '#visitors';
+    exports.ID_NEARBY_STATUS = '#nearby-status';
     function $(selector) {
         return document.querySelector(selector);
     }

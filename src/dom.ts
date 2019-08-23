@@ -12,6 +12,8 @@ export const ID_REG_DONE = '#reg-done';
 export const ID_UPLOAD_PHOTO_INPUT = '#upload-input';
 export const ID_USERPIC = '#userpic';
 export const ID_SHOW_PLACES = '#show-places';
+export const ID_VISITORS = '#visitors';
+export const ID_NEARBY_STATUS = '#nearby-status';
 
 export function $<T extends Element>(selector: string) {
   return document.querySelector(selector) as T;

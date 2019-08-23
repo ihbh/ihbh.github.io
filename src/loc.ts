@@ -30,8 +30,11 @@ export async function shareLocation(pos: GpsCoords) {
     return places;
   });
 
-  let args: VisitorNote = { user: null, time, pos };
-  await rpc.schedule(rpc.MAP_SHARE_LOCATION, args);
+  await rpc.invoke('Map.ShareLocation', {
+    time,
+    lat: pos.lat,
+    lon: pos.lng,
+  }, true);
 }
 
 export function getVisitedPlaces(): VisitedPlaceInfo[] {

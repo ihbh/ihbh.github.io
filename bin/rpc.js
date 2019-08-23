@@ -1,8 +1,6 @@
 define(["require", "exports", "./config", "./log", "./ls"], function (require, exports, config, log_1, ls) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.MAP_SHARE_LOCATION = 'Map.ShareLocation';
-    exports.USER_SET_DETAILS = 'User.SetDetails';
     const log = new log_1.TaggedLogger('rpc');
     let sending = false;
     class RpcError extends Error {
@@ -14,8 +12,10 @@ define(["require", "exports", "./config", "./log", "./ls"], function (require, e
         }
     }
     exports.RpcError = RpcError;
-    async function invoke(method, args) {
-        log.i('invoke:', method, args);
+    async function invoke(method, args, retry) {
+        log.i('invoke:', method, args, 'retry?', retry);
+        if (retry)
+            await schedule(method, args);
         let url = `${config.RPC_URL}/rpc/${method}`;
         await new Promise(resolve => setTimeout(resolve, config.RPC_DELAY * 1000));
         let res = await fetch(url, {
@@ -48,7 +48,6 @@ define(["require", "exports", "./config", "./log", "./ls"], function (require, e
             return unsent;
         });
     }
-    exports.schedule = schedule;
     async function sendall() {
         let unsent = ls.rpcs.unsent.get();
         let infos = ls.rpcs.infos.get();

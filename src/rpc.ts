@@ -2,9 +2,6 @@ import * as config from './config';
 import { TaggedLogger } from './log';
 import * as ls from './ls';
 
-export const MAP_SHARE_LOCATION = 'Map.ShareLocation';
-export const USER_SET_DETAILS = 'User.SetDetails';
-
 const log = new TaggedLogger('rpc');
 
 let sending = false;
@@ -21,8 +18,49 @@ export class RpcError extends Error {
   }
 }
 
-export async function invoke(method: string, args) {
-  log.i('invoke:', method, args);
+export interface UserDetails {
+  photo?: string;
+  name?: string;
+  info?: string;
+}
+
+export interface UserInfo {
+  uid: string;
+  name: string;
+  photo: string;
+}
+
+export interface SharedLocation {
+  lat: number;
+  lon: number;
+  time: number;
+}
+
+export function invoke(
+  method: 'User.SetDetails',
+  args: UserDetails,
+  retry: boolean)
+  : Promise<{}>;
+
+export function invoke(
+  method: 'Map.ShareLocation',
+  args: SharedLocation,
+  retry: boolean)
+  : Promise<{}>;
+
+export function invoke(
+  method: 'Map.GetPeopleNearby',
+  args: { lat: number, lon: number })
+  : Promise<string[]>;
+
+export function invoke(
+  method: 'Map.GetUsersInfo',
+  args: string[])
+  : Promise<UserInfo[]>;
+
+export async function invoke(method: string, args, retry?: boolean) {
+  log.i('invoke:', method, args, 'retry?', retry);
+  if (retry) await schedule(method, args);
 
   let url = `${config.RPC_URL}/rpc/${method}`;
 
@@ -47,7 +85,7 @@ export async function invoke(method: string, args) {
   return json;
 }
 
-export async function schedule(method: string, args) {
+async function schedule(method: string, args) {
   log.i('schedule:', method, args);
 
   let sha1 = await import('./sha1' as any);
@@ -77,7 +115,7 @@ export async function sendall() {
     for (let id of Object.keys(unsent)) {
       try {
         let { method, args } = infos[id];
-        await invoke(method, args);
+        await invoke(method as any, args);
 
         ls.rpcs.unsent.modify(unsent => {
           delete unsent[id];

@@ -217,3 +217,32 @@ body .page .ol-attribution * {
   word-break: break-word;
   z-index: 2;
 }
+
+#visitors {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 1em;
+  padding: 1em;
+}
+
+#visitors .card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#visitors .card img {
+  width: 64;
+  height: 64;
+  border-radius: 50%;
+}
+
+#visitors .card .name {
+  font-size: 0.5em;
+  text-align: center;
+}
+
+#nearby-status {
+  word-wrap: break-word;
+  word-break: break-all;
+}

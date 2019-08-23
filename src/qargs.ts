@@ -1,5 +1,8 @@
-type ArgId = 'page' | 'vpt';
+import { TaggedLogger } from "./log";
 
+type ArgId = 'page' | 'lat' | 'lon' | 'vpt' | 'pnt';
+
+let log = new TaggedLogger('qargs');
 let args: Map<string, string> = null;
 
 export function get(arg: ArgId) {
@@ -11,9 +14,11 @@ export function get(arg: ArgId) {
   return args.get(arg);
 }
 
-export function set(arg: ArgId, value: string) {
-  args.set(arg, value);
+export function set(newArgs) {
+  for (let arg in newArgs)
+    args.set(arg, newArgs[arg]);
   let query = serializeArgs(args);
+  log.i('?' + query);
   location.search = '?' + query;
 }
 
@@ -37,7 +42,7 @@ function serializeArgs(args: Map<string, string>) {
   for (let [key, val] of args) {
     let encKey = encodeURIComponent(key);
     let encVal = encodeURIComponent(val);
-    pairs.push(encKey + '=' + encVal);  
+    pairs.push(encKey + '=' + encVal);
   }
 
   return pairs.join('&');

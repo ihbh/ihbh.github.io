@@ -91,7 +91,7 @@ async function registerProfile() {
     try {
       let usr = await import('./usr');
 
-      await usr.setDetails({
+      usr.setDetails({
         photo: imgurl,
         name: username,
       });

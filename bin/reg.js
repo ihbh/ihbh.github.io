@@ -81,7 +81,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls", "./page"], f
             ls.username.set(username);
             try {
                 let usr = await new Promise((resolve_1, reject_1) => { require(['./usr'], resolve_1, reject_1); });
-                await usr.setDetails({
+                usr.setDetails({
                     photo: imgurl,
                     name: username,
                 });

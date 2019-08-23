@@ -3,13 +3,7 @@ import * as rpc from './rpc';
 
 const log = new TaggedLogger('usr');
 
-export interface UserDetails {
-  photo?: string;
-  name?: string;
-  info?: string;
-}
-
-export async function setDetails(details: UserDetails) {
+export async function setDetails(details: rpc.UserDetails) {
   log.i('details:', details);
-  await rpc.schedule(rpc.USER_SET_DETAILS, details);
+  await rpc.invoke('User.SetDetails', details, true);
 }

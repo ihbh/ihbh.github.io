@@ -9,8 +9,11 @@ define(["require", "exports", "./log", "./rpc", "./ls"], function (require, expo
             places[time] = [pos.lat, pos.lng];
             return places;
         });
-        let args = { user: null, time, pos };
-        await rpc.schedule(rpc.MAP_SHARE_LOCATION, args);
+        await rpc.invoke('Map.ShareLocation', {
+            time,
+            lat: pos.lat,
+            lon: pos.lng,
+        }, true);
     }
     exports.shareLocation = shareLocation;
     function getVisitedPlaces() {

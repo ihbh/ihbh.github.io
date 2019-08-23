@@ -1,6 +1,7 @@
-define(["require", "exports"], function (require, exports) {
+define(["require", "exports", "./log"], function (require, exports, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    let log = new log_1.TaggedLogger('qargs');
     let args = null;
     function get(arg) {
         if (!args) {
@@ -10,9 +11,11 @@ define(["require", "exports"], function (require, exports) {
         return args.get(arg);
     }
     exports.get = get;
-    function set(arg, value) {
-        args.set(arg, value);
+    function set(newArgs) {
+        for (let arg in newArgs)
+            args.set(arg, newArgs[arg]);
         let query = serializeArgs(args);
+        log.i('?' + query);
         location.search = '?' + query;
     }
     exports.set = set;

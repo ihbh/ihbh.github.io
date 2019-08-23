@@ -4,7 +4,7 @@ import { $, $$ } from './dom';
 
 const log = new TaggedLogger('page');
 
-type PageId = 'map' | 'reg' | 'places';
+type PageId = 'map' | 'reg' | 'places' | 'nearby';
 
 export async function init() {
   let id = get();
@@ -17,13 +17,13 @@ export function get(): PageId {
   return qargs.get('page') as PageId;
 }
 
-export function set(id: PageId) {
+export function set(id: PageId, args?) {
   if (get() == id) {
     log.i('select:', id);
     select(id);
   } else {
     log.i('redirect:', id);
-    qargs.set('page', id);
+    qargs.set({ page: id, ...args });
   }
 }
 

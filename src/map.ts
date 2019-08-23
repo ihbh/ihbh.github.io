@@ -7,7 +7,7 @@ import { MAP_BOX_SIZE } from './config';
 const log = new TaggedLogger('map');
 const { $ } = dom;
 
-let displayedGpsCoords = null;
+let displayedGpsCoords: Position = null;
 
 export async function init() {
   await initUserPic();
@@ -87,29 +87,30 @@ async function loadMap() {
 }
 
 async function initSendButton() {
-  try {
-    let button = $<HTMLButtonElement>(dom.ID_SEND);
+  let button = $<HTMLButtonElement>(dom.ID_SEND);
 
-    button.onclick = async () => {
-      log.i('#send:click');
-      let pwa = await import('./pwa');
-      pwa.showInstallPrompt();
-      button.disabled = true;
+  button.onclick = async () => {
+    log.i('#send:click');
+    let pwa = await import('./pwa');
+    pwa.showInstallPrompt();
+    button.disabled = true;
 
-      try {
-        await shareDisplayedLocation();
-      } catch (err) {
-        log.e(err);
-      } finally {
-        button.disabled = false;
-      }
+    try {
+      await shareDisplayedLocation();
+    } catch (err) {
+      log.e(err);
+    } finally {
+      button.disabled = false;
+    }
 
-      let rpc = await import('./rpc');
-      rpc.sendall();
-    };
-  } catch (err) {
-    log.e('pwa.init() failed:', err);
-  }
+    let rpc = await import('./rpc');
+    rpc.sendall();
+
+    page.set('nearby', {
+      lat: displayedGpsCoords.coords.latitude,
+      lon: displayedGpsCoords.coords.longitude,
+    });
+  };
 }
 
 async function shareDisplayedLocation() {

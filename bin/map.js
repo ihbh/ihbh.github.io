@@ -75,29 +75,28 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page", "./config"], f
         }
     }
     async function initSendButton() {
-        try {
-            let button = $(dom.ID_SEND);
-            button.onclick = async () => {
-                log.i('#send:click');
-                let pwa = await new Promise((resolve_3, reject_3) => { require(['./pwa'], resolve_3, reject_3); });
-                pwa.showInstallPrompt();
-                button.disabled = true;
-                try {
-                    await shareDisplayedLocation();
-                }
-                catch (err) {
-                    log.e(err);
-                }
-                finally {
-                    button.disabled = false;
-                }
-                let rpc = await new Promise((resolve_4, reject_4) => { require(['./rpc'], resolve_4, reject_4); });
-                rpc.sendall();
-            };
-        }
-        catch (err) {
-            log.e('pwa.init() failed:', err);
-        }
+        let button = $(dom.ID_SEND);
+        button.onclick = async () => {
+            log.i('#send:click');
+            let pwa = await new Promise((resolve_3, reject_3) => { require(['./pwa'], resolve_3, reject_3); });
+            pwa.showInstallPrompt();
+            button.disabled = true;
+            try {
+                await shareDisplayedLocation();
+            }
+            catch (err) {
+                log.e(err);
+            }
+            finally {
+                button.disabled = false;
+            }
+            let rpc = await new Promise((resolve_4, reject_4) => { require(['./rpc'], resolve_4, reject_4); });
+            rpc.sendall();
+            page.set('nearby', {
+                lat: displayedGpsCoords.coords.latitude,
+                lon: displayedGpsCoords.coords.longitude,
+            });
+        };
     }
     async function shareDisplayedLocation() {
         let loc = await new Promise((resolve_5, reject_5) => { require(['./loc'], resolve_5, reject_5); });
