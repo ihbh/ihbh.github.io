@@ -1,4 +1,4 @@
-define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config"], function (require, exports, log_1, rpc, qargs, dom, conf) {
+define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", "./react"], function (require, exports, log_1, rpc, qargs, dom, conf, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('map');
@@ -30,8 +30,10 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config"],
             }
             setStatus('');
             let container = $(dom.ID_VISITORS);
-            for (let info of infos)
-                container.append(makeUserCard(info));
+            for (let info of infos) {
+                let card = makeUserCard(info);
+                container.append(card);
+            }
         }
         catch (err) {
             setStatus(err + '');
@@ -44,16 +46,9 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config"],
         div.textContent = text;
     }
     function makeUserCard(info) {
-        let card = document.createElement('div');
-        card.className = 'card';
-        card.setAttribute('uid', info.uid);
-        let img = document.createElement('img');
-        img.src = info.photo;
-        let name = document.createElement('div');
-        name.className = 'name';
-        name.textContent = info.name;
-        card.append(img, name);
-        return card;
+        return react_1.default.createElement("div", { class: "card", uid: info.uid },
+            react_1.default.createElement("img", { src: info.photo }),
+            react_1.default.createElement("div", { class: "name" }, info.name));
     }
     async function getPeopleNearby({ lat, lon }) {
         let uids = await rpc.invoke('Map.GetPeopleNearby', { lat, lon });

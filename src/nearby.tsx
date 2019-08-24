@@ -3,6 +3,7 @@ import * as rpc from './rpc';
 import * as qargs from './qargs';
 import * as dom from './dom';
 import * as conf from './config';
+import React from './react';
 
 let log = new TaggedLogger('map');
 let { $ } = dom;
@@ -39,8 +40,10 @@ export async function init() {
 
     setStatus('');
     let container = $(dom.ID_VISITORS);
-    for (let info of infos)
-      container.append(makeUserCard(info));
+    for (let info of infos) {
+      let card = makeUserCard(info);
+      container.append(card);
+    }
   } catch (err) {
     setStatus(err + '');
     throw err;
@@ -53,16 +56,10 @@ function setStatus(text: string) {
 }
 
 function makeUserCard(info: rpc.UserInfo) {
-  let card = document.createElement('div');
-  card.className = 'card';
-  card.setAttribute('uid', info.uid);
-  let img = document.createElement('img');
-  img.src = info.photo;
-  let name = document.createElement('div');
-  name.className = 'name';
-  name.textContent = info.name;
-  card.append(img, name);
-  return card;
+  return <div class="card" uid={info.uid}>
+    <img src={info.photo} />
+    <div class="name">{info.name}</div>
+  </div>;
 }
 
 async function getPeopleNearby({ lat, lon }) {
