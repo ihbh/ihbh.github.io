@@ -38,6 +38,61 @@ button.btn:focus {
   height: 100%;
 }
 
+/* debug menu */
+
+#debug {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  display: none;
+  flex-direction: column;
+  z-index: 3;
+}
+
+body.debug #debug {
+  display: flex;
+}
+
+#debug button {
+  color: #444;  
+  font-size: 12pt;
+  box-shadow: none;  
+  background: none;
+  padding: 0;
+  margin: 1em;
+  text-decoration: underline;
+}
+
+#logs {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  font-size: 8pt;
+  font-family: monospace;
+  white-space: pre-wrap;
+  overflow-y: scroll;
+  word-break: break-word;
+  z-index: 2;
+}
+
+/* OSM */
+
+body .page .ol-attribution {
+  bottom: 0;
+  right: 0;
+  font-size: 10pt;
+}
+
+body .page .ol-attribution * {
+  font-size: 10pt;
+}
+
+/* ?page=reg */
+
 #p-reg {
   justify-content: space-evenly;
 }
@@ -118,7 +173,9 @@ button.btn:focus {
   margin: 0 auto;
 }
 
-#map, #all-places {
+/* ?page=map */
+
+#map {
   width: 100%;
   height: 100%;
   border: none;
@@ -126,16 +183,6 @@ button.btn:focus {
   left: 0;
   top: 0;
   z-index: 0;
-}
-
-body .page .ol-attribution {
-  bottom: 0;
-  right: 0;
-  font-size: 10pt;
-}
-
-body .page .ol-attribution * {
-  font-size: 10pt;
 }
 
 #no-gps {
@@ -183,44 +230,19 @@ body .page .ol-attribution * {
   box-shadow: none;
 }
 
-#debug {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  z-index: 1;
-  display: none;
-  flex-direction: column;
-  z-index: 3;
-}
+/* ?page=places */ 
 
-body.debug #debug {
-  display: flex;
-}
-
-#debug button {
-  color: #444;  
-  font-size: 12pt;
-  box-shadow: none;  
-  background: none;
-  padding: 0;
-  margin: 1em;
-  text-decoration: underline;
-}
-
-#logs {
+#all-places {
+  width: 100%;
+  height: 100%;
+  border: none;
   position: fixed;
   left: 0;
   top: 0;
-  width: 100%;
-  height: 100%;
-  background: #fff;
-  font-size: 8pt;
-  font-family: monospace;
-  white-space: pre-wrap;
-  overflow-y: scroll;
-  word-break: break-word;
-  z-index: 2;
+  z-index: 0;
 }
+
+/* ?page=nearby */
 
 #visitors {
   display: grid;
@@ -229,19 +251,21 @@ body.debug #debug {
   padding: 1em;
 }
 
-#visitors .card {
+#visitors a {
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-decoration: none;
+  color: inherit;
 }
 
-#visitors .card img {
+#visitors img {
   width: 64;
   height: 64;
   border-radius: 50%;
 }
 
-#visitors .card .name {
+#visitors span {
   font-size: 0.5em;
   text-align: center;
 }

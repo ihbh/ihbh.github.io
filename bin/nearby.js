@@ -30,10 +30,7 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", 
             }
             setStatus('');
             let container = $(dom.ID_VISITORS);
-            for (let info of infos) {
-                let card = makeUserCard(info);
-                container.append(card);
-            }
+            container.append(...infos.map(makeUserCard));
         }
         catch (err) {
             setStatus(err + '');
@@ -46,9 +43,10 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", 
         div.textContent = text;
     }
     function makeUserCard(info) {
-        return react_1.default.createElement("div", { class: "card", uid: info.uid },
+        let href = '/mess?uid=' + info.uid;
+        return react_1.default.createElement("a", { href: href },
             react_1.default.createElement("img", { src: info.photo }),
-            react_1.default.createElement("div", { class: "name" }, info.name));
+            react_1.default.createElement("span", null, info.name));
     }
     async function getPeopleNearby({ lat, lon }) {
         let uids = await rpc.invoke('Map.GetPeopleNearby', { lat, lon });

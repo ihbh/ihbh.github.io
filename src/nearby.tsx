@@ -40,10 +40,7 @@ export async function init() {
 
     setStatus('');
     let container = $(dom.ID_VISITORS);
-    for (let info of infos) {
-      let card = makeUserCard(info);
-      container.append(card);
-    }
+    container.append(...infos.map(makeUserCard));
   } catch (err) {
     setStatus(err + '');
     throw err;
@@ -56,10 +53,11 @@ function setStatus(text: string) {
 }
 
 function makeUserCard(info: rpc.UserInfo) {
-  return <div class="card" uid={info.uid}>
+  let href = '/mess?uid=' + info.uid;
+  return <a href={href}>
     <img src={info.photo} />
-    <div class="name">{info.name}</div>
-  </div>;
+    <span>{info.name}</span>
+  </a>;
 }
 
 async function getPeopleNearby({ lat, lon }) {
