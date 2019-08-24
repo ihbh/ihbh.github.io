@@ -1,11 +1,11 @@
-define(["require", "exports", "./dom", "./log", "./config"], function (require, exports, dom, log_1, config) {
+define(["require", "exports", "./dom", "./log", "./config", "./qargs"], function (require, exports, dom, log_1, conf, qargs) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('dbg');
     const { $ } = dom;
     function init() {
-        log.i('Debug mode?', config.DEBUG);
-        if (!config.DEBUG)
+        log.i('Debug mode?', conf.DEBUG);
+        if (!conf.DEBUG)
             return;
         document.body.classList.add(dom.CSS_DEBUG);
         $(dom.ID_RESET_LS).addEventListener('click', () => {
@@ -29,5 +29,20 @@ define(["require", "exports", "./dom", "./log", "./config"], function (require, 
         });
     }
     exports.init = init;
+    async function getDebugPeopleNearby() {
+        let ntest = +qargs.get('pnt') ||
+            conf.DBG_N_USERS_NEARBY;
+        log.i('Returning test data:', ntest);
+        let res = [];
+        for (let i = 0; i < ntest; i++) {
+            res.push({
+                uid: 'uid-' + i,
+                name: 'Joe' + i,
+                photo: '/favicon.ico',
+            });
+        }
+        return res;
+    }
+    exports.getDebugPeopleNearby = getDebugPeopleNearby;
 });
 //# sourceMappingURL=dbg.js.map

@@ -27,10 +27,9 @@ export async function init() {
     try {
       infos = await getPeopleNearby({ lat, lon });
     } catch (err) {
-      if (conf.DEBUG)
-        infos = await getDebugPeopleNearby();
-      else
-        throw err;
+      if (!conf.DEBUG) throw err;
+      let dbg = await import('./dbg');
+      infos = await dbg.getDebugPeopleNearby();
     }
 
     if (!infos.length) {
@@ -78,19 +77,4 @@ async function getPeopleNearby({ lat, lon }) {
   log.i('Users info:', infos);
 
   return infos;
-}
-
-async function getDebugPeopleNearby() {
-  let ntest = +qargs.get('pnt') ||
-    conf.DBG_N_USERS_NEARBY;
-  log.i('Returning test data:', ntest);
-  let res: rpc.UserInfo[] = [];
-  for (let i = 0; i < ntest; i++) {
-    res.push({
-      uid: 'uid-' + i,
-      name: 'Joe' + i,
-      photo: '/favicon.ico',
-    });
-  }
-  return res;
 }

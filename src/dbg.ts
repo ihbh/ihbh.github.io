@@ -1,14 +1,16 @@
 import * as dom from './dom';
 import { logs, TaggedLogger } from './log';
-import * as config from './config';
+import * as conf from './config';
+import * as qargs from './qargs';
+import * as rpc from './rpc';
 
 const log = new TaggedLogger('dbg');
 const { $ } = dom;
 
 export function init() {
-  log.i('Debug mode?', config.DEBUG);
+  log.i('Debug mode?', conf.DEBUG);
 
-  if (!config.DEBUG)
+  if (!conf.DEBUG)
     return;
 
   document.body.classList.add(dom.CSS_DEBUG);
@@ -36,4 +38,19 @@ export function init() {
     div.textContent = text;
     div.style.display = '';
   });
+}
+
+export async function getDebugPeopleNearby() {
+  let ntest = +qargs.get('pnt') ||
+    conf.DBG_N_USERS_NEARBY;
+  log.i('Returning test data:', ntest);
+  let res: rpc.UserInfo[] = [];
+  for (let i = 0; i < ntest; i++) {
+    res.push({
+      uid: 'uid-' + i,
+      name: 'Joe' + i,
+      photo: '/favicon.ico',
+    });
+  }
+  return res;
 }

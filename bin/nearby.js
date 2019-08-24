@@ -19,10 +19,10 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config"],
                 infos = await getPeopleNearby({ lat, lon });
             }
             catch (err) {
-                if (conf.DEBUG)
-                    infos = await getDebugPeopleNearby();
-                else
+                if (!conf.DEBUG)
                     throw err;
+                let dbg = await new Promise((resolve_1, reject_1) => { require(['./dbg'], resolve_1, reject_1); });
+                infos = await dbg.getDebugPeopleNearby();
             }
             if (!infos.length) {
                 setStatus('Looks like you are the first.');
@@ -61,20 +61,6 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config"],
         let infos = await rpc.invoke('Map.GetUsersInfo', uids);
         log.i('Users info:', infos);
         return infos;
-    }
-    async function getDebugPeopleNearby() {
-        let ntest = +qargs.get('pnt') ||
-            conf.DBG_N_USERS_NEARBY;
-        log.i('Returning test data:', ntest);
-        let res = [];
-        for (let i = 0; i < ntest; i++) {
-            res.push({
-                uid: 'uid-' + i,
-                name: 'Joe' + i,
-                photo: '/favicon.ico',
-            });
-        }
-        return res;
     }
 });
 //# sourceMappingURL=nearby.js.map
