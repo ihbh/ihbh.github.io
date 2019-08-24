@@ -53,7 +53,7 @@ function setStatus(text: string) {
 }
 
 function makeUserCard(info: rpc.UserInfo) {
-  let href = '/mess?uid=' + info.uid;
+  let href = '?page=chat&uid=' + info.uid;
   return <a href={href}>
     <img src={info.photo} />
     <span>{info.name}</span>

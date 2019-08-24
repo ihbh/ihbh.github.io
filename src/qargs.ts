@@ -1,6 +1,12 @@
 import { TaggedLogger } from "./log";
 
-type ArgId = 'page' | 'lat' | 'lon' | 'vpt' | 'pnt';
+type ArgId = 
+  'page' | 
+  'uid' |
+  'lat' | 
+  'lon' | 
+  'vpt' | 
+  'pnt';
 
 let log = new TaggedLogger('qargs');
 let args: Map<string, string> = null;

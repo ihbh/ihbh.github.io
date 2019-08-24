@@ -43,7 +43,7 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", 
         div.textContent = text;
     }
     function makeUserCard(info) {
-        let href = '/mess?uid=' + info.uid;
+        let href = '?page=chat&uid=' + info.uid;
         return react_1.default.createElement("a", { href: href },
             react_1.default.createElement("img", { src: info.photo }),
             react_1.default.createElement("span", null, info.name));
