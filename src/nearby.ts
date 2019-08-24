@@ -2,6 +2,7 @@ import { TaggedLogger } from './log';
 import * as rpc from './rpc';
 import * as qargs from './qargs';
 import * as dom from './dom';
+import * as conf from './config';
 
 let log = new TaggedLogger('map');
 let { $ } = dom;
@@ -21,7 +22,16 @@ export async function init() {
       throw new Error(`Invalid GPS coords: lat=${lat} lon=${lon}`);
 
     setStatus('Checking who has been here too...');
-    let infos = await getPeopleNearby({ lat, lon });
+    let infos: rpc.UserInfo[];
+
+    try {
+      infos = await getPeopleNearby({ lat, lon });
+    } catch (err) {
+      if (conf.DEBUG)
+        infos = await getDebugPeopleNearby();
+      else
+        throw err;
+    }
 
     if (!infos.length) {
       setStatus('Looks like you are the first.');
@@ -56,22 +66,7 @@ function makeUserCard(info: rpc.UserInfo) {
   return card;
 }
 
-async function getPeopleNearby({ lat, lon })
-  : Promise<rpc.UserInfo[]> {
-  let ntest = qargs.get('pnt');
-  if (ntest) {
-    log.i('Returning test data:', ntest);
-    let res: rpc.UserInfo[] = [];
-    for (let i = 0; +ntest < 100 && i < +ntest; i++) {
-      res.push({
-        uid: 'uid-' + i,
-        name: 'Joe' + i,
-        photo: '/favicon.ico',
-      });
-    }
-    return res;
-  }
-
+async function getPeopleNearby({ lat, lon }) {
   let uids = await rpc.invoke(
     'Map.GetPeopleNearby',
     { lat, lon });
@@ -83,4 +78,19 @@ async function getPeopleNearby({ lat, lon })
   log.i('Users info:', infos);
 
   return infos;
+}
+
+async function getDebugPeopleNearby() {
+  let ntest = +qargs.get('pnt') ||
+    conf.DBG_N_USERS_NEARBY;
+  log.i('Returning test data:', ntest);
+  let res: rpc.UserInfo[] = [];
+  for (let i = 0; i < ntest; i++) {
+    res.push({
+      uid: 'uid-' + i,
+      name: 'Joe' + i,
+      photo: '/favicon.ico',
+    });
+  }
+  return res;
 }

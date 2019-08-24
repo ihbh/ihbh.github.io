@@ -1,9 +1,13 @@
-define(["require", "exports", "./dom", "./log"], function (require, exports, dom, log_1) {
+define(["require", "exports", "./dom", "./log", "./config"], function (require, exports, dom, log_1, config) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('dbg');
     const { $ } = dom;
     function init() {
+        log.i('Debug mode?', config.DEBUG);
+        if (!config.DEBUG)
+            return;
+        document.body.classList.add(dom.CSS_DEBUG);
         $(dom.ID_RESET_LS).addEventListener('click', () => {
             log.i('#reset-logs:click');
             localStorage.clear();

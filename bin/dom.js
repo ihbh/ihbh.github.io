@@ -1,6 +1,7 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.CSS_DEBUG = 'debug';
     exports.ID_MAP = '#map';
     exports.ID_MAP_ALL_PLACES = '#all-places';
     exports.ID_SEND = '#send';

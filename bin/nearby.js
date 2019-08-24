@@ -1,4 +1,4 @@
-define(["require", "exports", "./log", "./rpc", "./qargs", "./dom"], function (require, exports, log_1, rpc, qargs, dom) {
+define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config"], function (require, exports, log_1, rpc, qargs, dom, conf) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('map');
@@ -14,7 +14,16 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom"], function (r
             if (!isValidLat(lat) || !isValidLon(lon))
                 throw new Error(`Invalid GPS coords: lat=${lat} lon=${lon}`);
             setStatus('Checking who has been here too...');
-            let infos = await getPeopleNearby({ lat, lon });
+            let infos;
+            try {
+                infos = await getPeopleNearby({ lat, lon });
+            }
+            catch (err) {
+                if (conf.DEBUG)
+                    infos = await getDebugPeopleNearby();
+                else
+                    throw err;
+            }
             if (!infos.length) {
                 setStatus('Looks like you are the first.');
                 return;
@@ -47,24 +56,25 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom"], function (r
         return card;
     }
     async function getPeopleNearby({ lat, lon }) {
-        let ntest = qargs.get('pnt');
-        if (ntest) {
-            log.i('Returning test data:', ntest);
-            let res = [];
-            for (let i = 0; +ntest < 100 && i < +ntest; i++) {
-                res.push({
-                    uid: 'uid-' + i,
-                    name: 'Joe' + i,
-                    photo: '/favicon.ico',
-                });
-            }
-            return res;
-        }
         let uids = await rpc.invoke('Map.GetPeopleNearby', { lat, lon });
         log.i('People nearby:', uids);
         let infos = await rpc.invoke('Map.GetUsersInfo', uids);
         log.i('Users info:', infos);
         return infos;
+    }
+    async function getDebugPeopleNearby() {
+        let ntest = +qargs.get('pnt') ||
+            conf.DBG_N_USERS_NEARBY;
+        log.i('Returning test data:', ntest);
+        let res = [];
+        for (let i = 0; i < ntest; i++) {
+            res.push({
+                uid: 'uid-' + i,
+                name: 'Joe' + i,
+                photo: '/favicon.ico',
+            });
+        }
+        return res;
     }
 });
 //# sourceMappingURL=nearby.js.map

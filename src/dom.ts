@@ -1,3 +1,5 @@
+export const CSS_DEBUG ='debug';
+
 export const ID_MAP = '#map';
 export const ID_MAP_ALL_PLACES = '#all-places';
 export const ID_SEND = '#send';

@@ -1,3 +1,5 @@
+export const DEBUG = true;
+export const DBG_N_USERS_NEARBY = 17;
 // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
 // 1e-5 corresponds to 1m precision
 export const MAP_1M = 1e-5;
