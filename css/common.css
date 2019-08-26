@@ -339,6 +339,10 @@ body .page .ol-attribution * {
   margin-right: 1em;
 }
 
+#reply-text * {
+  font-size: inherit;
+}
+
 #reply-text:empty::before {
   content: 'Your message here.';
   color: #888;
