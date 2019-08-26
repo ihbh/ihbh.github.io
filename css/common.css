@@ -55,9 +55,9 @@ body.debug #debug {
 }
 
 #debug button {
-  color: #444;  
+  color: #444;
   font-size: 12pt;
-  box-shadow: none;  
+  box-shadow: none;
   background: none;
   padding: 0;
   margin: 1em;
@@ -104,7 +104,7 @@ body .page .ol-attribution * {
   height: 200pt;
 }
 
-#photo-frame > button {
+#photo-frame>button {
   position: absolute;
   top: 0;
   left: 0;
@@ -118,7 +118,7 @@ body .page .ol-attribution * {
   font-weight: bold;
 }
 
-#photo-frame > img {
+#photo-frame>img {
   position: absolute;
   top: 0;
   left: 0;
@@ -201,12 +201,15 @@ body .page .ol-attribution * {
   top: 0.5em;
 }
 
-#controls > * {
+#controls>* {
+  margin-bottom: 0.5em;
+}
+
+#controls img {
   border-radius: 50%;
   border: none;
   background: #ccc;
   box-shadow: 0 0 7pt 1pt #000;
-  margin-bottom: 0.5em;
 }
 
 #send {
@@ -221,7 +224,7 @@ body .page .ol-attribution * {
   box-shadow: none;
 }
 
-/* ?page=places */ 
+/* ?page=places */
 
 #all-places {
   width: 100%;
@@ -295,7 +298,7 @@ body .page .ol-attribution * {
   flex: auto;
 }
 
-#messages > * {
+#messages>* {
   margin: 0.5em;
   border: 1px solid #eee;
   border-radius: 0.5em;
