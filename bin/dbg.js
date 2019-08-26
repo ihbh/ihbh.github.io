@@ -44,5 +44,18 @@ define(["require", "exports", "./dom", "./log", "./config", "./qargs"], function
         return res;
     }
     exports.getDebugPeopleNearby = getDebugPeopleNearby;
+    async function getTestMessages(user) {
+        let { default: text } = await new Promise((resolve_1, reject_1) => { require(['./lorem'], resolve_1, reject_1); });
+        let messages = [];
+        for (let i = 0; i < conf.DBG_N_MESSAGES; i++) {
+            messages.push({
+                user: Math.random() > 0.5 ? user : null,
+                time: new Date('Jan 3 2010').getTime() / 1000 | 0,
+                text: text.slice(0, conf.DBG_MESSAGE_LEN),
+            });
+        }
+        return messages;
+    }
+    exports.getTestMessages = getTestMessages;
 });
 //# sourceMappingURL=dbg.js.map

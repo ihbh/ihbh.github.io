@@ -3,6 +3,8 @@ define(["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.DEBUG = true;
     exports.DBG_N_USERS_NEARBY = 17;
+    exports.DBG_N_MESSAGES = 25;
+    exports.DBG_MESSAGE_LEN = 100;
     // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
     // 1e-5 corresponds to 1m precision
     exports.MAP_1M = 1e-5;

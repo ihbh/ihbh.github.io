@@ -16,6 +16,11 @@ export const ID_USERPIC = '#userpic';
 export const ID_SHOW_PLACES = '#show-places';
 export const ID_VISITORS = '#visitors';
 export const ID_NEARBY_STATUS = '#nearby-status';
+export const ID_CHAT_USER_ICON = '#chat-u-icon';
+export const ID_CHAT_USER_NAME = '#chat-u-name';
+export const ID_CHAT_MESSAGES = '#messages';
+export const ID_CHAT_REPLY_TEXT = '#reply-text';
+export const ID_CHAT_REPLY_SEND = '#reply-send';
 
 export function $<T extends Element>(selector: string) {
   return document.querySelector(selector) as T;

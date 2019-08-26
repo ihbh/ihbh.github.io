@@ -18,6 +18,11 @@ define(["require", "exports"], function (require, exports) {
     exports.ID_SHOW_PLACES = '#show-places';
     exports.ID_VISITORS = '#visitors';
     exports.ID_NEARBY_STATUS = '#nearby-status';
+    exports.ID_CHAT_USER_ICON = '#chat-u-icon';
+    exports.ID_CHAT_USER_NAME = '#chat-u-name';
+    exports.ID_CHAT_MESSAGES = '#messages';
+    exports.ID_CHAT_REPLY_TEXT = '#reply-text';
+    exports.ID_CHAT_REPLY_SEND = '#reply-send';
     function $(selector) {
         return document.querySelector(selector);
     }

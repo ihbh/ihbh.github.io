@@ -274,3 +274,90 @@ body .page .ol-attribution * {
   word-wrap: break-word;
   word-break: break-all;
 }
+
+/* ?page=chat */
+
+#p-chat {
+  display: flex;
+  flex-direction: column;
+}
+
+#u-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.5em;
+  background: #800;
+  color: #fff;
+}
+
+#u-header img {
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  margin-right: 0.5em;
+}
+
+#messages {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  flex: auto;
+}
+
+#messages > * {
+  margin: 0.5em;
+  border: 1px solid #eee;
+  border-radius: 0.5em;
+  padding: 0.5em;
+  width: 80%;
+  font-size: 0.5em;
+}
+
+#messages .yours {
+  margin-left: auto;
+  background: #efe;
+}
+
+#messages .theirs {
+  margin-right: auto;
+  background: #eef;
+}
+
+#u-footer {
+  padding: 0.5em;
+  display: flex;
+  flex-direction: row;
+}
+
+#reply-text {
+  font-size: 0.5em;
+  flex: auto;
+  padding: 0.5em;
+  vertical-align: middle;
+  border: 1px solid #ccf;
+  border-radius: 0.5em;
+  margin-right: 1em;
+}
+
+#reply-text:empty::before {
+  content: 'Your message here.';
+  color: #888;
+  font-style: italic;
+}
+
+#reply-text:focus {
+  outline: none;
+  border-color: #ccf;
+}
+
+#reply-send {
+  border-radius: 50%;
+  background: #800;
+  color: #fff;
+  width: 1em;
+  height: 1em;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+}

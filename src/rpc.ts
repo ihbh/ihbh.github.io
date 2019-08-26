@@ -36,6 +36,23 @@ export interface SharedLocation {
   time: number;
 }
 
+export interface ChatMessage {
+  user: string;
+  text: string;
+  time: number;
+}
+
+export function invoke(
+  method: 'Chat.GetMessages',
+  args: { user: string, time?: number })
+  : Promise<ChatMessage[]>;
+
+export function invoke(
+  method: 'Chat.SendMessage',
+  args: { user: string, text: string, time: number },
+  retry?: boolean,
+): Promise<void>;
+
 export function invoke(
   method: 'User.SetDetails',
   args: UserDetails,
