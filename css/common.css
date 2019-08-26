@@ -192,30 +192,21 @@ body .page .ol-attribution * {
   z-index: 1;
 }
 
-#userpic {
+#controls {
+  display: flex;
+  flex-direction: column;
   z-index: 1;
   position: fixed;
   right: 0.5em;
   top: 0.5em;
-  width: 2em;
-  height: 2em;
-  border-radius: 50%;
-  border: none;
-  background: #ccc;
-  box-shadow: 0 0 7pt 1pt #000;
 }
 
-#show-places {
-  z-index: 1;
-  position: fixed;
-  right: 0.5em;
-  top: 3.5em;
-  width: 2em;
-  height: 2em;
+#controls > * {
   border-radius: 50%;
   border: none;
   background: #ccc;
   box-shadow: 0 0 7pt 1pt #000;
+  margin-bottom: 0.5em;
 }
 
 #send {

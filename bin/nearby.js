@@ -1,7 +1,7 @@
 define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", "./react"], function (require, exports, log_1, rpc, qargs, dom, conf, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    let log = new log_1.TaggedLogger('map');
+    let log = new log_1.TaggedLogger('nearby');
     let { $ } = dom;
     let isValidLat = lat => lat >= -90 && lat <= +90;
     let isValidLon = lon => lon >= -180 && lon <= +180;

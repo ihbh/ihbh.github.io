@@ -5,7 +5,7 @@ import * as dom from './dom';
 import * as conf from './config';
 import React from './react';
 
-let log = new TaggedLogger('map');
+let log = new TaggedLogger('nearby');
 let { $ } = dom;
 
 let isValidLat = lat => lat >= -90 && lat <= +90;
