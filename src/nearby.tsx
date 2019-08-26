@@ -39,7 +39,7 @@ export async function init() {
     }
 
     setStatus('');
-    let container = $(dom.ID_VISITORS);
+    let container = dom.id.visitors;
     container.append(...infos.map(makeUserCard));
   } catch (err) {
     setStatus(err + '');
@@ -48,7 +48,7 @@ export async function init() {
 }
 
 function setStatus(text: string) {
-  let div = $<HTMLDivElement>(dom.ID_NEARBY_STATUS);
+  let div = dom.id.nearbyStatus;
   div.textContent = text;
 }
 

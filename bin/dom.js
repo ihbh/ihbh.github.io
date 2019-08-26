@@ -2,27 +2,29 @@ define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CSS_DEBUG = 'debug';
-    exports.ID_MAP = '#map';
-    exports.ID_MAP_ALL_PLACES = '#all-places';
-    exports.ID_SEND = '#send';
-    exports.ID_LOGS = '#logs';
-    exports.ID_SHOW_LOGS = '#show-logs';
-    exports.ID_RESET_LS = '#reset-ls';
-    exports.ID_NOGPS = '#no-gps';
-    exports.ID_REG_PHOTO = '#photo-frame > img';
-    exports.ID_REG_NAME = '#reg-name';
-    exports.ID_REG_ERROR = '#reg-err';
-    exports.ID_REG_DONE = '#reg-done';
-    exports.ID_UPLOAD_PHOTO_INPUT = '#upload-input';
-    exports.ID_USERPIC = '#userpic';
-    exports.ID_SHOW_PLACES = '#show-places';
-    exports.ID_VISITORS = '#visitors';
-    exports.ID_NEARBY_STATUS = '#nearby-status';
-    exports.ID_CHAT_USER_ICON = '#chat-u-icon';
-    exports.ID_CHAT_USER_NAME = '#chat-u-name';
-    exports.ID_CHAT_MESSAGES = '#messages';
-    exports.ID_CHAT_REPLY_TEXT = '#reply-text';
-    exports.ID_CHAT_REPLY_SEND = '#reply-send';
+    exports.id = {
+        get map() { return $('#map'); },
+        get mapAll() { return $('#all-places'); },
+        get sendLocation() { return $('#send'); },
+        get logs() { return $('#logs'); },
+        get showLogs() { return $('#show-logs'); },
+        get resetLS() { return $('#reset-ls'); },
+        get noGPS() { return $('#no-gps'); },
+        get regPhoto() { return $('#photo-frame > img'); },
+        get regName() { return $('#reg-name'); },
+        get regError() { return $('#reg-err'); },
+        get regDone() { return $('#reg-done'); },
+        get uploadPhotoInput() { return $('#upload-input'); },
+        get userPic() { return $('#userpic'); },
+        get showPlaces() { return $('#show-places'); },
+        get visitors() { return $('#visitors'); },
+        get nearbyStatus() { return $('#nearby-status'); },
+        get chatUserIcon() { return $('#chat-u-icon'); },
+        get chatUserName() { return $('#chat-u-name'); },
+        get chatMessages() { return $('#messages'); },
+        get chatReplyText() { return $('#reply-text'); },
+        get chatReplySend() { return $('#reply-send'); },
+    };
     function $(selector) {
         return document.querySelector(selector);
     }

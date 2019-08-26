@@ -12,14 +12,14 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page", "./config"], f
     }
     exports.init = init;
     function initShowPlaces() {
-        let img = $(dom.ID_SHOW_PLACES);
+        let img = dom.id.showPlaces;
         img.addEventListener('click', () => {
             page.set('places');
         });
     }
     function initUserPic() {
         try {
-            let img = $(dom.ID_USERPIC);
+            let img = dom.id.userPic;
             img.onerror = () => log.e('Failed to load user pic.');
             img.onload = () => log.i('user pic loaded:', img.width, 'x', img.height);
             let time = Date.now();
@@ -44,7 +44,7 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page", "./config"], f
         return blob;
     }
     async function initMap() {
-        $(dom.ID_NOGPS).addEventListener('click', async () => {
+        dom.id.noGPS.addEventListener('click', async () => {
             let res = await navigator.permissions.query({ name: 'geolocation' });
             log.i('navigator.permissions.query:', res.state);
             if (res.state != 'denied')
@@ -54,12 +54,12 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page", "./config"], f
     }
     async function loadMap() {
         try {
-            $(dom.ID_NOGPS).textContent = '';
+            dom.id.noGPS.textContent = '';
             let gps = await new Promise((resolve_1, reject_1) => { require(['./gps'], resolve_1, reject_1); });
             let pos = await gps.getGeoLocation();
             let { latitude: lat, longitude: lon } = pos.coords;
             let { OSM } = await new Promise((resolve_2, reject_2) => { require(['./osm'], resolve_2, reject_2); });
-            let osm = new OSM(dom.ID_MAP);
+            let osm = new OSM(dom.id.map.id);
             let s = config_1.MAP_BOX_SIZE;
             await osm.render({
                 min: { lat: lat - s, lon: lon - s },
@@ -71,11 +71,11 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page", "./config"], f
         catch (err) {
             // PositionError means that the phone has location turned off.
             log.e(err);
-            $(dom.ID_NOGPS).textContent = err.message;
+            dom.id.noGPS.textContent = err.message;
         }
     }
     async function initSendButton() {
-        let button = $(dom.ID_SEND);
+        let button = dom.id.sendLocation;
         button.onclick = async () => {
             log.i('#send:click');
             let pwa = await new Promise((resolve_3, reject_3) => { require(['./pwa'], resolve_3, reject_3); });

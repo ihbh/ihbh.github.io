@@ -15,8 +15,8 @@ define(["require", "exports", "./log", "./qargs", "./dom", "./rpc", "./config", 
     }
     exports.init = init;
     function setSendButtonHandler() {
-        let input = $(dom.ID_CHAT_REPLY_TEXT);
-        $(dom.ID_CHAT_REPLY_SEND).addEventListener('click', () => {
+        let input = dom.id.chatReplyText;
+        dom.id.chatReplySend.addEventListener('click', () => {
             try {
                 let text = input.textContent.trim();
                 if (!text)
@@ -28,7 +28,7 @@ define(["require", "exports", "./log", "./qargs", "./dom", "./rpc", "./config", 
                     time: Date.now() / 1000 | 0,
                 };
                 rpc.invoke('Chat.SendMessage', message, true);
-                let container = $(dom.ID_CHAT_MESSAGES);
+                let container = dom.id.chatMessages;
                 let div = renderMessage(message);
                 container.append(div);
                 div.scrollIntoView();
@@ -64,8 +64,8 @@ define(["require", "exports", "./log", "./qargs", "./dom", "./rpc", "./config", 
             let dbg = await new Promise((resolve_1, reject_1) => { require(['./dbg'], resolve_1, reject_1); });
             return dbg.getTestUserDetails(ruid);
         });
-        $(dom.ID_CHAT_USER_NAME).textContent = details.name;
-        $(dom.ID_CHAT_USER_ICON).src = details.photo;
+        dom.id.chatUserName.textContent = details.name;
+        dom.id.chatUserIcon.src = details.photo;
     }
     async function getMessages() {
         let messages = await rpc.invoke('Chat.GetMessages', {
@@ -76,7 +76,7 @@ define(["require", "exports", "./log", "./qargs", "./dom", "./rpc", "./config", 
             let dbg = await new Promise((resolve_2, reject_2) => { require(['./dbg'], resolve_2, reject_2); });
             return dbg.getTestMessages(ruid);
         });
-        let container = $(dom.ID_CHAT_MESSAGES);
+        let container = dom.id.chatMessages;
         let divs = messages.map(renderMessage);
         container.append(...divs);
         divs && divs[divs.length - 1].scrollIntoView();

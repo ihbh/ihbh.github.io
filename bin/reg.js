@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./log", "./ls", "./page"], function (require, exports, config_1, dom_1, log_1, ls, page) {
+define(["require", "exports", "./config", "./dom", "./log", "./ls", "./page"], function (require, exports, config_1, dom, log_1, ls, page) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const IMG_MAXSIZE = 4096;
@@ -6,15 +6,15 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls", "./page"], f
     const log = new log_1.TaggedLogger('reg');
     const strDataUrl = url => url.slice(0, 30) + '...' + url.slice(-10);
     function init() {
-        dom_1.$(dom_1.ID_REG_PHOTO).onclick =
+        dom.id.regPhoto.onclick =
             () => selectPhoto();
-        dom_1.$(dom_1.ID_REG_DONE).onclick =
+        dom.id.regDone.onclick =
             () => registerProfile();
     }
     exports.init = init;
     function selectPhoto() {
         log.i('Asking the user to select a profile pic.');
-        let input = dom_1.$(dom_1.ID_UPLOAD_PHOTO_INPUT);
+        let input = dom.id.uploadPhotoInput;
         input.click();
         input.onchange = () => {
             let file = input.files[0];
@@ -42,7 +42,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls", "./page"], f
             context.drawImage(bitmap, dx, dy, wh, wh);
             let dataUrl = canvas.toDataURL();
             log.i('Data URL:', strDataUrl(dataUrl));
-            let img = dom_1.$(dom_1.ID_REG_PHOTO);
+            let img = dom.id.regPhoto;
             img.src = dataUrl;
         }
         catch (err) {
@@ -50,7 +50,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls", "./page"], f
         }
     }
     function getResizedPhoto() {
-        let img = dom_1.$(dom_1.ID_REG_PHOTO);
+        let img = dom.id.regPhoto;
         if (!img.src)
             return null;
         let w = img.naturalWidth;
@@ -69,7 +69,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls", "./page"], f
     async function registerProfile() {
         try {
             log.i('updating profile');
-            let username = dom_1.$(dom_1.ID_REG_NAME).value || '';
+            let username = dom.id.regName.value || '';
             if (!username)
                 throw new Error('Need to set user name.');
             if (!config_1.VALID_USERNAME_REGEX.test(username))
@@ -94,7 +94,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls", "./page"], f
         }
         catch (err) {
             log.e('Failed to register profile:', err);
-            dom_1.$(dom_1.ID_REG_ERROR).textContent = err.message;
+            dom.id.regError.textContent = err.message;
         }
     }
 });

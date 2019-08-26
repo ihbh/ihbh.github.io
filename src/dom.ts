@@ -1,28 +1,30 @@
-export const CSS_DEBUG ='debug';
+export const CSS_DEBUG = 'debug';
 
-export const ID_MAP = '#map';
-export const ID_MAP_ALL_PLACES = '#all-places';
-export const ID_SEND = '#send';
-export const ID_LOGS = '#logs';
-export const ID_SHOW_LOGS = '#show-logs';
-export const ID_RESET_LS = '#reset-ls';
-export const ID_NOGPS = '#no-gps';
-export const ID_REG_PHOTO = '#photo-frame > img';
-export const ID_REG_NAME = '#reg-name';
-export const ID_REG_ERROR = '#reg-err';
-export const ID_REG_DONE = '#reg-done';
-export const ID_UPLOAD_PHOTO_INPUT = '#upload-input';
-export const ID_USERPIC = '#userpic';
-export const ID_SHOW_PLACES = '#show-places';
-export const ID_VISITORS = '#visitors';
-export const ID_NEARBY_STATUS = '#nearby-status';
-export const ID_CHAT_USER_ICON = '#chat-u-icon';
-export const ID_CHAT_USER_NAME = '#chat-u-name';
-export const ID_CHAT_MESSAGES = '#messages';
-export const ID_CHAT_REPLY_TEXT = '#reply-text';
-export const ID_CHAT_REPLY_SEND = '#reply-send';
+export const id = {
+  get map() { return $('#map'); },
+  get mapAll() { return $('#all-places'); },
+  get sendLocation() { return $<HTMLButtonElement>('#send'); },
+  get logs() { return $('#logs'); },
+  get showLogs() { return $('#show-logs'); },
+  get resetLS() { return $('#reset-ls'); },
+  get noGPS() { return $('#no-gps'); },
+  get regPhoto() { return $<HTMLImageElement>('#photo-frame > img'); },
+  get regName() { return $<HTMLInputElement>('#reg-name'); },
+  get regError() { return $('#reg-err'); },
+  get regDone() { return $('#reg-done'); },
+  get uploadPhotoInput() { return $<HTMLInputElement>('#upload-input'); },
+  get userPic() { return $<HTMLImageElement>('#userpic'); },
+  get showPlaces() { return $('#show-places'); },
+  get visitors() { return $('#visitors'); },
+  get nearbyStatus() { return $('#nearby-status'); },
+  get chatUserIcon() { return $<HTMLImageElement>('#chat-u-icon'); },
+  get chatUserName() { return $('#chat-u-name'); },
+  get chatMessages() { return $('#messages'); },
+  get chatReplyText() { return $('#reply-text'); },
+  get chatReplySend() { return $('#reply-send'); },
+};
 
-export function $<T extends Element>(selector: string) {
+export function $<T extends HTMLElement>(selector: string) {
   return document.querySelector(selector) as T;
 }
 

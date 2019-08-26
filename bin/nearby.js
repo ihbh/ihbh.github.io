@@ -29,7 +29,7 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", 
                 return;
             }
             setStatus('');
-            let container = $(dom.ID_VISITORS);
+            let container = dom.id.visitors;
             container.append(...infos.map(makeUserCard));
         }
         catch (err) {
@@ -39,7 +39,7 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", 
     }
     exports.init = init;
     function setStatus(text) {
-        let div = $(dom.ID_NEARBY_STATUS);
+        let div = dom.id.nearbyStatus;
         div.textContent = text;
     }
     function makeUserCard(info) {

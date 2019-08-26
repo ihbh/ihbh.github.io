@@ -15,15 +15,15 @@ export function init() {
 
   document.body.classList.add(dom.CSS_DEBUG);
 
-  $(dom.ID_RESET_LS).addEventListener('click', () => {
+  dom.id.resetLS.addEventListener('click', () => {
     log.i('#reset-logs:click');
     localStorage.clear();
     log.i('LS cleared.');
   });
 
-  $(dom.ID_SHOW_LOGS).addEventListener('click', () => {
+  dom.id.showLogs.addEventListener('click', () => {
     log.i('#show-logs:click');
-    let div = $<HTMLDivElement>(dom.ID_LOGS);
+    let div = dom.id.logs;
 
     if (!div.style.display) {
       log.i('Hiding the logs.');

@@ -26,7 +26,7 @@ define(["require", "exports", "./dom", "./log", "./loc", "./osm", "./config", ".
         if (!places.length)
             throw new Error('Nothing to render: no places visited.');
         let bbox = getBBox(places);
-        let osm = new osm_1.OSM(dom.ID_MAP_ALL_PLACES);
+        let osm = new osm_1.OSM(dom.id.mapAll.id);
         await osm.render(bbox);
         let psorted = places.sort((p1, p2) => +p1.time - +p2.time);
         let tmin = +psorted[0].time;

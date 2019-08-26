@@ -1,5 +1,5 @@
 import { VALID_USERNAME_REGEX, PHOTO_SIZE } from "./config";
-import { $, ID_REG_DONE, ID_REG_NAME, ID_REG_PHOTO, ID_UPLOAD_PHOTO_INPUT, ID_REG_ERROR } from './dom';
+import * as dom from './dom';
 import { TaggedLogger } from "./log";
 import * as ls from './ls';
 import * as page from './page';
@@ -11,15 +11,15 @@ const log = new TaggedLogger('reg');
 const strDataUrl = url => url.slice(0, 30) + '...' + url.slice(-10);
 
 export function init() {
-  $<HTMLImageElement>(ID_REG_PHOTO).onclick =
+  dom.id.regPhoto.onclick =
     () => selectPhoto();
-  $<HTMLButtonElement>(ID_REG_DONE).onclick =
+  dom.id.regDone.onclick =
     () => registerProfile();
 }
 
 function selectPhoto() {
   log.i('Asking the user to select a profile pic.');
-  let input = $<HTMLInputElement>(ID_UPLOAD_PHOTO_INPUT);
+  let input = dom.id.uploadPhotoInput;
   input.click();
   input.onchange = () => {
     let file = input.files[0];
@@ -48,7 +48,7 @@ async function savePhotoFromFile(file: File) {
     context.drawImage(bitmap, dx, dy, wh, wh);
     let dataUrl = canvas.toDataURL();
     log.i('Data URL:', strDataUrl(dataUrl));
-    let img = $<HTMLImageElement>(ID_REG_PHOTO);
+    let img = dom.id.regPhoto;
     img.src = dataUrl;
   } catch (err) {
     log.e('Failed to save photo:', err);
@@ -56,7 +56,7 @@ async function savePhotoFromFile(file: File) {
 }
 
 function getResizedPhoto() {
-  let img = $<HTMLImageElement>(ID_REG_PHOTO);
+  let img = dom.id.regPhoto;
   if (!img.src) return null;
   let w = img.naturalWidth;
   let h = img.naturalHeight;
@@ -77,7 +77,7 @@ function getResizedPhoto() {
 async function registerProfile() {
   try {
     log.i('updating profile');
-    let username = $<HTMLInputElement>(ID_REG_NAME).value || '';
+    let username = dom.id.regName.value || '';
     if (!username) throw new Error('Need to set user name.');
     if (!VALID_USERNAME_REGEX.test(username))
       throw new Error(`Username "${username}" doesn't match ${VALID_USERNAME_REGEX} regex.`);
@@ -104,6 +104,6 @@ async function registerProfile() {
     page.set('map');
   } catch (err) {
     log.e('Failed to register profile:', err);
-    $(ID_REG_ERROR).textContent = err.message;
+    dom.id.regError.textContent = err.message;
   }
 }

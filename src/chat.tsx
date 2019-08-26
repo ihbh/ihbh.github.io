@@ -25,9 +25,9 @@ export async function init() {
 }
 
 function setSendButtonHandler() {
-  let input = $(dom.ID_CHAT_REPLY_TEXT);
+  let input = dom.id.chatReplyText;
 
-  $(dom.ID_CHAT_REPLY_SEND).addEventListener('click', () => {
+  dom.id.chatReplySend.addEventListener('click', () => {
     try {
       let text = input.textContent.trim();
       if (!text) return;
@@ -38,7 +38,7 @@ function setSendButtonHandler() {
         time: Date.now() / 1000 | 0,
       };
       rpc.invoke('Chat.SendMessage', message, true);
-      let container = $(dom.ID_CHAT_MESSAGES);
+      let container = dom.id.chatMessages;
       let div = renderMessage(message);
       container.append(div);
       div.scrollIntoView();
@@ -77,8 +77,8 @@ async function getUserInfo() {
     return dbg.getTestUserDetails(ruid);
   });
 
-  $(dom.ID_CHAT_USER_NAME).textContent = details.name;
-  $<HTMLImageElement>(dom.ID_CHAT_USER_ICON).src = details.photo;
+  dom.id.chatUserName.textContent = details.name;
+  dom.id.chatUserIcon.src = details.photo;
 }
 
 async function getMessages() {
@@ -91,7 +91,7 @@ async function getMessages() {
     return dbg.getTestMessages(ruid);
   });
 
-  let container = $(dom.ID_CHAT_MESSAGES);
+  let container = dom.id.chatMessages;
   let divs = messages.map(renderMessage);
   container.append(...divs);
   divs && divs[divs.length - 1].scrollIntoView();
