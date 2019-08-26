@@ -2,6 +2,7 @@ export const DEBUG = true;
 export const DBG_N_USERS_NEARBY = 17;
 export const DBG_N_MESSAGES = 25;
 export const DBG_MESSAGE_LEN = 100;
+export const DBG_TEST_USER_PHOTO = '/icons/test.jpeg';
 // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
 // 1e-5 corresponds to 1m precision
 export const MAP_1M = 1e-5;
@@ -17,3 +18,4 @@ export const MARKER_ICON_SIZE = 64;
 export const MARKER_ICON_SCALE = 0.5;
 export const RPC_URL = 'http://localhost';
 export const RPC_DELAY = 1.5;
+export const CHAT_AUTOSAVE_INTERVAL = 1; // seconds

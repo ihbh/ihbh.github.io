@@ -18,8 +18,10 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
                     localStorage.removeItem(name);
                 }
                 else {
+                    let prev = localStorage.getItem(name);
                     let json = JSON.stringify(val);
-                    log.i(name, '<-', strval(json));
+                    if (prev != json)
+                        log.i(name, '<-', strval(json));
                     localStorage.setItem(name, json);
                 }
             },
@@ -37,5 +39,6 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         unsent: prop('rpcs.unsent', {}),
         failed: prop('rpcs.failed', {}),
     };
+    exports.unsentMessages = prop('chat.unsent', {});
 });
 //# sourceMappingURL=ls.js.map

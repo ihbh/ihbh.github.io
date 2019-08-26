@@ -17,8 +17,10 @@ function prop<T>(name: string, defval: T = null) {
         log.i(name, 'deleted');
         localStorage.removeItem(name);
       } else {
+        let prev = localStorage.getItem(name);
         let json = JSON.stringify(val);
-        log.i(name, '<-', strval(json));
+        if (prev != json)
+          log.i(name, '<-', strval(json));
         localStorage.setItem(name, json);
       }
     },
@@ -52,3 +54,6 @@ export const rpcs = {
   unsent: prop<SMap<number>>('rpcs.unsent', {}),
   failed: prop<SMap<string>>('rpcs.failed', {}),
 };
+
+export const unsentMessages =
+  prop<SMap<string>>('chat.unsent', {});

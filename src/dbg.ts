@@ -49,7 +49,7 @@ export async function getDebugPeopleNearby() {
     res.push({
       uid: 'uid-' + i,
       name: 'Joe' + i,
-      photo: '/favicon.ico',
+      photo: conf.DBG_TEST_USER_PHOTO,
     });
   }
   return res;
@@ -66,4 +66,13 @@ export async function getTestMessages(user: string) {
     });
   }
   return messages;
+}
+
+export async function getTestUserDetails(user: string) {
+  let { default: text } = await import('./lorem');
+  return {
+    photo: conf.DBG_TEST_USER_PHOTO,
+    name: 'Joe-' + user,
+    info: text,
+  };
 }

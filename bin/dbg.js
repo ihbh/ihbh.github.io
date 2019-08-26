@@ -38,7 +38,7 @@ define(["require", "exports", "./dom", "./log", "./config", "./qargs"], function
             res.push({
                 uid: 'uid-' + i,
                 name: 'Joe' + i,
-                photo: '/favicon.ico',
+                photo: conf.DBG_TEST_USER_PHOTO,
             });
         }
         return res;
@@ -57,5 +57,14 @@ define(["require", "exports", "./dom", "./log", "./config", "./qargs"], function
         return messages;
     }
     exports.getTestMessages = getTestMessages;
+    async function getTestUserDetails(user) {
+        let { default: text } = await new Promise((resolve_2, reject_2) => { require(['./lorem'], resolve_2, reject_2); });
+        return {
+            photo: conf.DBG_TEST_USER_PHOTO,
+            name: 'Joe-' + user,
+            info: text,
+        };
+    }
+    exports.getTestUserDetails = getTestUserDetails;
 });
 //# sourceMappingURL=dbg.js.map

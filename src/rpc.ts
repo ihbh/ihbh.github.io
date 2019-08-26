@@ -57,7 +57,12 @@ export function invoke(
   method: 'User.SetDetails',
   args: UserDetails,
   retry: boolean)
-  : Promise<{}>;
+  : Promise<void>;
+
+export function invoke(
+  method: 'User.GetDetails',
+  args: { user: string })
+  : Promise<UserDetails>;
 
 export function invoke(
   method: 'Map.ShareLocation',
