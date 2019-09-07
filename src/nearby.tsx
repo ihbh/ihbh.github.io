@@ -5,8 +5,13 @@ import * as dom from './dom';
 import * as conf from './config';
 import React from './react';
 
+interface UserInfo {
+  uid: string;
+  name: string;
+  photo: string;
+}
+
 let log = new TaggedLogger('nearby');
-let { $ } = dom;
 
 let isValidLat = lat => lat >= -90 && lat <= +90;
 let isValidLon = lon => lon >= -180 && lon <= +180;
@@ -23,7 +28,7 @@ export async function init() {
       throw new Error(`Invalid GPS coords: lat=${lat} lon=${lon}`);
 
     setStatus('Checking who has been here too...');
-    let infos: rpc.UserInfo[];
+    let infos: UserInfo[];
 
     try {
       infos = await getPeopleNearby({ lat, lon });
@@ -52,7 +57,7 @@ function setStatus(text: string) {
   div.textContent = text;
 }
 
-function makeUserCard(info: rpc.UserInfo) {
+function makeUserCard(info: UserInfo) {
   let href = '?page=chat&uid=' + info.uid;
   return <a href={href}>
     <img src={info.photo} />
@@ -60,16 +65,18 @@ function makeUserCard(info: rpc.UserInfo) {
   </a>;
 }
 
-async function getPeopleNearby({ lat, lon }) {
+async function getPeopleNearby({ lat, lon }): Promise<UserInfo[]> {
   let uids = await rpc.invoke(
     'Map.GetPeopleNearby',
     { lat, lon });
   log.i('People nearby:', uids);
 
   let infos = await rpc.invoke(
-    'Map.GetUsersInfo',
-    uids);
+    'User.GetDetails',
+    { users: uids, props: ['name', 'photo'] });
   log.i('Users info:', infos);
 
-  return infos;
+  return uids.map((uid, i) => {
+    return {uid, ...infos[i]} as UserInfo;
+  });
 }

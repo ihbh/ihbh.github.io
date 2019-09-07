@@ -19,15 +19,10 @@ export class RpcError extends Error {
 }
 
 export interface UserDetails {
-  photo?: string;
-  name?: string;
-  info?: string;
-}
-
-export interface UserInfo {
-  uid: string;
-  name: string;
+  pubkey: string;
   photo: string;
+  name: string;
+  info: string;
 }
 
 export interface SharedLocation {
@@ -61,8 +56,8 @@ export function invoke(
 
 export function invoke(
   method: 'User.GetDetails',
-  args: { user: string })
-  : Promise<UserDetails>;
+  args: { users: string[], props?: string[] })
+  : Promise<UserDetails[]>;
 
 export function invoke(
   method: 'Map.ShareLocation',
@@ -74,11 +69,6 @@ export function invoke(
   method: 'Map.GetPeopleNearby',
   args: { lat: number, lon: number })
   : Promise<string[]>;
-
-export function invoke(
-  method: 'Map.GetUsersInfo',
-  args: string[])
-  : Promise<UserInfo[]>;
 
 export async function invoke(method: string, args, retry?: boolean) {
   log.i('invoke:', method, args, 'retry?', retry);

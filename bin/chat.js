@@ -1,8 +1,7 @@
-define(["require", "exports", "./log", "./qargs", "./dom", "./rpc", "./config", "./react", "./ls"], function (require, exports, log_1, qargs, dom, rpc, conf, react_1, ls) {
+define(["require", "exports", "./config", "./dom", "./log", "./ls", "./qargs", "./react", "./rpc"], function (require, exports, conf, dom, log_1, ls, qargs, react_1, rpc) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('chat');
-    let { $ } = dom;
     let ruid = ''; // remote user id
     let autoSavedText = '';
     async function init() {
@@ -56,13 +55,14 @@ define(["require", "exports", "./log", "./qargs", "./dom", "./rpc", "./config", 
         input.textContent = autoSavedText;
     }
     async function getUserInfo() {
-        let details = await rpc.invoke('User.GetDetails', {
-            user: ruid,
+        let [details] = await rpc.invoke('User.GetDetails', {
+            users: [ruid],
         }).catch(async (err) => {
             if (!conf.DEBUG)
                 throw err;
             let dbg = await new Promise((resolve_1, reject_1) => { require(['./dbg'], resolve_1, reject_1); });
-            return dbg.getTestUserDetails(ruid);
+            let res = await dbg.getTestUserDetails(ruid);
+            return [res];
         });
         dom.id.chatUserName.textContent = details.name;
         dom.id.chatUserIcon.src = details.photo;

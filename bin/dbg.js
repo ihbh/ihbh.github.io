@@ -2,7 +2,6 @@ define(["require", "exports", "./dom", "./log", "./config", "./qargs"], function
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('dbg');
-    const { $ } = dom;
     function init() {
         log.i('Debug mode?', conf.DEBUG);
         if (!conf.DEBUG)

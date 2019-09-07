@@ -1,14 +1,12 @@
-import { TaggedLogger } from './log';
-import * as qargs from './qargs';
-import * as dom from './dom';
-import * as rpc from './rpc';
 import * as conf from './config';
-import React from './react';
+import * as dom from './dom';
+import { TaggedLogger } from './log';
 import * as ls from './ls';
-import { rpcs } from './ls';
+import * as qargs from './qargs';
+import React from './react';
+import * as rpc from './rpc';
 
 let log = new TaggedLogger('chat');
-let { $ } = dom;
 
 let ruid = ''; // remote user id
 let autoSavedText = '';
@@ -68,13 +66,14 @@ function setSendButtonHandler() {
 }
 
 async function getUserInfo() {
-  let details = await rpc.invoke('User.GetDetails', {
-    user: ruid,
+  let [details] = await rpc.invoke('User.GetDetails', {
+    users: [ruid],
   }).catch(async err => {
     if (!conf.DEBUG)
       throw err;
     let dbg = await import('./dbg');
-    return dbg.getTestUserDetails(ruid);
+    let res = await dbg.getTestUserDetails(ruid);
+    return [res];
   });
 
   dom.id.chatUserName.textContent = details.name;

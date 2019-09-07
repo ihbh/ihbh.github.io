@@ -1,9 +1,10 @@
 define(["require", "exports", "./log", "./rpc", "./ls"], function (require, exports, log_1, rpc, ls) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const MINUTE = 60 * 1000;
     const log = new log_1.TaggedLogger('loc');
     async function shareLocation(pos) {
-        let time = Date.now() / 1000 | 0;
+        let time = Date.now() / MINUTE | 0;
         log.i('Sharing location:', time, pos);
         ls.places.modify(places => {
             places[time] = [pos.lat, pos.lng];
@@ -19,7 +20,7 @@ define(["require", "exports", "./log", "./rpc", "./ls"], function (require, expo
     function getVisitedPlaces() {
         let json = ls.places.get();
         return Object.keys(json).map(key => {
-            let time = new Date(1000 * +key);
+            let time = new Date(MINUTE * +key);
             let [lat, lon] = json[key];
             return { lat, lon, time };
         });
