@@ -1,12 +1,17 @@
 {
   "scripts": {
-    "build": "npm i && npm run cpsha1 && tsc && npm run cpsw",
-    "cpsha1": "cp node_modules/js-sha1/src/*.js bin",
-    "cpsw": "cp -f bin/sw.js sw.js",
-    "webfsd": "killall -q webfsd; sudo webfsd -F -l - -p 80 -r . -f index.html"
+    "build": "npm i && npm run cp-libs && tsc && npm run cp-sw",
+    "cp-libs": "npm run cp-sha1 && npm run cp-scop",
+    "cp-sha1": "cp node_modules/js-sha1/src/*.js bin",
+    "cp-scop": "rsync -a node_modules/supercop.wasm/src/* bin/supercop",
+    "cp-sw": "cp -f bin/sw.js sw.js",
+    "webfsd": "killall -q webfsd; webfsd -F -l - -p 8080 -r . -f index.html"
   },
   "devDependencies": {
     "js-sha1": "0.6.0",
     "typescript": "3.5.3"
+  },
+  "dependencies": {
+    "supercop.wasm": "5.0.1"
   }
 }

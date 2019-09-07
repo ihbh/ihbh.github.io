@@ -31,8 +31,11 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         };
     }
     exports.username = prop('user.name');
-    // data:image/jpeg;base64,...
-    exports.userimg = prop('user.img');
+    exports.userimg = prop('user.img'); // data:image/jpeg;base64,...
+    // ed25519
+    exports.keyseed = prop('user.keyseed');
+    exports.privkey = prop('user.privkey');
+    exports.pubkey = prop('user.pubkey');
     exports.places = prop('places', {});
     exports.rpcs = {
         infos: prop('rpcs.info', {}),

@@ -16,6 +16,6 @@ export const PHOTO_SIZE = 64;
 export const MARKER_ICON_URL = '/icons/marker.png';
 export const MARKER_ICON_SIZE = 64;
 export const MARKER_ICON_SCALE = 0.5;
-export const RPC_URL = 'http://localhost';
+export const RPC_URL = 'http://localhost:3921';
 export const RPC_DELAY = 1.5;
 export const CHAT_AUTOSAVE_INTERVAL = 1; // seconds

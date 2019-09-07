@@ -5,10 +5,10 @@ define(["require", "exports", "./config", "./log", "./ls"], function (require, e
     let sending = false;
     class RpcError extends Error {
         constructor(method, response) {
-            super(`RPC ${method} failed: ${response.status}`);
+            super(`RPC ${method} failed: ${response && response.status}`);
             this.method = method;
             this.response = response;
-            this.status = response.status;
+            this.status = response && response.status;
         }
     }
     exports.RpcError = RpcError;
@@ -16,27 +16,42 @@ define(["require", "exports", "./config", "./log", "./ls"], function (require, e
         log.i('invoke:', method, args, 'retry?', retry);
         if (retry)
             await schedule(method, args);
-        let url = `${config.RPC_URL}/rpc/${method}`;
+        let user = await new Promise((resolve_1, reject_1) => { require(['./user'], resolve_1, reject_1); });
+        let path = '/rpc/' + method;
+        let url = config.RPC_URL + path;
+        let body = JSON.stringify(args);
+        let uid = await user.uid.get();
+        let sig = await user.sign(path + '\n' + body);
+        let headers = {
+            'Authorization': JSON.stringify({ uid, sig }),
+            'Content-Type': 'application/json',
+        };
         await new Promise(resolve => setTimeout(resolve, config.RPC_DELAY * 1000));
-        let res = await fetch(url, {
-            method: 'POST',
-            mode: 'cors',
-            cache: 'no-cache',
-            headers: { 'Content-Type': 'application/json' },
-            redirect: 'error',
-            referrer: 'no-referrer',
-            body: JSON.stringify(args),
-        });
-        if (!res.ok)
-            throw new RpcError(method, res);
-        let json = await res.json();
-        log.i(res.status, json);
-        return json;
+        try {
+            let res = await fetch(url, {
+                method: 'POST',
+                mode: 'cors',
+                cache: 'no-cache',
+                redirect: 'error',
+                referrer: 'no-referrer',
+                headers,
+                body,
+            });
+            if (!res.ok)
+                throw new RpcError(method, res);
+            let json = await res.json();
+            log.i(res.status, json);
+            return json;
+        }
+        catch (err) {
+            log.e('fetch() failed:', err);
+            throw new RpcError(method, null);
+        }
     }
     exports.invoke = invoke;
     async function schedule(method, args) {
         log.i('schedule:', method, args);
-        let sha1 = await new Promise((resolve_1, reject_1) => { require(['./sha1'], resolve_1, reject_1); });
+        let sha1 = await new Promise((resolve_2, reject_2) => { require(['./sha1'], resolve_2, reject_2); });
         let info = { method, args };
         let id = sha1(JSON.stringify(info)).slice(0, 6);
         ls.rpcs.infos.modify(infos => {
@@ -70,8 +85,10 @@ define(["require", "exports", "./config", "./log", "./ls"], function (require, e
                     });
                 }
                 catch (err) {
-                    if (err instanceof RpcError && err.response.status >= 500) {
-                        log.i('will be resent later:', id);
+                    let retry = err instanceof RpcError &&
+                        (!err.status || err.status >= 500);
+                    if (retry) {
+                        log.i('will be resent later:', id, infos[id].method);
                     }
                     else {
                         ls.rpcs.unsent.modify(unsent => {

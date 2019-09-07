@@ -13,8 +13,8 @@ export class RpcError extends Error {
     public method: string,
     public response: Response) {
 
-    super(`RPC ${method} failed: ${response.status}`);
-    this.status = response.status;
+    super(`RPC ${method} failed: ${response && response.status}`);
+    this.status = response && response.status;
   }
 }
 
@@ -84,27 +84,43 @@ export async function invoke(method: string, args, retry?: boolean) {
   log.i('invoke:', method, args, 'retry?', retry);
   if (retry) await schedule(method, args);
 
-  let url = `${config.RPC_URL}/rpc/${method}`;
+  let user = await import('./user');
+
+  let path = '/rpc/' + method;
+  let url = config.RPC_URL + path;
+  let body = JSON.stringify(args);
+  let uid = await user.uid.get();
+  let sig = await user.sign(path + '\n' + body);
+
+  let headers = {
+    'Authorization': JSON.stringify({ uid, sig }),
+    'Content-Type': 'application/json',
+  }
 
   await new Promise(resolve =>
     setTimeout(resolve, config.RPC_DELAY * 1000));
 
-  let res = await fetch(url, {
-    method: 'POST',
-    mode: 'cors',
-    cache: 'no-cache',
-    headers: { 'Content-Type': 'application/json' },
-    redirect: 'error',
-    referrer: 'no-referrer',
-    body: JSON.stringify(args),
-  });
+  try {
+    let res = await fetch(url, {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      redirect: 'error',
+      referrer: 'no-referrer',
+      headers,
+      body,
+    });
 
-  if (!res.ok)
-    throw new RpcError(method, res);
+    if (!res.ok)
+      throw new RpcError(method, res);
 
-  let json = await res.json();
-  log.i(res.status, json);
-  return json;
+    let json = await res.json();
+    log.i(res.status, json);
+    return json;
+  } catch (err) {
+    log.e('fetch() failed:', err);
+    throw new RpcError(method, null);
+  }
 }
 
 async function schedule(method: string, args) {
@@ -149,8 +165,11 @@ export async function sendall() {
           return infos;
         });
       } catch (err) {
-        if (err instanceof RpcError && err.response.status >= 500) {
-          log.i('will be resent later:', id);
+        let retry = err instanceof RpcError &&
+          (!err.status || err.status >= 500);
+
+        if (retry) {
+          log.i('will be resent later:', id, infos[id].method);
         } else {
           ls.rpcs.unsent.modify(unsent => {
             delete unsent[id];

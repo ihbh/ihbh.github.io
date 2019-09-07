@@ -9,6 +9,10 @@
 
   const modules = new Map<string, ModuleDef>();
 
+  function log(...args) {
+    console.debug('[amd] I', ...args);
+  }
+
   function define(deps: string[], init: (...deps) => void) {
     if (!init) {
       init = deps as any;
@@ -21,9 +25,14 @@
     if (mod && mod.url)
       throw new Error('Module already defined: ' + url);
     mod.url = url;
-    mod.deps = deps;
+    mod.deps = deps.map(dep => {
+      if (!dep.startsWith('./')) return dep;
+      let newdep = url.replace(/\/[^/]+$/, dep.slice(1));
+      if (!newdep.endsWith('.js')) newdep += '.js';
+      return newdep;
+    });
     mod.init = init;
-    log('define:', url, '->', ...deps);
+    log('define:', url, '<-', ...mod.deps);
   }
 
   function require(deps: string[], resolve?: (exports) => void, reject?) {
@@ -48,10 +57,10 @@
             case 'exports':
               return mod.exports;
             default:
-              log('require:', url, '->', dep);
               return require([dep]);
           };
         });
+        log('require:', url, '<-', ...mod.deps);
         return Promise.all(tasks).then(modexps => {
           mod.exports = mod.init.apply(null, modexps)
             || mod.exports;
@@ -89,10 +98,6 @@
   function resolveScriptUrl(dep: string) {
     return dep.startsWith('./') ?
       'bin' + dep.slice(1) + '.js' : dep;
-  }
-
-  function log(...args) {
-    // console.log('[amd] I', ...args);
   }
 
   window['define'] = define;

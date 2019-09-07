@@ -43,9 +43,12 @@ interface SMap<V> {
 }
 
 export const username = prop<string>('user.name');
+export const userimg = prop<string>('user.img'); // data:image/jpeg;base64,...
 
-// data:image/jpeg;base64,...
-export const userimg = prop<string>('user.img');
+// ed25519
+export const keyseed = prop<string>('user.keyseed');
+export const privkey = prop<string>('user.privkey');
+export const pubkey = prop<string>('user.pubkey');
 
 export const places = prop<Places>('places', {});
 
