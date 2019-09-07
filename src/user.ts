@@ -88,11 +88,16 @@ let privkey = new AsyncProp<string>(async () => {
 
 // First 64 bits of sha256(pubkey).
 export let uid = new AsyncProp<string>(async () => {
+  let id = ls.uid.get();
+  if (id) return id;
+
   let key = await pubkey.get();
   let bytes = Buffer.from(key, 'hex').toArray(Uint8Array).buffer;
   let hash = await crypto.subtle.digest(UID_HASH, bytes);
   let subhash = hash.slice(0, UID_SIZE / 8);
-  return new Buffer(subhash).toString('hex');
+  id = new Buffer(subhash).toString('hex');
+  ls.uid.set(id);
+  return id;
 });
 
 // 512 bits = 64 bytes.

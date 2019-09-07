@@ -36,6 +36,7 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     exports.keyseed = prop('user.keyseed');
     exports.privkey = prop('user.privkey');
     exports.pubkey = prop('user.pubkey');
+    exports.uid = prop('user.id');
     exports.places = prop('places', {});
     exports.rpcs = {
         infos: prop('rpcs.info', {}),

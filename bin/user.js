@@ -64,11 +64,16 @@ define(["require", "exports", "./buffer", "./log", "./ls", "./prop"], function (
     });
     // First 64 bits of sha256(pubkey).
     exports.uid = new prop_1.AsyncProp(async () => {
+        let id = ls.uid.get();
+        if (id)
+            return id;
         let key = await exports.pubkey.get();
         let bytes = buffer_1.default.from(key, 'hex').toArray(Uint8Array).buffer;
         let hash = await crypto.subtle.digest(UID_HASH, bytes);
         let subhash = hash.slice(0, UID_SIZE / 8);
-        return new buffer_1.default(subhash).toString('hex');
+        id = new buffer_1.default(subhash).toString('hex');
+        ls.uid.set(id);
+        return id;
     });
     // 512 bits = 64 bytes.
     async function sign(data) {
