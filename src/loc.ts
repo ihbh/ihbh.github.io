@@ -2,8 +2,6 @@ import { TaggedLogger } from "./log";
 import * as rpc from './rpc';
 import * as ls from './ls';
 
-const MINUTE = 60 * 1000;
-
 const log = new TaggedLogger('loc');
 
 export interface GpsCoords {
@@ -24,7 +22,7 @@ export interface VisitedPlaceInfo {
 }
 
 export async function shareLocation(pos: GpsCoords) {
-  let time = Date.now() / MINUTE | 0;
+  let time = Date.now() / 1000 | 0;
   log.i('Sharing location:', time, pos);
 
   ls.places.modify(places => {
@@ -43,7 +41,7 @@ export function getVisitedPlaces(): VisitedPlaceInfo[] {
   let json = ls.places.get();
 
   return Object.keys(json).map(key => {
-    let time = new Date(MINUTE * +key);
+    let time = new Date(1000 * +key);
     let [lat, lon] = json[key];
     return { lat, lon, time };
   });
