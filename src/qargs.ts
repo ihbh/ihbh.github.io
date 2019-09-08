@@ -1,7 +1,8 @@
 import { TaggedLogger } from "./log";
 
 type ArgId = 
-  'page' | 
+  'page' |
+  'rpc' | 
   'uid' |
   'lat' | 
   'lon' | 

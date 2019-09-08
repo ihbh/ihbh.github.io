@@ -1,6 +1,7 @@
 import * as config from './config';
 import { TaggedLogger } from './log';
 import * as ls from './ls';
+import * as qargs from './qargs';
 
 const log = new TaggedLogger('rpc');
 
@@ -77,7 +78,7 @@ export async function invoke(method: string, args, retry?: boolean) {
   let user = await import('./user');
 
   let path = '/rpc/' + method;
-  let url = config.RPC_URL + path;
+  let url = getRpcUrl() + path;
   let body = JSON.stringify(args);
   let uid = await user.uid.get();
   let sig = await user.sign(path + '\n' + body);
@@ -181,4 +182,19 @@ export async function sendall() {
     sending = false;
     log.i('still unsent rpcs:', Object.keys(unsent).length);
   }
+}
+
+function getRpcUrl() {
+  let url = qargs.get('rpc');
+  if (!url) return config.DEFAULT_RPC_URL;
+
+  if (url.indexOf('://') < 0) {
+    let scheme = config.DEBUG ? 'http' : 'https';
+    url = scheme + '://' + url;
+  }
+
+  if (!/:\d+$/.test(url))
+  url = url + ':' + config.DEFAULT_RPC_PORT;
+
+  return url;
 }

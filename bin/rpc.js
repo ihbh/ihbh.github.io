@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./log", "./ls"], function (require, exports, config, log_1, ls) {
+define(["require", "exports", "./config", "./log", "./ls", "./qargs"], function (require, exports, config, log_1, ls, qargs) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('rpc');
@@ -18,7 +18,7 @@ define(["require", "exports", "./config", "./log", "./ls"], function (require, e
             await schedule(method, args);
         let user = await new Promise((resolve_1, reject_1) => { require(['./user'], resolve_1, reject_1); });
         let path = '/rpc/' + method;
-        let url = config.RPC_URL + path;
+        let url = getRpcUrl() + path;
         let body = JSON.stringify(args);
         let uid = await user.uid.get();
         let sig = await user.sign(path + '\n' + body);
@@ -112,5 +112,17 @@ define(["require", "exports", "./config", "./log", "./ls"], function (require, e
         }
     }
     exports.sendall = sendall;
+    function getRpcUrl() {
+        let url = qargs.get('rpc');
+        if (!url)
+            return config.DEFAULT_RPC_URL;
+        if (url.indexOf('://') < 0) {
+            let scheme = config.DEBUG ? 'http' : 'https';
+            url = scheme + '://' + url;
+        }
+        if (!/:\d+$/.test(url))
+            url = url + ':' + config.DEFAULT_RPC_PORT;
+        return url;
+    }
 });
 //# sourceMappingURL=rpc.js.map
