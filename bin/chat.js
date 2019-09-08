@@ -55,7 +55,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls", "./qargs", "
         input.textContent = autoSavedText;
     }
     async function getUserInfo() {
-        let [details] = await rpc.invoke('User.GetDetails', {
+        let [details] = await rpc.invoke('Users.GetDetails', {
             users: [ruid],
         }).catch(async (err) => {
             if (!conf.DEBUG)

@@ -50,7 +50,7 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", 
     async function getPeopleNearby({ lat, lon }) {
         let uids = await rpc.invoke('Map.GetPeopleNearby', { lat, lon });
         log.i('People nearby:', uids);
-        let infos = await rpc.invoke('User.GetDetails', { users: uids, props: ['name', 'photo'] });
+        let infos = await rpc.invoke('Users.GetDetails', { users: uids, props: ['name', 'photo'] });
         log.i('Users info:', infos);
         return uids.map((uid, i) => {
             return Object.assign({ uid }, infos[i]);

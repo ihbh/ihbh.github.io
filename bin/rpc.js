@@ -25,8 +25,10 @@ define(["require", "exports", "./config", "./log", "./ls"], function (require, e
         let headers = {
             'Authorization': JSON.stringify({ uid, sig }),
             'Content-Type': 'application/json',
+            'Content-Length': body.length + '',
         };
         await new Promise(resolve => setTimeout(resolve, config.RPC_DELAY * 1000));
+        url = url.replace('/User.', '/Users.');
         try {
             let res = await fetch(url, {
                 method: 'POST',
@@ -39,7 +41,8 @@ define(["require", "exports", "./config", "./log", "./ls"], function (require, e
             });
             if (!res.ok)
                 throw new RpcError(method, res);
-            let json = await res.json();
+            let text = await res.text();
+            let json = text ? JSON.parse(text) : null;
             log.i(res.status, json);
             return json;
         }

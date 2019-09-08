@@ -72,7 +72,7 @@ async function getPeopleNearby({ lat, lon }): Promise<UserInfo[]> {
   log.i('People nearby:', uids);
 
   let infos = await rpc.invoke(
-    'User.GetDetails',
+    'Users.GetDetails',
     { users: uids, props: ['name', 'photo'] });
   log.i('Users info:', infos);
 

@@ -5,5 +5,5 @@ const log = new TaggedLogger('usr');
 
 export async function setDetails(details: rpc.UserDetails) {
   log.i('details:', details);
-  await rpc.invoke('User.SetDetails', details, true);
+  await rpc.invoke('Users.SetDetails', details, true);
 }

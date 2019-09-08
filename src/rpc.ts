@@ -49,13 +49,13 @@ export function invoke(
 ): Promise<void>;
 
 export function invoke(
-  method: 'User.SetDetails',
+  method: 'Users.SetDetails',
   args: UserDetails,
   retry: boolean)
   : Promise<void>;
 
 export function invoke(
-  method: 'User.GetDetails',
+  method: 'Users.GetDetails',
   args: { users: string[], props?: string[] })
   : Promise<UserDetails[]>;
 
@@ -85,10 +85,13 @@ export async function invoke(method: string, args, retry?: boolean) {
   let headers = {
     'Authorization': JSON.stringify({ uid, sig }),
     'Content-Type': 'application/json',
-  }
+    'Content-Length': body.length + '',
+  };
 
   await new Promise(resolve =>
     setTimeout(resolve, config.RPC_DELAY * 1000));
+
+  url = url.replace('/User.', '/Users.');
 
   try {
     let res = await fetch(url, {
@@ -104,7 +107,8 @@ export async function invoke(method: string, args, retry?: boolean) {
     if (!res.ok)
       throw new RpcError(method, res);
 
-    let json = await res.json();
+    let text = await res.text();
+    let json = text ? JSON.parse(text) : null;
     log.i(res.status, json);
     return json;
   } catch (err) {
