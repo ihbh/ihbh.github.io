@@ -18,16 +18,31 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
             DB.idbs.set(dbname, db);
             return db;
         }
+        static close(dbname) {
+            let db = DB.idbs.get(dbname);
+            if (!db)
+                return;
+            db.idb.close();
+            DB.idbs.delete(dbname);
+        }
         static async clear() {
             let idbs = await indexedDB.databases();
-            for (let { name } of idbs)
-                indexedDB.deleteDatabase(name);
+            for (let { name } of idbs) {
+                log.i('Deleting db:', name);
+                DB.close(name);
+                let r = indexedDB.deleteDatabase(name);
+                await new Promise((resolve, reject) => {
+                    r.onerror = () => reject(new Error(`Failed to delete db: ${name}`));
+                    r.onsuccess = () => resolve();
+                });
+            }
+            log.i('Deleted all idbs.');
         }
         static async save() {
             let idbs = await indexedDB.databases();
             let json = {};
             for (let { name: dbname } of idbs) {
-                let db = await DB.open(dbname);
+                let db = DB.open(dbname);
                 let tnames = await db.getTableNames();
                 json[dbname] = {};
                 for (let tname of tnames) {
@@ -37,6 +52,21 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
                 }
             }
             return json;
+        }
+        static async load(json) {
+            for (let dbname in json) {
+                let db = DB.open(dbname);
+                for (let tname in json[dbname]) {
+                    let t = db.open(tname);
+                    let r = json[dbname][tname];
+                    try {
+                        await t.load(r);
+                    }
+                    catch (err) {
+                        throw new Error(`Failed to import table ${t.name}: ${err}`);
+                    }
+                }
+            }
         }
         open(name) {
             let t = this.tables.get(name);
@@ -136,6 +166,11 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
                 return json;
             });
         }
+        load(json) {
+            let ps = Object.keys(json)
+                .map(key => this.set(key, json[key]));
+            return Promise.all(ps).then(() => { });
+        }
     }
     exports.DBTable = DBTable;
     function prop(keyname, defval = null) {
@@ -163,5 +198,9 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
         return DB.save();
     }
     exports.save = save;
+    function load(json) {
+        DB.load(json);
+    }
+    exports.load = load;
 });
 //# sourceMappingURL=idb.js.map

@@ -23,17 +23,32 @@ export class DB {
     return db;
   }
 
+  static close(dbname: string) {
+    let db = DB.idbs.get(dbname);
+    if (!db) return;
+    db.idb.close();
+    DB.idbs.delete(dbname);
+  }
+
   static async clear() {
     let idbs = await indexedDB.databases();
-    for (let { name } of idbs)
-      indexedDB.deleteDatabase(name);
+    for (let { name } of idbs) {
+      log.i('Deleting db:', name);
+      DB.close(name);
+      let r = indexedDB.deleteDatabase(name);
+      await new Promise<void>((resolve, reject) => {
+        r.onerror = () => reject(new Error(`Failed to delete db: ${name}`));
+        r.onsuccess = () => resolve();
+      });
+    }
+    log.i('Deleted all idbs.');
   }
 
   static async save() {
     let idbs = await indexedDB.databases();
     let json = {};
     for (let { name: dbname } of idbs) {
-      let db = await DB.open(dbname);
+      let db = DB.open(dbname);
       let tnames = await db.getTableNames();
       json[dbname] = {};
       for (let tname of tnames) {
@@ -43,6 +58,21 @@ export class DB {
       }
     }
     return json;
+  }
+
+  static async load(json) {
+    for (let dbname in json) {
+      let db = DB.open(dbname);
+      for (let tname in json[dbname]) {
+        let t = db.open(tname);
+        let r = json[dbname][tname];
+        try {
+          await t.load(r);
+        } catch (err) {
+          throw new Error(`Failed to import table ${t.name}: ${err}`);
+        }
+      }
+    }
   }
 
   readonly version = 1;
@@ -173,6 +203,12 @@ export class DBTable {
       return json;
     });
   }
+
+  load(json) {
+    let ps = Object.keys(json)
+      .map(key => this.set(key, json[key]));
+    return Promise.all(ps).then(() => { });
+  }
 }
 
 export function prop<T>(keyname: string, defval: T = null) {
@@ -200,4 +236,8 @@ export async function clear() {
 
 export function save() {
   return DB.save();
+}
+
+export function load(json) {
+  DB.load(json);
 }

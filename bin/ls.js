@@ -38,5 +38,10 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
         return JSON.parse(json);
     }
     exports.save = save;
+    function load(json) {
+        for (let i in json)
+            localStorage.setItem(i, json[i]);
+    }
+    exports.load = load;
 });
 //# sourceMappingURL=ls.js.map

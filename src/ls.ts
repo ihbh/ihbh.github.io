@@ -39,3 +39,8 @@ export function save() {
   let json = JSON.stringify(localStorage);
   return JSON.parse(json);
 }
+
+export function load(json) {
+  for (let i in json)
+    localStorage.setItem(i, json[i]);
+}
