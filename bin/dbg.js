@@ -38,6 +38,7 @@ define(["require", "exports", "./dom", "./log", "./config", "./qargs", "./ls", "
                 input.type = 'file';
                 input.accept = 'application/json';
                 input.click();
+                log.i('Waiting for input.onchange...');
                 let file = await new Promise((resolve, reject) => {
                     input.onchange = () => {
                         if (input.files.length == 1)

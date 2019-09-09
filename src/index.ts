@@ -14,12 +14,13 @@ dom.whenLoaded().then(async () => {
   let isUserRegistered = !!await gp.username.get();
   log.i('user registered?', isUserRegistered);
 
-  if (page.get()) {
-    await page.init();
-  } else if (isUserRegistered) {
+  if (!isUserRegistered) {
+    page.set('reg');
+  } else if (!page.get() || page.get() == 'reg') {
     page.set('map');
   } else {
-    page.set('reg');
+    log.i('Page explicitly selected:', page.get());
+    await page.init();
   }
 }).catch(err => {
   log.e('failed:', err);

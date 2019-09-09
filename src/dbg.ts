@@ -54,6 +54,7 @@ export function init() {
       input.accept = 'application/json';
       input.click();
 
+      log.i('Waiting for input.onchange...');
       let file = await new Promise<File>((resolve, reject) => {
         input.onchange = () => {
           if (input.files.length == 1)
