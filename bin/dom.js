@@ -9,6 +9,7 @@ define(["require", "exports"], function (require, exports) {
         get logs() { return $('#logs'); },
         get showLogs() { return $('#show-logs'); },
         get resetLS() { return $('#reset-ls'); },
+        get exportDB() { return $('#export-db'); },
         get noGPS() { return $('#no-gps'); },
         get regPhoto() { return $('#photo-frame > img'); },
         get regName() { return $('#reg-name'); },

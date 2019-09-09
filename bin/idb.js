@@ -18,6 +18,26 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
             DB.idbs.set(dbname, db);
             return db;
         }
+        static async clear() {
+            let idbs = await indexedDB.databases();
+            for (let { name } of idbs)
+                indexedDB.deleteDatabase(name);
+        }
+        static async save() {
+            let idbs = await indexedDB.databases();
+            let json = {};
+            for (let { name: dbname } of idbs) {
+                let db = await DB.open(dbname);
+                let tnames = await db.getTableNames();
+                json[dbname] = {};
+                for (let tname of tnames) {
+                    let t = db.open(tname);
+                    let r = await t.save();
+                    json[dbname][tname] = r;
+                }
+            }
+            return json;
+        }
         open(name) {
             let t = this.tables.get(name);
             if (t)
@@ -51,6 +71,14 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
                 };
             });
             return this.ready;
+        }
+        async getTableNames() {
+            let idb = await this.init();
+            let list = idb.objectStoreNames;
+            let names = [];
+            for (let i = 0; i < list.length; i++)
+                names.push(list.item(i));
+            return names;
         }
     }
     DB.idbs = new Map();
@@ -96,6 +124,18 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
         keys() {
             return this.schedule(`${this.name}.keys()`, s => s.getAllKeys());
         }
+        save() {
+            return this.keys().then(keys => {
+                let ps = keys.map(key => this.get(key)
+                    .then(val => [key, val]));
+                return Promise.all(ps);
+            }).then(entires => {
+                let json = {};
+                for (let [key, val] of entires)
+                    json[key] = val;
+                return json;
+            });
+        }
     }
     exports.DBTable = DBTable;
     function prop(keyname, defval = null) {
@@ -115,5 +155,13 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
         });
     }
     exports.prop = prop;
+    async function clear() {
+        await DB.clear();
+    }
+    exports.clear = clear;
+    function save() {
+        return DB.save();
+    }
+    exports.save = save;
 });
 //# sourceMappingURL=idb.js.map

@@ -8,12 +8,14 @@ savelog('I', 'log', [
 
 function savelog(sev, tag, args) {
   let ts = ((Date.now() - time) / 1000).toFixed(3);
-  logs.push([ts, sev + '.' + tag, ...args]);
+  logs.push([sev, ts, tag, ...args]);
 }
 
 export class TaggedLogger {
-  constructor(private tag: string) {
+  readonly tag: string;
 
+  constructor(tag: string) {
+    this.tag = '[' + tag + ']';
   }
 
   d(...args) {

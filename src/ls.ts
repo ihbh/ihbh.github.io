@@ -30,3 +30,12 @@ export function prop<T>(name: string, defval: T = null): AsyncProp<T> {
     },
   });
 }
+
+export function clear() {
+  localStorage.clear();
+}
+
+export function save() {
+  let json = JSON.stringify(localStorage);
+  return JSON.parse(json);
+}

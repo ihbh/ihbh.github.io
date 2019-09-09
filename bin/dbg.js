@@ -1,4 +1,4 @@
-define(["require", "exports", "./dom", "./log", "./config", "./qargs"], function (require, exports, dom, log_1, conf, qargs) {
+define(["require", "exports", "./dom", "./log", "./config", "./qargs", "./ls", "./idb"], function (require, exports, dom, log_1, conf, qargs, ls, idb) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('dbg');
@@ -7,10 +7,29 @@ define(["require", "exports", "./dom", "./log", "./config", "./qargs"], function
         if (!conf.DEBUG)
             return;
         document.body.classList.add(dom.CSS_DEBUG);
-        dom.id.resetLS.addEventListener('click', () => {
+        dom.id.resetLS.addEventListener('click', async () => {
             log.i('#reset-logs:click');
-            localStorage.clear();
+            await ls.clear();
+            await idb.clear();
             log.i('LS cleared.');
+        });
+        dom.id.exportDB.addEventListener('click', async () => {
+            log.i('Exporting data...');
+            try {
+                let json = {
+                    ls: await ls.save(),
+                    idb: await idb.save(),
+                };
+                let blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' });
+                let a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = conf.DBG_DATA_FILENAME;
+                a.click();
+                log.i('Data exported.');
+            }
+            catch (err) {
+                log.e('Failed to export data:', err);
+            }
         });
         dom.id.showLogs.addEventListener('click', () => {
             log.i('#show-logs:click');

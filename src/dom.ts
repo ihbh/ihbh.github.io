@@ -7,6 +7,7 @@ export const id = {
   get logs() { return $('#logs'); },
   get showLogs() { return $('#show-logs'); },
   get resetLS() { return $('#reset-ls'); },
+  get exportDB() { return $('#export-db'); },
   get noGPS() { return $('#no-gps'); },
   get regPhoto() { return $<HTMLImageElement>('#photo-frame > img'); },
   get regName() { return $<HTMLInputElement>('#reg-name'); },

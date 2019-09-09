@@ -29,5 +29,14 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
         });
     }
     exports.prop = prop;
+    function clear() {
+        localStorage.clear();
+    }
+    exports.clear = clear;
+    function save() {
+        let json = JSON.stringify(localStorage);
+        return JSON.parse(json);
+    }
+    exports.save = save;
 });
 //# sourceMappingURL=ls.js.map

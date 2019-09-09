@@ -9,11 +9,11 @@ define(["require", "exports"], function (require, exports) {
     ]);
     function savelog(sev, tag, args) {
         let ts = ((Date.now() - time) / 1000).toFixed(3);
-        exports.logs.push([ts, sev + '.' + tag, ...args]);
+        exports.logs.push([sev, ts, tag, ...args]);
     }
     class TaggedLogger {
         constructor(tag) {
-            this.tag = tag;
+            this.tag = '[' + tag + ']';
         }
         d(...args) {
             console.debug(this.tag, ...args);

@@ -1,6 +1,12 @@
 import { TaggedLogger } from "./log";
 import { AsyncProp } from "./prop";
 
+declare global {
+  interface IDBFactory {
+    databases(): Promise<any>;
+  }
+}
+
 const DB_NAME = 'user';
 const TABLE_NAME = 'props';
 
@@ -15,6 +21,28 @@ export class DB {
     db = new DB(dbname);
     DB.idbs.set(dbname, db);
     return db;
+  }
+
+  static async clear() {
+    let idbs = await indexedDB.databases();
+    for (let { name } of idbs)
+      indexedDB.deleteDatabase(name);
+  }
+
+  static async save() {
+    let idbs = await indexedDB.databases();
+    let json = {};
+    for (let { name: dbname } of idbs) {
+      let db = await DB.open(dbname);
+      let tnames = await db.getTableNames();
+      json[dbname] = {};
+      for (let tname of tnames) {
+        let t = db.open(tname);
+        let r = await t.save();
+        json[dbname][tname] = r;
+      }
+    }
+    return json;
   }
 
   readonly version = 1;
@@ -61,6 +89,15 @@ export class DB {
     });
 
     return this.ready;
+  }
+
+  async getTableNames(): Promise<string[]> {
+    let idb = await this.init();
+    let list = idb.objectStoreNames;
+    let names = [];
+    for (let i = 0; i < list.length; i++)
+      names.push(list.item(i));
+    return names;
   }
 }
 
@@ -123,6 +160,19 @@ export class DBTable {
       `${this.name}.keys()`,
       s => s.getAllKeys());
   }
+
+  save(): Promise<any> {
+    return this.keys().then(keys => {
+      let ps = keys.map(key => this.get(key)
+        .then(val => [key, val]));
+      return Promise.all(ps);
+    }).then(entires => {
+      let json = {};
+      for (let [key, val] of entires)
+        json[key] = val;
+      return json;
+    });
+  }
 }
 
 export function prop<T>(keyname: string, defval: T = null) {
@@ -142,4 +192,12 @@ export function prop<T>(keyname: string, defval: T = null) {
       await t.set(keyname, value);
     },
   });
+}
+
+export async function clear() {
+  await DB.clear();
+}
+
+export function save() {
+  return DB.save();
 }
