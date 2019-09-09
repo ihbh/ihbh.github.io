@@ -7,12 +7,6 @@ define(["require", "exports", "./dom", "./log", "./config", "./qargs", "./ls", "
         if (!conf.DEBUG)
             return;
         document.body.classList.add(dom.CSS_DEBUG);
-        dom.id.resetLS.addEventListener('click', async () => {
-            log.i('#reset-logs:click');
-            await ls.clear();
-            await idb.clear();
-            log.i('Data cleared.');
-        });
         dom.id.exportDB.addEventListener('click', async () => {
             log.i('Exporting data...');
             try {

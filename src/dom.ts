@@ -6,7 +6,6 @@ export const id = {
   get sendLocation() { return $<HTMLButtonElement>('#send'); },
   get logs() { return $('#logs'); },
   get showLogs() { return $('#show-logs'); },
-  get resetLS() { return $('#reset-ls'); },
   get exportDB() { return $('#export-db'); },
   get importDB() { return $('#import-db'); },
   get noGPS() { return $('#no-gps'); },
