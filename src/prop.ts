@@ -4,11 +4,11 @@ type Setter<T> = (value: T) => void | Promise<void>;
 interface Args<T> {
   get: Getter<T>;
   set?: Setter<T>;
-  cache?: boolean;
+  nocache?: boolean;
 }
 
 export class AsyncProp<T> {
-  private cache: boolean;
+  private nocache: boolean;
   private getter: Getter<T>;
   private setter: Setter<T>;
   private pget: Promise<T>;
@@ -18,12 +18,12 @@ export class AsyncProp<T> {
       args = { get: args };
     this.getter = args.get;
     this.setter = args.set;
-    this.cache = !!args.cache;
+    this.nocache = !!args.nocache;
   }
 
   get(): Promise<T> {
     let get = this.getter;
-    return this.cache && this.pget ||
+    return !this.nocache && this.pget ||
       (this.pget = Promise.resolve(get()));
   }
 

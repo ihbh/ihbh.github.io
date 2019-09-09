@@ -85,12 +85,15 @@ export class DBTable {
   }
 
   private async execPendingTransactions() {
-    log.i('Executing pending transactions:', this.pending.length);
     let db = await this.db.init();
     let t = db.transaction(this.name, 'readwrite');
     let s = t.objectStore(this.name);
 
-    for (let [name, fn, resolve, reject] of this.pending) {
+    let ts = this.pending;
+    this.pending = [];
+    log.i('Executing pending transactions:', ts.map(t => t[0]));
+
+    for (let [name, fn, resolve, reject] of ts) {
       let r = fn(s);
       r.onerror = () => reject(new Error(`Transaction ${name} failed: ${r.error}`));
       r.onsuccess = () => resolve(r.result);
@@ -124,13 +127,15 @@ export class DBTable {
 
 export function prop<T>(keyname: string, defval: T = null) {
   return new AsyncProp<T>({
-    cache: false,
+    nocache: true,
+
     async get() {
       let db = DB.open(DB_NAME);
       let t = db.open(TABLE_NAME);
       let v = await t.get(keyname);
       return v === undefined ? defval : v;
     },
+
     async set(value: T) {
       let db = DB.open(DB_NAME);
       let t = db.open(TABLE_NAME);

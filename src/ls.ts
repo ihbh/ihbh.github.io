@@ -7,13 +7,15 @@ const strval = s => (s || '').slice(0, 20) +
 
 export function prop<T>(name: string, defval: T = null): AsyncProp<T> {
   return new AsyncProp<T>({
-    cache: false,
+    nocache: true,
+
     get(): T {
       let json = localStorage.getItem(name);
       let val = json ? JSON.parse(json) : defval;
       log.i(name, '->', strval(json));
       return val;
     },
+    
     set(val: T) {
       if (val === null) {
         log.i(name, 'deleted');

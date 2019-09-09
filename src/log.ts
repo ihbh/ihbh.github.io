@@ -1,17 +1,42 @@
 export const logs = [];
+const time = Date.now();
 
-export class TaggedLogger{
+savelog('I', 'log', [
+  'Logging session started:',
+  new Date().toJSON(),
+]);
+
+function savelog(sev, tag, args) {
+  let ts = ((Date.now() - time) / 1000).toFixed(3);
+  logs.push([ts, sev + '.' + tag, ...args]);
+}
+
+export class TaggedLogger {
   constructor(private tag: string) {
 
   }
 
+  d(...args) {
+    console.debug(this.tag, ...args);
+    this.save('D', args);
+  }
+
   i(...args) {
-    console.log('[' +this. tag + '] I', ...args);
-    logs.push(['I', ...args]);
+    console.info(this.tag, ...args);
+    this.save('I', args);
+  }
+
+  w(...args) {
+    console.warn(this.tag, ...args);
+    this.save('W', args);
   }
 
   e(...args) {
-    console.error('[' +this. tag + '] E', ...args);
-    logs.push(['E', ...args]);
+    console.error(this.tag, ...args);
+    this.save('E', args);
+  }
+
+  private save(sev: string, args: any[]) {
+    savelog(sev, this.tag, args);
   }
 }

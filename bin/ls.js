@@ -6,7 +6,7 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
         ' (' + (s || '').length + ' chars)';
     function prop(name, defval = null) {
         return new prop_1.AsyncProp({
-            cache: false,
+            nocache: true,
             get() {
                 let json = localStorage.getItem(name);
                 let val = json ? JSON.parse(json) : defval;

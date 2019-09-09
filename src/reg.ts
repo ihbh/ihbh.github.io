@@ -93,7 +93,7 @@ async function registerProfile() {
       let user = await import('./user');
       let pubkey = await user.pubkey.get();
 
-      usr.setDetails({
+      await usr.setDetails({
         pubkey: pubkey,
         photo: imgurl,
         name: username,

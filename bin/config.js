@@ -21,7 +21,7 @@ define(["require", "exports"], function (require, exports) {
     exports.MARKER_ICON_SCALE = 0.5;
     exports.DEFAULT_RPC_URL = 'https://ihbh.org:3921';
     exports.DEFAULT_RPC_PORT = 3921;
-    exports.RPC_DELAY = 1.5;
+    exports.RPC_DELAY = 0;
     exports.CHAT_AUTOSAVE_INTERVAL = 1; // seconds
 });
 //# sourceMappingURL=config.js.map

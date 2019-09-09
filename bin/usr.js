@@ -4,7 +4,7 @@ define(["require", "exports", "./log", "./rpc"], function (require, exports, log
     const log = new log_1.TaggedLogger('usr');
     async function setDetails(details) {
         log.i('details:', details);
-        await rpc.invoke('Users.SetDetails', details, true);
+        await rpc.schedule('Users.SetDetails', details);
     }
     exports.setDetails = setDetails;
 });

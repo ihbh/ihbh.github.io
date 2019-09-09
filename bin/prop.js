@@ -7,11 +7,11 @@ define(["require", "exports"], function (require, exports) {
                 args = { get: args };
             this.getter = args.get;
             this.setter = args.set;
-            this.cache = !!args.cache;
+            this.nocache = !!args.nocache;
         }
         get() {
             let get = this.getter;
-            return this.cache && this.pget ||
+            return !this.nocache && this.pget ||
                 (this.pget = Promise.resolve(get()));
         }
         set(value) {

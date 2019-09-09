@@ -83,7 +83,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./page"], f
                 let usr = await new Promise((resolve_1, reject_1) => { require(['./usr'], resolve_1, reject_1); });
                 let user = await new Promise((resolve_2, reject_2) => { require(['./user'], resolve_2, reject_2); });
                 let pubkey = await user.pubkey.get();
-                usr.setDetails({
+                await usr.setDetails({
                     pubkey: pubkey,
                     photo: imgurl,
                     name: username,

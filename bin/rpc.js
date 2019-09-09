@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./log", "./gp", "./qargs"], function (require, exports, config, log_1, gp, qargs) {
+define(["require", "exports", "./config", "./log", "./gp", "./qargs", "./prop"], function (require, exports, config, log_1, gp, qargs, prop_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('rpc');
@@ -18,7 +18,7 @@ define(["require", "exports", "./config", "./log", "./gp", "./qargs"], function 
             await schedule(method, args);
         let user = await new Promise((resolve_1, reject_1) => { require(['./user'], resolve_1, reject_1); });
         let path = '/rpc/' + method;
-        let url = getRpcUrl() + path;
+        let url = (await rpcurl.get()) + path;
         let body = JSON.stringify(args);
         let uid = await user.uid.get();
         let sig = await user.sign(path + '\n' + body);
@@ -66,6 +66,7 @@ define(["require", "exports", "./config", "./log", "./gp", "./qargs"], function 
             return unsent;
         });
     }
+    exports.schedule = schedule;
     async function sendall() {
         let unsent = await gp.rpcs.unsent.get();
         let infos = await gp.rpcs.infos.get();
@@ -112,17 +113,17 @@ define(["require", "exports", "./config", "./log", "./gp", "./qargs"], function 
         }
     }
     exports.sendall = sendall;
-    function getRpcUrl() {
-        let url = qargs.get('rpc');
-        if (!url)
-            return config.DEFAULT_RPC_URL;
+    let rpcurl = new prop_1.AsyncProp(() => {
+        let url = qargs.get('rpc')
+            || config.DEFAULT_RPC_URL;
         if (url.indexOf('://') < 0) {
             let scheme = config.DEBUG ? 'http' : 'https';
             url = scheme + '://' + url;
         }
         if (!/:\d+$/.test(url))
             url = url + ':' + config.DEFAULT_RPC_PORT;
+        log.i('RPC URL:', url);
         return url;
-    }
+    });
 });
 //# sourceMappingURL=rpc.js.map

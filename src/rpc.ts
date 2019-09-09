@@ -2,6 +2,7 @@ import * as config from './config';
 import { TaggedLogger } from './log';
 import * as gp from './gp';
 import * as qargs from './qargs';
+import { AsyncProp } from './prop';
 
 const log = new TaggedLogger('rpc');
 
@@ -78,7 +79,7 @@ export async function invoke(method: string, args, retry?: boolean) {
   let user = await import('./user');
 
   let path = '/rpc/' + method;
-  let url = getRpcUrl() + path;
+  let url = (await rpcurl.get()) + path;
   let body = JSON.stringify(args);
   let uid = await user.uid.get();
   let sig = await user.sign(path + '\n' + body);
@@ -118,7 +119,7 @@ export async function invoke(method: string, args, retry?: boolean) {
   }
 }
 
-async function schedule(method: string, args) {
+export async function schedule(method: string, args) {
   log.i('schedule:', method, args);
 
   let sha1 = await import('./sha1' as any);
@@ -184,9 +185,9 @@ export async function sendall() {
   }
 }
 
-function getRpcUrl() {
-  let url = qargs.get('rpc');
-  if (!url) return config.DEFAULT_RPC_URL;
+let rpcurl = new AsyncProp<string>(() => {
+  let url = qargs.get('rpc')
+    || config.DEFAULT_RPC_URL;
 
   if (url.indexOf('://') < 0) {
     let scheme = config.DEBUG ? 'http' : 'https';
@@ -194,7 +195,8 @@ function getRpcUrl() {
   }
 
   if (!/:\d+$/.test(url))
-  url = url + ':' + config.DEFAULT_RPC_PORT;
+    url = url + ':' + config.DEFAULT_RPC_PORT;
 
+  log.i('RPC URL:', url);
   return url;
-}
+});
