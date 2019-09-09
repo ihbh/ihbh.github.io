@@ -1,5 +1,6 @@
 (function init() {
     const modules = new Map();
+    window['ihbh'] = { mods: modules };
     function log(...args) {
         console.debug('[amd] I', ...args);
     }

@@ -8,6 +8,7 @@
   }
 
   const modules = new Map<string, ModuleDef>();
+  window['ihbh'] = { mods: modules };
 
   function log(...args) {
     console.debug('[amd] I', ...args);
