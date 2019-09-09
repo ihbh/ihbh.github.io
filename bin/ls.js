@@ -1,11 +1,12 @@
-define(["require", "exports", "./log"], function (require, exports, log_1) {
+define(["require", "exports", "./log", "./prop"], function (require, exports, log_1, prop_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('ls');
     const strval = s => (s || '').slice(0, 20) +
         ' (' + (s || '').length + ' chars)';
     function prop(name, defval = null) {
-        return {
+        return new prop_1.AsyncProp({
+            cache: false,
             get() {
                 let json = localStorage.getItem(name);
                 let val = json ? JSON.parse(json) : defval;
@@ -25,24 +26,8 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
                     localStorage.setItem(name, json);
                 }
             },
-            modify(fn) {
-                this.set(fn(this.get()));
-            },
-        };
+        });
     }
-    exports.username = prop('user.name');
-    exports.userimg = prop('user.img'); // data:image/jpeg;base64,...
-    // ed25519
-    exports.keyseed = prop('user.keyseed');
-    exports.privkey = prop('user.privkey');
-    exports.pubkey = prop('user.pubkey');
-    exports.uid = prop('user.id');
-    exports.places = prop('places', {});
-    exports.rpcs = {
-        infos: prop('rpcs.info', {}),
-        unsent: prop('rpcs.unsent', {}),
-        failed: prop('rpcs.failed', {}),
-    };
-    exports.unsentMessages = prop('chat.unsent', {});
+    exports.prop = prop;
 });
 //# sourceMappingURL=ls.js.map

@@ -2,12 +2,26 @@ define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class AsyncProp {
-        constructor(getter) {
-            this.getter = getter;
+        constructor(args) {
+            if (args instanceof Function)
+                args = { get: args };
+            this.getter = args.get;
+            this.setter = args.set;
+            this.cache = !!args.cache;
         }
         get() {
-            return this.result ||
-                (this.result = this.getter.call(null));
+            let get = this.getter;
+            return this.cache && this.pget ||
+                (this.pget = Promise.resolve(get()));
+        }
+        set(value) {
+            let set = this.setter;
+            if (!set)
+                throw new Error('This is a read only prop.');
+            return Promise.resolve(set(value));
+        }
+        modify(edit) {
+            return this.get().then(edit).then(v => this.set(v));
         }
     }
     exports.AsyncProp = AsyncProp;

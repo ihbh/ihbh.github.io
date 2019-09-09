@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./log", "./ls", "./qargs", "./react", "./rpc"], function (require, exports, conf, dom, log_1, ls, qargs, react_1, rpc) {
+define(["require", "exports", "./config", "./dom", "./log", "./gp", "./qargs", "./react", "./rpc"], function (require, exports, conf, dom, log_1, gp, qargs, react_1, rpc) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('chat');
@@ -13,7 +13,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls", "./qargs", "
         setSendButtonHandler();
     }
     exports.init = init;
-    function setSendButtonHandler() {
+    async function setSendButtonHandler() {
         let input = dom.id.chatReplyText;
         dom.id.chatReplySend.addEventListener('click', () => {
             try {
@@ -38,11 +38,11 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls", "./qargs", "
                 log.e('Failed to send message:', err);
             }
         });
-        setInterval(() => {
+        setInterval(async () => {
             let newText = input.textContent;
             if (newText == autoSavedText)
                 return;
-            ls.unsentMessages.modify(unsent => {
+            await gp.unsentMessages.modify(unsent => {
                 if (!newText)
                     delete unsent[ruid];
                 else
@@ -51,7 +51,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls", "./qargs", "
                 return unsent;
             });
         }, conf.CHAT_AUTOSAVE_INTERVAL * 1000);
-        autoSavedText = ls.unsentMessages.get()[ruid] || '';
+        autoSavedText = (await gp.unsentMessages.get()[ruid]) || '';
         input.textContent = autoSavedText;
     }
     async function getUserInfo() {

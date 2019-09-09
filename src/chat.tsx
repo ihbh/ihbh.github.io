@@ -1,7 +1,7 @@
 import * as conf from './config';
 import * as dom from './dom';
 import { TaggedLogger } from './log';
-import * as ls from './ls';
+import * as gp from './gp';
 import * as qargs from './qargs';
 import React from './react';
 import * as rpc from './rpc';
@@ -22,7 +22,7 @@ export async function init() {
   setSendButtonHandler();
 }
 
-function setSendButtonHandler() {
+async function setSendButtonHandler() {
   let input = dom.id.chatReplyText;
 
   dom.id.chatReplySend.addEventListener('click', () => {
@@ -47,11 +47,11 @@ function setSendButtonHandler() {
     }
   });
 
-  setInterval(() => {
+  setInterval(async () => {
     let newText = input.textContent;
     if (newText == autoSavedText) return;
 
-    ls.unsentMessages.modify(unsent => {
+    await gp.unsentMessages.modify(unsent => {
       if (!newText)
         delete unsent[ruid];
       else
@@ -61,7 +61,7 @@ function setSendButtonHandler() {
     });
   }, conf.CHAT_AUTOSAVE_INTERVAL * 1000);
 
-  autoSavedText = ls.unsentMessages.get()[ruid] || '';
+  autoSavedText = (await gp.unsentMessages.get()[ruid]) || '';
   input.textContent = autoSavedText;
 }
 

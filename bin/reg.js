@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./log", "./ls", "./page"], function (require, exports, config_1, dom, log_1, ls, page) {
+define(["require", "exports", "./config", "./dom", "./log", "./gp", "./page"], function (require, exports, config_1, dom, log_1, gp, page) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const IMG_MAXSIZE = 4096;
@@ -77,8 +77,8 @@ define(["require", "exports", "./config", "./dom", "./log", "./ls", "./page"], f
             let imgurl = getResizedPhoto();
             if (!imgurl)
                 throw new Error('Need to set user photo.');
-            ls.userimg.set(imgurl);
-            ls.username.set(username);
+            await gp.userimg.set(imgurl);
+            await gp.username.set(username);
             try {
                 let usr = await new Promise((resolve_1, reject_1) => { require(['./usr'], resolve_1, reject_1); });
                 let user = await new Promise((resolve_2, reject_2) => { require(['./user'], resolve_2, reject_2); });

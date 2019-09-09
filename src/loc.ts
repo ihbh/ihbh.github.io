@@ -1,6 +1,6 @@
 import { TaggedLogger } from "./log";
 import * as rpc from './rpc';
-import * as ls from './ls';
+import * as gp from './gp';
 
 const log = new TaggedLogger('loc');
 
@@ -25,7 +25,7 @@ export async function shareLocation(pos: GpsCoords) {
   let time = Date.now() / 1000 | 0;
   log.i('Sharing location:', time, pos);
 
-  ls.places.modify(places => {
+  await gp.places.modify(places => {
     places[time] = [pos.lat, pos.lng];
     return places;
   });
@@ -37,8 +37,8 @@ export async function shareLocation(pos: GpsCoords) {
   }, true);
 }
 
-export function getVisitedPlaces(): VisitedPlaceInfo[] {
-  let json = ls.places.get();
+export async function getVisitedPlaces(): Promise<VisitedPlaceInfo[]> {
+  let json = await gp.places.get();
 
   return Object.keys(json).map(key => {
     let time = new Date(1000 * +key);

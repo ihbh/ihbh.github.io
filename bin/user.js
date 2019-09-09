@@ -1,4 +1,4 @@
-define(["require", "exports", "./buffer", "./log", "./ls", "./prop"], function (require, exports, buffer_1, log_1, ls, prop_1) {
+define(["require", "exports", "./buffer", "./log", "./gp", "./prop"], function (require, exports, buffer_1, log_1, gp, prop_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const WASM_LIB = './supercop/index';
@@ -26,19 +26,19 @@ define(["require", "exports", "./buffer", "./log", "./ls", "./prop"], function (
     });
     // 256 bits = 32 bytes.
     let keyseed = new prop_1.AsyncProp(async () => {
-        let hex = ls.keyseed.get();
+        let hex = await gp.keyseed.get();
         if (hex)
             return hex;
         let sc = await wasmlib.get();
         log.i('Generating a ed25519 seed.');
         let seed = sc.createSeed();
         hex = new buffer_1.default(seed).toString('hex');
-        ls.keyseed.set(hex);
+        await gp.keyseed.set(hex);
         return hex;
     });
     let keypair = new prop_1.AsyncProp(async () => {
-        let pubkey = ls.pubkey.get();
-        let privkey = ls.privkey.get();
+        let pubkey = await gp.pubkey.get();
+        let privkey = await gp.privkey.get();
         if (!pubkey || !privkey) {
             let hex = await keyseed.get();
             let seed = buffer_1.default.from(hex, 'hex').toArray(Uint8Array);
@@ -47,8 +47,8 @@ define(["require", "exports", "./buffer", "./log", "./ls", "./prop"], function (
             let keys = sc.createKeyPair(seed);
             pubkey = new buffer_1.default(keys.publicKey).toString('hex');
             privkey = new buffer_1.default(keys.secretKey).toString('hex');
-            ls.pubkey.set(pubkey);
-            ls.privkey.set(privkey);
+            await gp.pubkey.set(pubkey);
+            await gp.privkey.set(privkey);
         }
         return { pubkey, privkey };
     });
@@ -64,7 +64,7 @@ define(["require", "exports", "./buffer", "./log", "./ls", "./prop"], function (
     });
     // First 64 bits of sha256(pubkey).
     exports.uid = new prop_1.AsyncProp(async () => {
-        let id = ls.uid.get();
+        let id = await gp.uid.get();
         if (id)
             return id;
         let key = await exports.pubkey.get();
@@ -72,7 +72,7 @@ define(["require", "exports", "./buffer", "./log", "./ls", "./prop"], function (
         let hash = await crypto.subtle.digest(UID_HASH, bytes);
         let subhash = hash.slice(0, UID_SIZE / 8);
         id = new buffer_1.default(subhash).toString('hex');
-        ls.uid.set(id);
+        await gp.uid.set(id);
         return id;
     });
     // 512 bits = 64 bytes.

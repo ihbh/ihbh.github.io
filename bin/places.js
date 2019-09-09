@@ -12,7 +12,7 @@ define(["require", "exports", "./dom", "./log", "./loc", "./osm", "./config", ".
     }
     exports.init = init;
     async function loadMap() {
-        let places = loc.getVisitedPlaces();
+        let places = await loc.getVisitedPlaces();
         switch (qargs.get('vpt')) {
             case 'b':
                 log.i('Using big test visited places.');

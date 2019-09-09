@@ -16,7 +16,7 @@ export async function init() {
 }
 
 async function loadMap() {
-  let places = loc.getVisitedPlaces();
+  let places = await loc.getVisitedPlaces();
 
   switch (qargs.get('vpt')) {
     case 'b':

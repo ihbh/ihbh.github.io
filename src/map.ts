@@ -1,11 +1,10 @@
 import * as dom from './dom';
 import { TaggedLogger } from './log';
-import * as ls from './ls';
+import * as gp from './gp';
 import * as page from './page';
 import { MAP_BOX_SIZE } from './config';
 
 const log = new TaggedLogger('map');
-const { $ } = dom;
 
 let displayedGpsCoords: Position = null;
 
@@ -23,19 +22,19 @@ function initShowPlaces() {
   });
 }
 
-function initUserPic() {
+async function initUserPic() {
   try {
     let img = dom.id.userPic;
     img.onerror = () => log.e('Failed to load user pic.');
     img.onload = () => log.i('user pic loaded:',
       img.width, 'x', img.height);
     let time = Date.now();
-    let datauri = ls.userimg.get();
+    let datauri = await gp.userimg.get();
     let blob = dataUriToBlob(datauri);
     let bloburi = URL.createObjectURL(blob);
     log.i('img.src:', bloburi, Date.now() - time, 'ms');
     img.src = bloburi;
-    img.title = ls.username.get();
+    img.title = await gp.username.get();
   } catch (err) {
     log.e(err);
   }

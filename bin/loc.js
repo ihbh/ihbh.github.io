@@ -1,11 +1,11 @@
-define(["require", "exports", "./log", "./rpc", "./ls"], function (require, exports, log_1, rpc, ls) {
+define(["require", "exports", "./log", "./rpc", "./gp"], function (require, exports, log_1, rpc, gp) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('loc');
     async function shareLocation(pos) {
         let time = Date.now() / 1000 | 0;
         log.i('Sharing location:', time, pos);
-        ls.places.modify(places => {
+        await gp.places.modify(places => {
             places[time] = [pos.lat, pos.lng];
             return places;
         });
@@ -16,8 +16,8 @@ define(["require", "exports", "./log", "./rpc", "./ls"], function (require, expo
         }, true);
     }
     exports.shareLocation = shareLocation;
-    function getVisitedPlaces() {
-        let json = ls.places.get();
+    async function getVisitedPlaces() {
+        let json = await gp.places.get();
         return Object.keys(json).map(key => {
             let time = new Date(1000 * +key);
             let [lat, lon] = json[key];

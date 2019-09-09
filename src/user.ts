@@ -1,6 +1,6 @@
 import Buffer from './buffer';
 import { TaggedLogger } from "./log";
-import * as ls from './ls';
+import * as gp from './gp';
 import { AsyncProp } from "./prop";
 
 const WASM_LIB = './supercop/index';
@@ -43,21 +43,21 @@ let wasmlib = new AsyncProp<Supercop>(async () => {
 
 // 256 bits = 32 bytes.
 let keyseed = new AsyncProp<string>(async () => {
-  let hex = ls.keyseed.get();
+  let hex = await gp.keyseed.get();
   if (hex) return hex;
 
   let sc = await wasmlib.get();
   log.i('Generating a ed25519 seed.');
   let seed = sc.createSeed();
   hex = new Buffer(seed).toString('hex');
-  ls.keyseed.set(hex);
+  await gp.keyseed.set(hex);
   return hex;
 
 });
 
 let keypair = new AsyncProp(async () => {
-  let pubkey = ls.pubkey.get();
-  let privkey = ls.privkey.get();
+  let pubkey = await gp.pubkey.get();
+  let privkey = await gp.privkey.get();
 
   if (!pubkey || !privkey) {
     let hex = await keyseed.get();
@@ -67,8 +67,8 @@ let keypair = new AsyncProp(async () => {
     let keys = sc.createKeyPair(seed);
     pubkey = new Buffer(keys.publicKey).toString('hex');
     privkey = new Buffer(keys.secretKey).toString('hex');
-    ls.pubkey.set(pubkey);
-    ls.privkey.set(privkey);
+    await gp.pubkey.set(pubkey);
+    await gp.privkey.set(privkey);
   }
 
   return { pubkey, privkey };
@@ -88,7 +88,7 @@ let privkey = new AsyncProp<string>(async () => {
 
 // First 64 bits of sha256(pubkey).
 export let uid = new AsyncProp<string>(async () => {
-  let id = ls.uid.get();
+  let id = await gp.uid.get();
   if (id) return id;
 
   let key = await pubkey.get();
@@ -96,7 +96,7 @@ export let uid = new AsyncProp<string>(async () => {
   let hash = await crypto.subtle.digest(UID_HASH, bytes);
   let subhash = hash.slice(0, UID_SIZE / 8);
   id = new Buffer(subhash).toString('hex');
-  ls.uid.set(id);
+  await gp.uid.set(id);
   return id;
 });
 

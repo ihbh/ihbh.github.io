@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./log", "./ls", "./qargs"], function (require, exports, config, log_1, ls, qargs) {
+define(["require", "exports", "./config", "./log", "./gp", "./qargs"], function (require, exports, config, log_1, gp, qargs) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('rpc');
@@ -57,18 +57,18 @@ define(["require", "exports", "./config", "./log", "./ls", "./qargs"], function 
         let sha1 = await new Promise((resolve_2, reject_2) => { require(['./sha1'], resolve_2, reject_2); });
         let info = { method, args };
         let id = sha1(JSON.stringify(info)).slice(0, 6);
-        ls.rpcs.infos.modify(infos => {
+        await gp.rpcs.infos.modify(infos => {
             infos[id] = info;
             return infos;
         });
-        ls.rpcs.unsent.modify(unsent => {
+        await gp.rpcs.unsent.modify(unsent => {
             unsent[id] = Date.now() / 1000 | 0;
             return unsent;
         });
     }
     async function sendall() {
-        let unsent = ls.rpcs.unsent.get();
-        let infos = ls.rpcs.infos.get();
+        let unsent = await gp.rpcs.unsent.get();
+        let infos = await gp.rpcs.infos.get();
         if (sending)
             throw new Error('Still sending.');
         log.i('sending unsent:', Object.keys(unsent).length);
@@ -78,11 +78,11 @@ define(["require", "exports", "./config", "./log", "./ls", "./qargs"], function 
                 try {
                     let { method, args } = infos[id];
                     await invoke(method, args);
-                    ls.rpcs.unsent.modify(unsent => {
+                    await gp.rpcs.unsent.modify(unsent => {
                         delete unsent[id];
                         return unsent;
                     });
-                    ls.rpcs.infos.modify(infos => {
+                    await gp.rpcs.infos.modify(infos => {
                         delete infos[id];
                         return infos;
                     });
@@ -94,11 +94,11 @@ define(["require", "exports", "./config", "./log", "./ls", "./qargs"], function 
                         log.i('will be resent later:', id, infos[id].method);
                     }
                     else {
-                        ls.rpcs.unsent.modify(unsent => {
+                        await gp.rpcs.unsent.modify(unsent => {
                             delete unsent[id];
                             return unsent;
                         });
-                        ls.rpcs.failed.modify(errs => {
+                        await gp.rpcs.failed.modify(errs => {
                             errs[id] = err.message;
                             return errs;
                         });

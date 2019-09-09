@@ -1,7 +1,7 @@
 import { VALID_USERNAME_REGEX, PHOTO_SIZE } from "./config";
 import * as dom from './dom';
 import { TaggedLogger } from "./log";
-import * as ls from './ls';
+import * as gp from './gp';
 import * as page from './page';
 
 const IMG_MAXSIZE = 4096;
@@ -85,8 +85,8 @@ async function registerProfile() {
     let imgurl = getResizedPhoto();
     if (!imgurl) throw new Error('Need to set user photo.');
 
-    ls.userimg.set(imgurl);
-    ls.username.set(username);
+    await gp.userimg.set(imgurl);
+    await gp.username.set(username);
 
     try {
       let usr = await import('./usr');

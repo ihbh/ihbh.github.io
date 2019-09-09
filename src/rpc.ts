@@ -1,6 +1,6 @@
 import * as config from './config';
 import { TaggedLogger } from './log';
-import * as ls from './ls';
+import * as gp from './gp';
 import * as qargs from './qargs';
 
 const log = new TaggedLogger('rpc');
@@ -122,23 +122,23 @@ async function schedule(method: string, args) {
   log.i('schedule:', method, args);
 
   let sha1 = await import('./sha1' as any);
-  let info: ls.RpcInfo = { method, args };
+  let info: gp.RpcInfo = { method, args };
   let id = sha1(JSON.stringify(info)).slice(0, 6);
 
-  ls.rpcs.infos.modify(infos => {
+  await gp.rpcs.infos.modify(infos => {
     infos[id] = info;
     return infos;
   });
 
-  ls.rpcs.unsent.modify(unsent => {
+  await gp.rpcs.unsent.modify(unsent => {
     unsent[id] = Date.now() / 1000 | 0;
     return unsent;
   });
 }
 
 export async function sendall() {
-  let unsent = ls.rpcs.unsent.get();
-  let infos = ls.rpcs.infos.get();
+  let unsent = await gp.rpcs.unsent.get();
+  let infos = await gp.rpcs.infos.get();
 
   if (sending) throw new Error('Still sending.');
   log.i('sending unsent:', Object.keys(unsent).length);
@@ -150,12 +150,12 @@ export async function sendall() {
         let { method, args } = infos[id];
         await invoke(method as any, args);
 
-        ls.rpcs.unsent.modify(unsent => {
+        await gp.rpcs.unsent.modify(unsent => {
           delete unsent[id];
           return unsent;
         });
 
-        ls.rpcs.infos.modify(infos => {
+        await gp.rpcs.infos.modify(infos => {
           delete infos[id];
           return infos;
         });
@@ -166,12 +166,12 @@ export async function sendall() {
         if (retry) {
           log.i('will be resent later:', id, infos[id].method);
         } else {
-          ls.rpcs.unsent.modify(unsent => {
+          await gp.rpcs.unsent.modify(unsent => {
             delete unsent[id];
             return unsent;
           });
 
-          ls.rpcs.failed.modify(errs => {
+          await gp.rpcs.failed.modify(errs => {
             errs[id] = err.message;
             return errs;
           });

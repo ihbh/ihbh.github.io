@@ -1,8 +1,7 @@
-define(["require", "exports", "./dom", "./log", "./ls", "./page", "./config"], function (require, exports, dom, log_1, ls, page, config_1) {
+define(["require", "exports", "./dom", "./log", "./gp", "./page", "./config"], function (require, exports, dom, log_1, gp, page, config_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('map');
-    const { $ } = dom;
     let displayedGpsCoords = null;
     async function init() {
         await initUserPic();
@@ -17,18 +16,18 @@ define(["require", "exports", "./dom", "./log", "./ls", "./page", "./config"], f
             page.set('places');
         });
     }
-    function initUserPic() {
+    async function initUserPic() {
         try {
             let img = dom.id.userPic;
             img.onerror = () => log.e('Failed to load user pic.');
             img.onload = () => log.i('user pic loaded:', img.width, 'x', img.height);
             let time = Date.now();
-            let datauri = ls.userimg.get();
+            let datauri = await gp.userimg.get();
             let blob = dataUriToBlob(datauri);
             let bloburi = URL.createObjectURL(blob);
             log.i('img.src:', bloburi, Date.now() - time, 'ms');
             img.src = bloburi;
-            img.title = ls.username.get();
+            img.title = await gp.username.get();
         }
         catch (err) {
             log.e(err);
