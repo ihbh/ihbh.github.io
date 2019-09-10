@@ -1,7 +1,12 @@
 define(["require", "exports", "./config", "./log"], function (require, exports, config, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const log = new log_1.TaggedLogger('gps');
+    let log = new log_1.TaggedLogger('gps');
+    let logpos = (label, pos) => {
+        let { latitude, longitude, altitude, accuracy } = pos.coords;
+        log.i(`${label}: lat=${latitude} lon=${longitude} ` +
+            `acc=${accuracy}m alt=${altitude || 0}m`);
+    };
     function getGeoLocation() {
         let options = {
             enableHighAccuracy: true,
@@ -9,14 +14,16 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
             maximumAge: 0,
         };
         return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                navigator.geolocation
-                    .getCurrentPosition(resolve, reject, options);
-            }, config.GPS_DELAY);
+            navigator.geolocation
+                .getCurrentPosition(resolve, reject, options);
+            if (config.DEBUG) {
+                let wid = navigator.geolocation.watchPosition(pos => logpos('watch', pos));
+                setTimeout(() => {
+                    navigator.geolocation.clearWatch(wid);
+                }, config.GPS_WATCH_DURATION);
+            }
         }).then(pos => {
-            let { latitude, longitude, altitude, accuracy } = pos.coords;
-            log.i(`current: lat=${latitude} lon=${longitude} ` +
-                `acc=${accuracy}m alt=${altitude || 0}m`);
+            logpos('current', pos);
             return pos;
         });
     }

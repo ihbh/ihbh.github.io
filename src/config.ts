@@ -9,7 +9,7 @@ export const DBG_MAX_SHOW_LOGS = 500;
 // 1e-5 corresponds to 1m precision
 export const MAP_1M = 1e-5;
 export const GPS_DIGITS = 7;
-export const GPS_DELAY = 0; // ms
+export const GPS_WATCH_DURATION = 15000; // ms
 export const GPS_TIMEOUT = 15000; // ms
 export const MAP_BOX_SIZE = 250 * MAP_1M;
 export const OSM_URL = 'https://www.openstreetmap.org/export/embed.html';

@@ -1,7 +1,13 @@
 import * as config from './config';
 import { TaggedLogger } from './log';
 
-const log = new TaggedLogger('gps');
+let log = new TaggedLogger('gps');
+
+let logpos = (label: string, pos: Position) => {
+  let { latitude, longitude, altitude, accuracy } = pos.coords;
+  log.i(`${label}: lat=${latitude} lon=${longitude} ` +
+    `acc=${accuracy}m alt=${altitude || 0}m`);
+};
 
 export function getGeoLocation() {
   let options: PositionOptions = {
@@ -10,14 +16,18 @@ export function getGeoLocation() {
     maximumAge: 0,
   };
   return new Promise<Position>((resolve, reject) => {
-    setTimeout(() => {
-      navigator.geolocation
-        .getCurrentPosition(resolve, reject, options);
-    }, config.GPS_DELAY);
+    navigator.geolocation
+      .getCurrentPosition(resolve, reject, options);
+
+    if (config.DEBUG) {
+      let wid = navigator.geolocation.watchPosition(
+        pos => logpos('watch', pos));
+      setTimeout(() => {
+        navigator.geolocation.clearWatch(wid);
+      }, config.GPS_WATCH_DURATION);
+    }
   }).then(pos => {
-    let { latitude, longitude, altitude, accuracy } = pos.coords;
-    log.i(`current: lat=${latitude} lon=${longitude} ` +
-      `acc=${accuracy}m alt=${altitude || 0}m`);
+    logpos('current', pos);
     return pos;
   });
 }
