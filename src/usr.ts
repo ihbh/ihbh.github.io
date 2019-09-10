@@ -5,7 +5,7 @@ const log = new TaggedLogger('usr');
 
 export async function setDetails(details: rpc.UserDetails) {
   log.i('details:', details);
-  await rpc.schedule('Users.SetDetails', details);
+  await rpc.invoke('Users.SetDetails', details, true);
 }
 
 export async function getPhotoUri() {
