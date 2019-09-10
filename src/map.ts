@@ -1,8 +1,7 @@
+import { MAP_BOX_SIZE } from './config';
 import * as dom from './dom';
 import { TaggedLogger } from './log';
-import * as gp from './gp';
 import * as page from './page';
-import { MAP_BOX_SIZE } from './config';
 
 const log = new TaggedLogger('map');
 
@@ -28,26 +27,13 @@ async function initUserPic() {
     img.onerror = () => log.e('Failed to load user pic.');
     img.onload = () => log.i('user pic loaded:',
       img.width, 'x', img.height);
-    let time = Date.now();
-    let datauri = await gp.userimg.get();
-    let blob = dataUriToBlob(datauri);
-    let bloburi = URL.createObjectURL(blob);
-    log.i('img.src:', bloburi, Date.now() - time, 'ms');
-    img.src = bloburi;
-    img.title = await gp.username.get();
+    
+    let usr = await import('./usr');
+    img.src = await usr.getPhotoUri();
+    img.title = await usr.getDisplayName();
   } catch (err) {
     log.e(err);
   }
-}
-
-function dataUriToBlob(datauri: string) {
-  let [, mime, b64] = /^data:(.+);base64,(.+)$/.exec(datauri);
-  let data = atob(b64);
-  let bytes = new Uint8Array(data.length);
-  for (let i = 0; i < data.length; i++)
-    bytes[i] = data.charCodeAt(i);
-  let blob = new Blob([bytes.buffer], { type: mime });
-  return blob;
 }
 
 async function initMap() {

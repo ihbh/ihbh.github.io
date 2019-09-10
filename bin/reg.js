@@ -1,15 +1,17 @@
-define(["require", "exports", "./config", "./dom", "./log", "./gp", "./page"], function (require, exports, config_1, dom, log_1, gp, page) {
+define(["require", "exports", "./config", "./dom", "./log", "./gp", "./page", "./usr"], function (require, exports, config_1, dom, log_1, gp, page, usr) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const IMG_MAXSIZE = 4096;
     const IMG_MIME = 'image/jpeg';
     const log = new log_1.TaggedLogger('reg');
     const strDataUrl = url => url.slice(0, 30) + '...' + url.slice(-10);
-    function init() {
+    async function init() {
         dom.id.regPhoto.onclick =
             () => selectPhoto();
         dom.id.regDone.onclick =
             () => registerProfile();
+        dom.id.regPhoto.src = await usr.getPhotoUri();
+        dom.id.regName.value = await usr.getDisplayName();
     }
     exports.init = init;
     function selectPhoto() {
@@ -80,14 +82,13 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./page"], f
             await gp.userimg.set(imgurl);
             await gp.username.set(username);
             try {
-                let usr = await new Promise((resolve_1, reject_1) => { require(['./usr'], resolve_1, reject_1); });
-                let user = await new Promise((resolve_2, reject_2) => { require(['./user'], resolve_2, reject_2); });
+                let user = await new Promise((resolve_1, reject_1) => { require(['./user'], resolve_1, reject_1); });
                 let pubkey = await user.pubkey.get();
                 await usr.setDetails({
                     pubkey: pubkey,
                     photo: imgurl,
                     name: username,
-                    info: '',
+                    info: new Date().toJSON(),
                 });
                 log.i('Registered!');
             }

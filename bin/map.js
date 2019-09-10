@@ -1,4 +1,4 @@
-define(["require", "exports", "./dom", "./log", "./gp", "./page", "./config"], function (require, exports, dom, log_1, gp, page, config_1) {
+define(["require", "exports", "./config", "./dom", "./log", "./page"], function (require, exports, config_1, dom, log_1, page) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('map');
@@ -21,26 +21,13 @@ define(["require", "exports", "./dom", "./log", "./gp", "./page", "./config"], f
             let img = dom.id.userPic;
             img.onerror = () => log.e('Failed to load user pic.');
             img.onload = () => log.i('user pic loaded:', img.width, 'x', img.height);
-            let time = Date.now();
-            let datauri = await gp.userimg.get();
-            let blob = dataUriToBlob(datauri);
-            let bloburi = URL.createObjectURL(blob);
-            log.i('img.src:', bloburi, Date.now() - time, 'ms');
-            img.src = bloburi;
-            img.title = await gp.username.get();
+            let usr = await new Promise((resolve_1, reject_1) => { require(['./usr'], resolve_1, reject_1); });
+            img.src = await usr.getPhotoUri();
+            img.title = await usr.getDisplayName();
         }
         catch (err) {
             log.e(err);
         }
-    }
-    function dataUriToBlob(datauri) {
-        let [, mime, b64] = /^data:(.+);base64,(.+)$/.exec(datauri);
-        let data = atob(b64);
-        let bytes = new Uint8Array(data.length);
-        for (let i = 0; i < data.length; i++)
-            bytes[i] = data.charCodeAt(i);
-        let blob = new Blob([bytes.buffer], { type: mime });
-        return blob;
     }
     async function initMap() {
         dom.id.noGPS.addEventListener('click', async () => {
@@ -54,10 +41,10 @@ define(["require", "exports", "./dom", "./log", "./gp", "./page", "./config"], f
     async function loadMap() {
         try {
             dom.id.noGPS.textContent = '';
-            let gps = await new Promise((resolve_1, reject_1) => { require(['./gps'], resolve_1, reject_1); });
+            let gps = await new Promise((resolve_2, reject_2) => { require(['./gps'], resolve_2, reject_2); });
             let pos = await gps.getGeoLocation();
             let { latitude: lat, longitude: lon } = pos.coords;
-            let { OSM } = await new Promise((resolve_2, reject_2) => { require(['./osm'], resolve_2, reject_2); });
+            let { OSM } = await new Promise((resolve_3, reject_3) => { require(['./osm'], resolve_3, reject_3); });
             let osm = new OSM(dom.id.map.id);
             let s = config_1.MAP_BOX_SIZE;
             await osm.render({
@@ -77,7 +64,7 @@ define(["require", "exports", "./dom", "./log", "./gp", "./page", "./config"], f
         let button = dom.id.sendLocation;
         button.onclick = async () => {
             log.i('#send:click');
-            let pwa = await new Promise((resolve_3, reject_3) => { require(['./pwa'], resolve_3, reject_3); });
+            let pwa = await new Promise((resolve_4, reject_4) => { require(['./pwa'], resolve_4, reject_4); });
             pwa.showInstallPrompt();
             button.disabled = true;
             try {
@@ -89,7 +76,7 @@ define(["require", "exports", "./dom", "./log", "./gp", "./page", "./config"], f
             finally {
                 button.disabled = false;
             }
-            let rpc = await new Promise((resolve_4, reject_4) => { require(['./rpc'], resolve_4, reject_4); });
+            let rpc = await new Promise((resolve_5, reject_5) => { require(['./rpc'], resolve_5, reject_5); });
             rpc.sendall();
             page.set('nearby', {
                 lat: displayedGpsCoords.coords.latitude,
@@ -98,7 +85,7 @@ define(["require", "exports", "./dom", "./log", "./gp", "./page", "./config"], f
         };
     }
     async function shareDisplayedLocation() {
-        let loc = await new Promise((resolve_5, reject_5) => { require(['./loc'], resolve_5, reject_5); });
+        let loc = await new Promise((resolve_6, reject_6) => { require(['./loc'], resolve_6, reject_6); });
         if (!displayedGpsCoords)
             throw new Error('No GPS!');
         let { latitude: lat, longitude: lng } = displayedGpsCoords.coords;

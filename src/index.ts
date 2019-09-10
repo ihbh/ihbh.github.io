@@ -16,7 +16,7 @@ dom.whenLoaded().then(async () => {
 
   if (!isUserRegistered) {
     page.set('reg');
-  } else if (!page.get() || page.get() == 'reg') {
+  } else if (!page.get()) {
     page.set('map');
   } else {
     log.i('Page explicitly selected:', page.get());

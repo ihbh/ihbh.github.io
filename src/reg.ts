@@ -3,6 +3,7 @@ import * as dom from './dom';
 import { TaggedLogger } from "./log";
 import * as gp from './gp';
 import * as page from './page';
+import * as usr from './usr';
 
 const IMG_MAXSIZE = 4096;
 const IMG_MIME = 'image/jpeg';
@@ -10,11 +11,13 @@ const IMG_MIME = 'image/jpeg';
 const log = new TaggedLogger('reg');
 const strDataUrl = url => url.slice(0, 30) + '...' + url.slice(-10);
 
-export function init() {
+export async function init() {
   dom.id.regPhoto.onclick =
     () => selectPhoto();
   dom.id.regDone.onclick =
     () => registerProfile();
+  dom.id.regPhoto.src = await usr.getPhotoUri();
+  dom.id.regName.value = await usr.getDisplayName();
 }
 
 function selectPhoto() {
@@ -89,7 +92,6 @@ async function registerProfile() {
     await gp.username.set(username);
 
     try {
-      let usr = await import('./usr');
       let user = await import('./user');
       let pubkey = await user.pubkey.get();
 
@@ -97,7 +99,7 @@ async function registerProfile() {
         pubkey: pubkey,
         photo: imgurl,
         name: username,
-        info: '',
+        info: new Date().toJSON(),
       });
 
       log.i('Registered!');
