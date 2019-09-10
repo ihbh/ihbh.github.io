@@ -1,8 +1,8 @@
 define(["require", "exports", "./log", "./prop"], function (require, exports, log_1, prop_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const DB_NAME = 'user';
-    const TABLE_NAME = 'props';
+    exports.USERDATA_DB_NAME = 'user';
+    exports.DEFAULT_USERDATA_TABLE_NAME = 'props';
     let log = new log_1.TaggedLogger('idb');
     class DB {
         constructor(name) {
@@ -38,17 +38,26 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
             }
             log.i('Deleted all idbs.');
         }
-        static async save() {
-            let idbs = await indexedDB.databases();
+        static async names() {
+            try {
+                let idbs = await indexedDB.databases();
+                return idbs.map(db => db.name);
+            }
+            catch (err) {
+                log.e('Failed to get db names:', err);
+                return [exports.USERDATA_DB_NAME];
+            }
+        }
+        static async save(filter) {
             let json = {};
-            for (let { name: dbname } of idbs) {
-                let db = DB.open(dbname);
-                let tnames = await db.getTableNames();
-                json[dbname] = {};
-                for (let tname of tnames) {
-                    let t = db.open(tname);
-                    let r = await t.save();
-                    json[dbname][tname] = r;
+            let dbnames = await DB.names();
+            for (let dbname of dbnames.filter(filter)) {
+                try {
+                    let db = DB.open(dbname);
+                    json[dbname] = await db.save();
+                }
+                catch (err) {
+                    log.e(`Failed to save ${dbname}:`, err);
                 }
             }
             return json;
@@ -101,6 +110,16 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
                 };
             });
             return this.ready;
+        }
+        async save() {
+            let tnames = await this.getTableNames();
+            let json = {};
+            for (let tname of tnames) {
+                let t = this.open(tname);
+                let r = await t.save();
+                json[tname] = r;
+            }
+            return json;
         }
         async getTableNames() {
             let idb = await this.init();
@@ -185,14 +204,14 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
         return new prop_1.AsyncProp({
             nocache: true,
             async get() {
-                let db = DB.open(DB_NAME);
-                let t = db.open(TABLE_NAME);
+                let db = DB.open(exports.USERDATA_DB_NAME);
+                let t = db.open(exports.DEFAULT_USERDATA_TABLE_NAME);
                 let v = await t.get(keyname);
                 return v === undefined ? defval : v;
             },
             async set(value) {
-                let db = DB.open(DB_NAME);
-                let t = db.open(TABLE_NAME);
+                let db = DB.open(exports.USERDATA_DB_NAME);
+                let t = db.open(exports.DEFAULT_USERDATA_TABLE_NAME);
                 await t.set(keyname, value);
             },
         });
@@ -202,8 +221,8 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
         await DB.clear();
     }
     exports.clear = clear;
-    function save() {
-        return DB.save();
+    function save(filter) {
+        return DB.save(filter);
     }
     exports.save = save;
     function load(json) {

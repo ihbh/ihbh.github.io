@@ -12,7 +12,7 @@ define(["require", "exports", "./dom", "./log", "./logdb", "./config", "./qargs"
             try {
                 let json = {
                     ls: await ls.save(),
-                    idb: await idb.save(),
+                    idb: await idb.save(name => name != conf.LOG_IDB_NAME),
                 };
                 let blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' });
                 let a = document.createElement('a');

@@ -22,7 +22,7 @@ export function init() {
     try {
       let json = {
         ls: await ls.save(),
-        idb: await idb.save(),
+        idb: await idb.save(name => name != conf.LOG_IDB_NAME),
       };
 
       let blob = new Blob(
