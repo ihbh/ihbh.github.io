@@ -12,7 +12,8 @@ define(["require", "exports"], function (require, exports) {
     // 1e-5 corresponds to 1m precision
     exports.MAP_1M = 1e-5;
     exports.GPS_DIGITS = 7;
-    exports.GPS_TIMEOUT = 3000;
+    exports.GPS_DELAY = 0; // ms
+    exports.GPS_TIMEOUT = 15000; // ms
     exports.MAP_BOX_SIZE = 250 * exports.MAP_1M;
     exports.OSM_URL = 'https://www.openstreetmap.org/export/embed.html';
     exports.OSM_LIB = 'https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js';
@@ -27,6 +28,6 @@ define(["require", "exports"], function (require, exports) {
     exports.RPC_DELAY = 0;
     exports.CHAT_AUTOSAVE_INTERVAL = 1; // seconds
     exports.LOG_IDB_NAME = 'logs';
-    exports.LOG_IDB_INTERVAL = 500; // ms
+    exports.LOG_IDB_INTERVAL = 5; // ms
 });
 //# sourceMappingURL=config.js.map

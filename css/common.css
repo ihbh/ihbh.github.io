@@ -210,6 +210,8 @@ body .page .ol-attribution * {
   border: none;
   background: #ccc;
   box-shadow: 0 0 7pt 1pt #000;
+  width: 64px;
+  height: 64px;
 }
 
 #send {

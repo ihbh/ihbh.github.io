@@ -18,6 +18,7 @@ define(["require", "exports"], function (require, exports) {
         get uploadPhotoInput() { return $('#upload-input'); },
         get userPic() { return $('#userpic'); },
         get showPlaces() { return $('#show-places'); },
+        get refreshGps() { return $('#refresh-gps'); },
         get visitors() { return $('#visitors'); },
         get nearbyStatus() { return $('#nearby-status'); },
         get chatUserIcon() { return $('#chat-u-icon'); },

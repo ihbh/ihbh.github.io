@@ -7,10 +7,13 @@ export function getGeoLocation() {
   let options: PositionOptions = {
     enableHighAccuracy: true,
     timeout: config.GPS_TIMEOUT,
+    maximumAge: 0,
   };
   return new Promise<Position>((resolve, reject) => {
-    navigator.geolocation
-      .getCurrentPosition(resolve, reject, options);
+    setTimeout(() => {
+      navigator.geolocation
+        .getCurrentPosition(resolve, reject, options);
+    }, config.GPS_DELAY);
   }).then(pos => {
     log.i('gps coords:', pos);
     return pos;

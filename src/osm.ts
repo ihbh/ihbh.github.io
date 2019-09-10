@@ -2,8 +2,6 @@ import * as dom from './dom';
 import { TaggedLogger } from "./log";
 import * as config from './config';
 
-declare const ol; // OSM v5.3
-
 const log = new TaggedLogger('osm');
 
 export interface BBox {
@@ -20,6 +18,7 @@ export class OSM {
   private mapid: string = null;
   private map = null; // ol.Map
   private ol = null;
+  private layers = [];
 
   constructor(mapid: string) {
     this.mapid = mapid.replace('#', '');
@@ -43,7 +42,7 @@ export class OSM {
       ],
     });
 
-    await this.setBBox(bbox);
+    bbox && await this.setBBox(bbox);
   }
 
   setBBox({ min, max }: BBox) {
@@ -87,5 +86,12 @@ export class OSM {
     });
 
     this.map.addLayer(layer);
+    this.layers.push(layer);
+  }
+
+  clearMarkers() {
+    for (let layer of this.layers)
+      this.map.removeLayer(layer);
+    this.layers = [];
   }
 }

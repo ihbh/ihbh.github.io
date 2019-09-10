@@ -10,8 +10,10 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./page", ".
             () => selectPhoto();
         dom.id.regDone.onclick =
             () => registerProfile();
-        dom.id.regPhoto.src = await usr.getPhotoUri();
         dom.id.regName.value = await usr.getDisplayName();
+        let imguri = await usr.getPhotoUri();
+        if (imguri)
+            dom.id.regPhoto.src = imguri;
     }
     exports.init = init;
     function selectPhoto() {

@@ -16,6 +16,7 @@ export const id = {
   get uploadPhotoInput() { return $<HTMLInputElement>('#upload-input'); },
   get userPic() { return $<HTMLImageElement>('#userpic'); },
   get showPlaces() { return $('#show-places'); },
+  get refreshGps() { return $<HTMLButtonElement>('#refresh-gps'); },
   get visitors() { return $('#visitors'); },
   get nearbyStatus() { return $('#nearby-status'); },
   get chatUserIcon() { return $<HTMLImageElement>('#chat-u-icon'); },

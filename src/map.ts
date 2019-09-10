@@ -1,24 +1,27 @@
 import { MAP_BOX_SIZE } from './config';
 import * as dom from './dom';
+import * as gps from './gps';
 import { TaggedLogger } from './log';
+import { OSM } from './osm';
 import * as page from './page';
+
+declare const PositionError;
 
 const log = new TaggedLogger('map');
 
-let displayedGpsCoords: Position = null;
+let osm: OSM;
+let pos: Position;
 
 export async function init() {
   await initUserPic();
   await initShowPlaces();
   await initMap();
   await initSendButton();
+  await initRefreshGps();
 }
 
 function initShowPlaces() {
-  let img = dom.id.showPlaces;
-  img.addEventListener('click', () => {
-    page.set('places');
-  });
+  dom.id.showPlaces.onclick = () => page.set('places');
 }
 
 async function initUserPic() {
@@ -27,7 +30,7 @@ async function initUserPic() {
     img.onerror = () => log.e('Failed to load user pic.');
     img.onload = () => log.i('user pic loaded:',
       img.width, 'x', img.height);
-    
+
     let usr = await import('./usr');
     img.src = await usr.getPhotoUri();
     img.title = await usr.getDisplayName();
@@ -49,25 +52,38 @@ async function initMap() {
 
 async function loadMap() {
   try {
+    log.i('Loading OSM.');
     dom.id.noGPS.textContent = '';
-    let gps = await import('./gps');
-    let pos = await gps.getGeoLocation();
-    let { latitude: lat, longitude: lon } = pos.coords;
-    let { OSM } = await import('./osm');
-    let osm = new OSM(dom.id.map.id);
-    let s = MAP_BOX_SIZE;
+    osm = new OSM(dom.id.map.id);
+    await osm.render(null);
+    await updateShownLocation();
+  } catch (err) {
+    log.e('Failed to render OSM:', err);
+    dom.id.noGPS.textContent = err.message;
+    if (err instanceof PositionError)
+      log.w('Location permission denied?');
+  }
+}
 
-    await osm.render({
+async function updateShownLocation() {
+  try {
+    log.i('Refreshing the GPS location.');
+    pos = await gps.getGeoLocation();
+    let { latitude: lat, longitude: lon } = pos.coords;
+
+    log.i('Updating OSM view box.');
+    let s = MAP_BOX_SIZE;
+    osm.setBBox({
       min: { lat: lat - s, lon: lon - s },
       max: { lat: lat + s, lon: lon + s },
     });
 
+    log.i('Updating OSM markers.');
+    osm.clearMarkers();
     osm.addMarker({ lat, lon });
-    displayedGpsCoords = pos;
   } catch (err) {
-    // PositionError means that the phone has location turned off.
-    log.e(err);
-    dom.id.noGPS.textContent = err.message;
+    log.e('Failed to refresh GPS coords:', err);
+    throw err;
   }
 }
 
@@ -92,15 +108,19 @@ async function initSendButton() {
     rpc.sendall();
 
     page.set('nearby', {
-      lat: displayedGpsCoords.coords.latitude,
-      lon: displayedGpsCoords.coords.longitude,
+      lat: pos.coords.latitude,
+      lon: pos.coords.longitude,
     });
   };
 }
 
+async function initRefreshGps() {
+  dom.id.refreshGps.onclick = () => updateShownLocation();
+}
+
 async function shareDisplayedLocation() {
   let loc = await import('./loc');
-  if (!displayedGpsCoords) throw new Error('No GPS!');
-  let { latitude: lat, longitude: lng } = displayedGpsCoords.coords;
+  if (!pos) throw new Error('No GPS!');
+  let { latitude: lat, longitude: lng } = pos.coords;
   await loc.shareLocation({ lat, lng });
 }

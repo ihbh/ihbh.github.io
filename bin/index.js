@@ -8,7 +8,10 @@ define(["require", "exports", "./dbg", "./dom", "./log", "./gp", "./page", "./pw
         let isUserRegistered = !!await gp.username.get();
         log.i('user registered?', isUserRegistered);
         if (!isUserRegistered) {
-            page.set('reg');
+            if (page.get() == 'reg')
+                await page.init();
+            else
+                page.set('reg');
         }
         else if (!page.get()) {
             page.set('map');

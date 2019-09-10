@@ -6,10 +6,13 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
         let options = {
             enableHighAccuracy: true,
             timeout: config.GPS_TIMEOUT,
+            maximumAge: 0,
         };
         return new Promise((resolve, reject) => {
-            navigator.geolocation
-                .getCurrentPosition(resolve, reject, options);
+            setTimeout(() => {
+                navigator.geolocation
+                    .getCurrentPosition(resolve, reject, options);
+            }, config.GPS_DELAY);
         }).then(pos => {
             log.i('gps coords:', pos);
             return pos;

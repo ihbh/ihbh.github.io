@@ -7,6 +7,7 @@ define(["require", "exports", "./dom", "./log", "./config"], function (require, 
             this.mapid = null;
             this.map = null; // ol.Map
             this.ol = null;
+            this.layers = [];
             this.mapid = mapid.replace('#', '');
         }
         async render(bbox) {
@@ -22,7 +23,7 @@ define(["require", "exports", "./dom", "./log", "./config"], function (require, 
                     })
                 ],
             });
-            await this.setBBox(bbox);
+            bbox && await this.setBBox(bbox);
         }
         setBBox({ min, max }) {
             let ol = this.ol;
@@ -55,6 +56,12 @@ define(["require", "exports", "./dom", "./log", "./config"], function (require, 
                 }),
             });
             this.map.addLayer(layer);
+            this.layers.push(layer);
+        }
+        clearMarkers() {
+            for (let layer of this.layers)
+                this.map.removeLayer(layer);
+            this.layers = [];
         }
     }
     exports.OSM = OSM;

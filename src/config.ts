@@ -9,7 +9,8 @@ export const DBG_MAX_SHOW_LOGS = 1e4;
 // 1e-5 corresponds to 1m precision
 export const MAP_1M = 1e-5;
 export const GPS_DIGITS = 7;
-export const GPS_TIMEOUT = 3000;
+export const GPS_DELAY = 0; // ms
+export const GPS_TIMEOUT = 15000; // ms
 export const MAP_BOX_SIZE = 250 * MAP_1M;
 export const OSM_URL = 'https://www.openstreetmap.org/export/embed.html';
 export const OSM_LIB = 'https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js';
@@ -24,4 +25,4 @@ export const DEFAULT_RPC_PORT = 3921;
 export const RPC_DELAY = 0;
 export const CHAT_AUTOSAVE_INTERVAL = 1; // seconds
 export const LOG_IDB_NAME = 'logs';
-export const LOG_IDB_INTERVAL = 500; // ms
+export const LOG_IDB_INTERVAL = 5; // ms

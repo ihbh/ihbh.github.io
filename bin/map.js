@@ -1,20 +1,19 @@
-define(["require", "exports", "./config", "./dom", "./log", "./page"], function (require, exports, config_1, dom, log_1, page) {
+define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", "./page"], function (require, exports, config_1, dom, gps, log_1, osm_1, page) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('map');
-    let displayedGpsCoords = null;
+    let osm;
+    let pos;
     async function init() {
         await initUserPic();
         await initShowPlaces();
         await initMap();
         await initSendButton();
+        await initRefreshGps();
     }
     exports.init = init;
     function initShowPlaces() {
-        let img = dom.id.showPlaces;
-        img.addEventListener('click', () => {
-            page.set('places');
-        });
+        dom.id.showPlaces.onclick = () => page.set('places');
     }
     async function initUserPic() {
         try {
@@ -40,31 +39,44 @@ define(["require", "exports", "./config", "./dom", "./log", "./page"], function 
     }
     async function loadMap() {
         try {
+            log.i('Loading OSM.');
             dom.id.noGPS.textContent = '';
-            let gps = await new Promise((resolve_2, reject_2) => { require(['./gps'], resolve_2, reject_2); });
-            let pos = await gps.getGeoLocation();
+            osm = new osm_1.OSM(dom.id.map.id);
+            await osm.render(null);
+            await updateShownLocation();
+        }
+        catch (err) {
+            log.e('Failed to render OSM:', err);
+            dom.id.noGPS.textContent = err.message;
+            if (err instanceof PositionError)
+                log.w('Location permission denied?');
+        }
+    }
+    async function updateShownLocation() {
+        try {
+            log.i('Refreshing the GPS location.');
+            pos = await gps.getGeoLocation();
             let { latitude: lat, longitude: lon } = pos.coords;
-            let { OSM } = await new Promise((resolve_3, reject_3) => { require(['./osm'], resolve_3, reject_3); });
-            let osm = new OSM(dom.id.map.id);
+            log.i('Updating OSM view box.');
             let s = config_1.MAP_BOX_SIZE;
-            await osm.render({
+            osm.setBBox({
                 min: { lat: lat - s, lon: lon - s },
                 max: { lat: lat + s, lon: lon + s },
             });
+            log.i('Updating OSM markers.');
+            osm.clearMarkers();
             osm.addMarker({ lat, lon });
-            displayedGpsCoords = pos;
         }
         catch (err) {
-            // PositionError means that the phone has location turned off.
-            log.e(err);
-            dom.id.noGPS.textContent = err.message;
+            log.e('Failed to refresh GPS coords:', err);
+            throw err;
         }
     }
     async function initSendButton() {
         let button = dom.id.sendLocation;
         button.onclick = async () => {
             log.i('#send:click');
-            let pwa = await new Promise((resolve_4, reject_4) => { require(['./pwa'], resolve_4, reject_4); });
+            let pwa = await new Promise((resolve_2, reject_2) => { require(['./pwa'], resolve_2, reject_2); });
             pwa.showInstallPrompt();
             button.disabled = true;
             try {
@@ -76,19 +88,22 @@ define(["require", "exports", "./config", "./dom", "./log", "./page"], function 
             finally {
                 button.disabled = false;
             }
-            let rpc = await new Promise((resolve_5, reject_5) => { require(['./rpc'], resolve_5, reject_5); });
+            let rpc = await new Promise((resolve_3, reject_3) => { require(['./rpc'], resolve_3, reject_3); });
             rpc.sendall();
             page.set('nearby', {
-                lat: displayedGpsCoords.coords.latitude,
-                lon: displayedGpsCoords.coords.longitude,
+                lat: pos.coords.latitude,
+                lon: pos.coords.longitude,
             });
         };
     }
+    async function initRefreshGps() {
+        dom.id.refreshGps.onclick = () => updateShownLocation();
+    }
     async function shareDisplayedLocation() {
-        let loc = await new Promise((resolve_6, reject_6) => { require(['./loc'], resolve_6, reject_6); });
-        if (!displayedGpsCoords)
+        let loc = await new Promise((resolve_4, reject_4) => { require(['./loc'], resolve_4, reject_4); });
+        if (!pos)
             throw new Error('No GPS!');
-        let { latitude: lat, longitude: lng } = displayedGpsCoords.coords;
+        let { latitude: lat, longitude: lng } = pos.coords;
         await loc.shareLocation({ lat, lng });
     }
 });
