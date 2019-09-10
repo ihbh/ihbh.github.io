@@ -1,52 +1,24 @@
-define(["require", "exports", "./config", "./log"], function (require, exports, config, log_1) {
+define(["require", "exports", "./log"], function (require, exports, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('gps');
-    let logpos = (label, pos) => {
-        let { latitude, longitude, altitude, accuracy } = pos.coords;
-        log.i(`${label}: lat=${latitude} lon=${longitude} ` +
-            `acc=${accuracy}m alt=${altitude || 0}m`);
-    };
-    function getGeoLocation() {
-        let options = {
-            enableHighAccuracy: true,
-            timeout: config.GPS_TIMEOUT,
-            maximumAge: 0,
-        };
-        return new Promise((resolve, reject) => {
-            navigator.geolocation
-                .getCurrentPosition(resolve, reject, options);
-            if (config.DEBUG) {
-                let wid = navigator.geolocation.watchPosition(pos => logpos('watch', pos));
-                setTimeout(() => {
-                    navigator.geolocation.clearWatch(wid);
-                }, config.GPS_WATCH_DURATION);
+    function watch(listener) {
+        let wid = navigator.geolocation.watchPosition(pos => {
+            let { latitude, longitude, altitude, accuracy } = pos.coords;
+            log.i(`update: lat=${latitude.toFixed(4)} lon=${longitude.toFixed(4)} ` +
+                `acc=${accuracy.toFixed(0)}m alt=${altitude || 0}m`);
+            listener(pos.coords);
+        }, err => {
+            log.w('error:', err);
+        }, { enableHighAccuracy: true });
+        log.i('Watch started:', wid);
+        return {
+            stop() {
+                navigator.geolocation.clearWatch(wid);
+                log.i('Watch stopped:', wid);
             }
-        }).then(pos => {
-            logpos('current', pos);
-            return pos;
-        });
+        };
     }
-    exports.getGeoLocation = getGeoLocation;
-    function makeBBox(lat, lng) {
-        // https://wiki.openstreetmap.org/wiki/Bounding_Box
-        return [
-            lng - config.MAP_BOX_SIZE,
-            lat - config.MAP_BOX_SIZE,
-            lng + config.MAP_BOX_SIZE,
-            lat + config.MAP_BOX_SIZE,
-        ];
-    }
-    function makeOsmUrl(lat, lng) {
-        let bbox = makeBBox(lat, lng)
-            .map(x => x.toFixed(config.GPS_DIGITS))
-            .join(',');
-        let mark = [lat, lng]
-            .map(x => x.toFixed(config.GPS_DIGITS))
-            .join(',');
-        return config.OSM_URL +
-            `?bbox=${bbox}&marker=${mark}&layers=ND`;
-    }
-    exports.makeOsmUrl = makeOsmUrl;
+    exports.watch = watch;
 });
 //# sourceMappingURL=gps.js.map

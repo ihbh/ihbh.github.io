@@ -1,54 +1,28 @@
-import * as config from './config';
 import { TaggedLogger } from './log';
 
 let log = new TaggedLogger('gps');
 
-let logpos = (label: string, pos: Position) => {
-  let { latitude, longitude, altitude, accuracy } = pos.coords;
-  log.i(`${label}: lat=${latitude} lon=${longitude} ` +
-    `acc=${accuracy}m alt=${altitude || 0}m`);
-};
+export interface Watcher {
+  stop(): void;
+}
 
-export function getGeoLocation() {
-  let options: PositionOptions = {
-    enableHighAccuracy: true,
-    timeout: config.GPS_TIMEOUT,
-    maximumAge: 0,
-  };
-  return new Promise<Position>((resolve, reject) => {
-    navigator.geolocation
-      .getCurrentPosition(resolve, reject, options);
+export function watch(listener: (pos: Coordinates) => void): Watcher {
+  let wid = navigator.geolocation.watchPosition(
+    pos => {
+      let { latitude, longitude, altitude, accuracy } = pos.coords;
+      log.i(`update: lat=${latitude.toFixed(4)} lon=${longitude.toFixed(4)} ` +
+        `acc=${accuracy.toFixed(0)}m alt=${altitude || 0}m`);
+      listener(pos.coords);
+    }, err => {
+      log.w('error:', err);
+    }, { enableHighAccuracy: true });
 
-    if (config.DEBUG) {
-      let wid = navigator.geolocation.watchPosition(
-        pos => logpos('watch', pos));
-      setTimeout(() => {
-        navigator.geolocation.clearWatch(wid);
-      }, config.GPS_WATCH_DURATION);
+  log.i('Watch started:', wid);
+
+  return {
+    stop() {
+      navigator.geolocation.clearWatch(wid);
+      log.i('Watch stopped:', wid);
     }
-  }).then(pos => {
-    logpos('current', pos);
-    return pos;
-  });
-}
-
-function makeBBox(lat: number, lng: number) {
-  // https://wiki.openstreetmap.org/wiki/Bounding_Box
-  return [
-    lng - config.MAP_BOX_SIZE, // min lng, left
-    lat - config.MAP_BOX_SIZE, // min lat, bottom
-    lng + config.MAP_BOX_SIZE, // max lng, right
-    lat + config.MAP_BOX_SIZE, // max lat, top
-  ];
-}
-
-export function makeOsmUrl(lat: number, lng: number) {
-  let bbox = makeBBox(lat, lng)
-    .map(x => x.toFixed(config.GPS_DIGITS))
-    .join(',');
-  let mark = [lat, lng]
-    .map(x => x.toFixed(config.GPS_DIGITS))
-    .join(',');
-  return config.OSM_URL +
-    `?bbox=${bbox}&marker=${mark}&layers=ND`;
+  };
 }

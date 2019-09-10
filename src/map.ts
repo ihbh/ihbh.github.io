@@ -10,7 +10,8 @@ declare const PositionError;
 const log = new TaggedLogger('map');
 
 let osm: OSM;
-let pos: Position;
+let bestPos: Coordinates;
+let watcher: gps.Watcher;
 
 export async function init() {
   await initUserPic();
@@ -56,7 +57,7 @@ async function loadMap() {
     dom.id.noGPS.textContent = '';
     osm = new OSM(dom.id.map.id);
     await osm.render(null);
-    await updateShownLocation();
+    await startWatchingGps();
   } catch (err) {
     log.e('Failed to render OSM:', err);
     dom.id.noGPS.textContent = err.message;
@@ -65,13 +66,26 @@ async function loadMap() {
   }
 }
 
-async function updateShownLocation() {
+function startWatchingGps() {
+  log.i('Refreshing the GPS location.');
+  watcher && watcher.stop()
+  watcher = gps.watch(onGpsUpdated);
+}
+
+function onGpsUpdated(pos: Coordinates) {
+  if (bestPos && bestPos.accuracy > pos.accuracy) {
+    log.d('Discarding less accurate coords:', pos);
+    return;
+  }
+
+  bestPos = pos;
+  dom.id.sendLocation.disabled = false;
+
   try {
     log.i('Refreshing the GPS location.');
-    pos = await gps.getGeoLocation();
-    let { latitude: lat, longitude: lon } = pos.coords;
+    let { latitude: lat, longitude: lon } = pos;
 
-    log.i('Updating OSM view box.');
+    log.i('Updating OSM view box:', pos);
     let s = MAP_BOX_SIZE;
     osm.setBBox({
       min: { lat: lat - s, lon: lon - s },
@@ -89,6 +103,7 @@ async function updateShownLocation() {
 
 async function initSendButton() {
   let button = dom.id.sendLocation;
+  button.disabled = true;
 
   button.onclick = async () => {
     log.i('#send:click');
@@ -108,19 +123,19 @@ async function initSendButton() {
     rpc.sendall();
 
     page.set('nearby', {
-      lat: pos.coords.latitude,
-      lon: pos.coords.longitude,
+      lat: bestPos.latitude,
+      lon: bestPos.longitude,
     });
   };
 }
 
 async function initRefreshGps() {
-  dom.id.refreshGps.onclick = () => updateShownLocation();
+  dom.id.refreshGps.onclick = () => startWatchingGps();
 }
 
 async function shareDisplayedLocation() {
+  if (!bestPos) throw new Error('GPS not ready.');
   let loc = await import('./loc');
-  if (!pos) throw new Error('No GPS!');
-  let { latitude: lat, longitude: lng } = pos.coords;
+  let { latitude: lat, longitude: lng } = bestPos;
   await loc.shareLocation({ lat, lng });
 }
