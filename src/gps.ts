@@ -15,7 +15,9 @@ export function getGeoLocation() {
         .getCurrentPosition(resolve, reject, options);
     }, config.GPS_DELAY);
   }).then(pos => {
-    log.i('gps coords:', pos);
+    let { latitude, longitude, altitude, accuracy } = pos.coords;
+    log.i(`current: lat=${latitude} lon=${longitude} ` +
+      `acc=${accuracy}m alt=${altitude || 0}m`);
     return pos;
   });
 }
