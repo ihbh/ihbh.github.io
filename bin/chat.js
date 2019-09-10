@@ -57,6 +57,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./qargs", "
     async function getUserInfo() {
         let [details] = await rpc.invoke('Users.GetDetails', {
             users: [ruid],
+            props: ['name', 'photo'],
         }).catch(async (err) => {
             if (!conf.DEBUG)
                 throw err;
@@ -64,8 +65,8 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./qargs", "
             let res = await dbg.getTestUserDetails(ruid);
             return [res];
         });
-        dom.id.chatUserName.textContent = details.name;
-        dom.id.chatUserIcon.src = details.photo;
+        dom.id.chatUserName.textContent = details ? details.name : ruid;
+        dom.id.chatUserIcon.src = details && details.photo;
     }
     async function getMessages() {
         let messages = await rpc.invoke('Chat.GetMessages', {
