@@ -59,7 +59,7 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
         watcher = gps.watch(onGpsUpdated);
     }
     function onGpsUpdated(pos) {
-        if (bestPos && bestPos.accuracy > pos.accuracy) {
+        if (bestPos && bestPos.accuracy >= pos.accuracy) {
             log.d('Discarding less accurate coords:', pos);
             return;
         }
