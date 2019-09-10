@@ -92,6 +92,7 @@ export function init() {
     let text = json.map(x => x.join(' ')).join('\n');
     div.textContent = text;
     div.style.display = '';
+    div.scrollTop = div.scrollHeight;
   });
 }
 
