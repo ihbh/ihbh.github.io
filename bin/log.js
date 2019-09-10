@@ -1,16 +1,6 @@
-define(["require", "exports"], function (require, exports) {
+define(["require", "exports", "./logdb"], function (require, exports, logdb) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.logs = [];
-    const time = Date.now();
-    savelog('I', 'log', [
-        'Logging session started:',
-        new Date().toJSON(),
-    ]);
-    function savelog(sev, tag, args) {
-        let ts = ((Date.now() - time) / 1000).toFixed(3);
-        exports.logs.push([sev, ts, tag, ...args]);
-    }
     class TaggedLogger {
         constructor(tag) {
             this.tag = '[' + tag + ']';
@@ -32,7 +22,7 @@ define(["require", "exports"], function (require, exports) {
             this.save('E', args);
         }
         save(sev, args) {
-            savelog(sev, this.tag, args);
+            logdb.writeLog(sev, this.tag, args);
         }
     }
     exports.TaggedLogger = TaggedLogger;

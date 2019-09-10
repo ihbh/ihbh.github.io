@@ -68,12 +68,12 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
                 }
             }
         }
-        open(name) {
-            let t = this.tables.get(name);
+        open(tableName, args) {
+            let t = this.tables.get(tableName);
             if (t)
                 return t;
-            t = new DBTable(name, this);
-            this.tables.set(name, t);
+            t = new DBTable(tableName, this, args);
+            this.tables.set(tableName, t);
             return t;
         }
         init() {
@@ -114,11 +114,16 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
     DB.idbs = new Map();
     exports.DB = DB;
     class DBTable {
-        constructor(name, db) {
+        constructor(name, db, { logs = true } = {}) {
             this.name = name;
             this.db = db;
             this.pending = [];
             this.timer = 0;
+            this.logs = logs;
+        }
+        log(...args) {
+            if (this.logs)
+                log.i(...args);
         }
         schedule(name, fn) {
             return new Promise((resolve, reject) => {
@@ -135,8 +140,8 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
             let s = t.objectStore(this.name);
             let ts = this.pending;
             this.pending = [];
-            log.i('Executing pending transactions:', ts.map(t => t[0]));
             for (let [name, fn, resolve, reject] of ts) {
+                this.log('exec:', name);
                 let r = fn(s);
                 r.onerror = () => reject(new Error(`Transaction ${name} failed: ${r.error}`));
                 r.onsuccess = () => resolve(r.result);
@@ -147,6 +152,9 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
         }
         set(key, value) {
             return this.schedule(`${this.name}.set(${key})`, s => s.put(value, key));
+        }
+        add(key, value) {
+            return this.schedule(`${this.name}.add(${key})`, s => s.add(value, key));
         }
         remove(key) {
             return this.schedule(`${this.name}.remove(${key})`, s => s.delete(key));

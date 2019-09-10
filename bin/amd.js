@@ -27,41 +27,37 @@
         log('define:', url, '<-', ...mod.deps);
     }
     function require(deps, resolve, reject) {
-        return Promise.resolve().then(() => {
-            if (deps.length != 1)
-                throw new Error('require() expects 1 dep: ' + deps);
-            let url = resolveScriptUrl(deps[0]);
-            let mod = modules.get(url) || {};
-            modules.set(url, mod);
-            if (mod.exports)
-                return mod.exports;
-            if (!mod.loaded)
-                mod.loaded = downloadScript(url);
-            return mod.loaded.then(() => {
-                if (!mod.init)
-                    throw new Error('define() call missing: ' + url);
-                mod.exports = {};
-                let tasks = mod.deps.map(dep => {
-                    switch (dep) {
-                        case 'require':
-                            return require;
-                        case 'exports':
-                            return mod.exports;
-                        default:
-                            return require([dep]);
-                    }
-                    ;
-                });
-                log('require:', url, '<-', ...mod.deps);
-                return Promise.all(tasks).then(modexps => {
-                    mod.exports = mod.init.apply(null, modexps)
-                        || mod.exports;
-                    return mod.exports;
-                });
+        if (deps.length != 1)
+            throw new Error('require() expects 1 dep: ' + deps);
+        let url = resolveScriptUrl(deps[0]);
+        let mod = modules.get(url) || {};
+        modules.set(url, mod);
+        log('require:', url);
+        mod.ready = mod.ready || downloadScript(url).then(() => {
+            if (!mod.init)
+                throw new Error('define() call missing: ' + url);
+            mod.exports = {};
+            let pdeps = mod.deps.map(dep => {
+                switch (dep) {
+                    case 'require':
+                        return require;
+                    case 'exports':
+                        return mod.exports;
+                    default:
+                        return require([dep]);
+                }
+                ;
             });
-        }).then(res => {
-            resolve && resolve(res);
-            return res;
+            return Promise.all(pdeps).then(alldeps => {
+                let init = mod.init;
+                mod.exports = init(...alldeps)
+                    || mod.exports;
+                log('ready:', url);
+            });
+        });
+        return mod.ready.then(() => {
+            resolve && resolve(mod.exports);
+            return mod.exports;
         }, err => {
             reject && reject(err);
             throw err;
@@ -69,12 +65,17 @@
     }
     function downloadScript(url) {
         return new Promise((resolve, reject) => {
-            log('load:', url);
+            log('loading:', url);
             let script = document.createElement('script');
             script.src = url;
             script.async = true;
-            script.onload = () => resolve();
-            script.onerror = () => reject(new Error('require() failed: ' + url));
+            script.onload = () => {
+                log('loaded:', url);
+                resolve();
+            };
+            script.onerror = () => {
+                reject(new Error('require() failed: ' + url));
+            };
             document.head.appendChild(script);
         });
     }

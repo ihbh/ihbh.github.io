@@ -1,15 +1,4 @@
-export const logs = [];
-const time = Date.now();
-
-savelog('I', 'log', [
-  'Logging session started:',
-  new Date().toJSON(),
-]);
-
-function savelog(sev, tag, args) {
-  let ts = ((Date.now() - time) / 1000).toFixed(3);
-  logs.push([sev, ts, tag, ...args]);
-}
+import * as logdb from './logdb';
 
 export class TaggedLogger {
   readonly tag: string;
@@ -39,6 +28,6 @@ export class TaggedLogger {
   }
 
   private save(sev: string, args: any[]) {
-    savelog(sev, this.tag, args);
+    logdb.writeLog(sev, this.tag, args);
   }
 }

@@ -85,11 +85,11 @@ export class DB {
 
   }
 
-  open(name: string): DBTable {
-    let t = this.tables.get(name);
+  open(tableName: string, args?: DBTableArgs): DBTable {
+    let t = this.tables.get(tableName);
     if (t) return t;
-    t = new DBTable(name, this);
-    this.tables.set(name, t);
+    t = new DBTable(tableName, this, args);
+    this.tables.set(tableName, t);
     return t;
   }
 
@@ -133,12 +133,23 @@ export class DB {
 
 type TransactionFn = (store: IDBObjectStore) => IDBRequest<any>;
 
+interface DBTableArgs {
+  logs?: boolean;
+}
+
 export class DBTable {
   private pending: [string, TransactionFn, Function, Function][] = [];
   private timer = 0;
+  private logs: boolean;
 
-  constructor(public name: string, private db: DB) {
+  constructor(public name: string, private db: DB,
+    { logs = true }: DBTableArgs = {}) {
 
+    this.logs = logs;
+  }
+
+  private log(...args) {
+    if (this.logs) log.i(...args);
   }
 
   private schedule(name: string, fn: TransactionFn): Promise<any> {
@@ -158,9 +169,9 @@ export class DBTable {
 
     let ts = this.pending;
     this.pending = [];
-    log.i('Executing pending transactions:', ts.map(t => t[0]));
 
     for (let [name, fn, resolve, reject] of ts) {
+      this.log('exec:', name);
       let r = fn(s);
       r.onerror = () => reject(new Error(`Transaction ${name} failed: ${r.error}`));
       r.onsuccess = () => resolve(r.result);
@@ -177,6 +188,12 @@ export class DBTable {
     return this.schedule(
       `${this.name}.set(${key})`,
       s => s.put(value, key));
+  }
+
+  add(key: any, value: any): Promise<void> {
+    return this.schedule(
+      `${this.name}.add(${key})`,
+      s => s.add(value, key));
   }
 
   remove(key: string): Promise<void> {

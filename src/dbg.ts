@@ -1,5 +1,6 @@
 import * as dom from './dom';
-import { logs, TaggedLogger } from './log';
+import { TaggedLogger } from './log';
+import * as logdb from './logdb';
 import * as conf from './config';
 import * as qargs from './qargs';
 import * as rpc from './rpc';
@@ -75,7 +76,7 @@ export function init() {
     }
   });
 
-  dom.id.showLogs.addEventListener('click', () => {
+  dom.id.showLogs.addEventListener('click', async () => {
     log.i('#show-logs:click');
     let div = dom.id.logs;
 
@@ -85,10 +86,10 @@ export function init() {
       return;
     }
 
-    let text = logs
-      .map(args => args.join(' ').trim())
-      .join('\n');
-
+    log.i('Getting a copy of the logs.');
+    let json = await logdb.getLogs();
+    log.i('Got logs:', json.length);
+    let text = json.map(x => x.join(' ')).join('\n');
     div.textContent = text;
     div.style.display = '';
   });

@@ -4,6 +4,7 @@ export const DBG_N_MESSAGES = 25;
 export const DBG_MESSAGE_LEN = 100;
 export const DBG_TEST_USER_PHOTO = '/icons/test.jpeg';
 export const DBG_DATA_FILENAME = 'ihbh.json';
+export const DBG_MAX_SHOW_LOGS = 1e4;
 // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
 // 1e-5 corresponds to 1m precision
 export const MAP_1M = 1e-5;
@@ -21,3 +22,5 @@ export const DEFAULT_RPC_URL = 'https://ihbh.org:3921';
 export const DEFAULT_RPC_PORT = 3921;
 export const RPC_DELAY = 0;
 export const CHAT_AUTOSAVE_INTERVAL = 1; // seconds
+export const LOG_IDB_NAME = 'logs';
+export const LOG_IDB_INTERVAL = 500; // ms

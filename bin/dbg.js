@@ -1,4 +1,4 @@
-define(["require", "exports", "./dom", "./log", "./config", "./qargs", "./ls", "./idb"], function (require, exports, dom, log_1, conf, qargs, ls, idb) {
+define(["require", "exports", "./dom", "./log", "./logdb", "./config", "./qargs", "./ls", "./idb"], function (require, exports, dom, log_1, logdb, conf, qargs, ls, idb) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('dbg');
@@ -56,7 +56,7 @@ define(["require", "exports", "./dom", "./log", "./config", "./qargs", "./ls", "
                 log.e('Failed to import data:', err);
             }
         });
-        dom.id.showLogs.addEventListener('click', () => {
+        dom.id.showLogs.addEventListener('click', async () => {
             log.i('#show-logs:click');
             let div = dom.id.logs;
             if (!div.style.display) {
@@ -64,9 +64,10 @@ define(["require", "exports", "./dom", "./log", "./config", "./qargs", "./ls", "
                 div.style.display = 'none';
                 return;
             }
-            let text = log_1.logs
-                .map(args => args.join(' ').trim())
-                .join('\n');
+            log.i('Getting a copy of the logs.');
+            let json = await logdb.getLogs();
+            log.i('Got logs:', json.length);
+            let text = json.map(x => x.join(' ')).join('\n');
             div.textContent = text;
             div.style.display = '';
         });

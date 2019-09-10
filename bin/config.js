@@ -7,6 +7,7 @@ define(["require", "exports"], function (require, exports) {
     exports.DBG_MESSAGE_LEN = 100;
     exports.DBG_TEST_USER_PHOTO = '/icons/test.jpeg';
     exports.DBG_DATA_FILENAME = 'ihbh.json';
+    exports.DBG_MAX_SHOW_LOGS = 1e4;
     // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
     // 1e-5 corresponds to 1m precision
     exports.MAP_1M = 1e-5;
@@ -24,5 +25,7 @@ define(["require", "exports"], function (require, exports) {
     exports.DEFAULT_RPC_PORT = 3921;
     exports.RPC_DELAY = 0;
     exports.CHAT_AUTOSAVE_INTERVAL = 1; // seconds
+    exports.LOG_IDB_NAME = 'logs';
+    exports.LOG_IDB_INTERVAL = 500; // ms
 });
 //# sourceMappingURL=config.js.map
