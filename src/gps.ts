@@ -6,6 +6,7 @@ const log = new TaggedLogger('gps');
 export function getGeoLocation() {
   let options: PositionOptions = {
     enableHighAccuracy: true,
+    timeout: config.GPS_TIMEOUT,
   };
   return new Promise<Position>((resolve, reject) => {
     navigator.geolocation

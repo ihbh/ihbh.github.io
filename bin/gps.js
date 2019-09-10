@@ -5,6 +5,7 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
     function getGeoLocation() {
         let options = {
             enableHighAccuracy: true,
+            timeout: config.GPS_TIMEOUT,
         };
         return new Promise((resolve, reject) => {
             navigator.geolocation

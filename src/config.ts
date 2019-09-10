@@ -9,6 +9,7 @@ export const DBG_MAX_SHOW_LOGS = 1e4;
 // 1e-5 corresponds to 1m precision
 export const MAP_1M = 1e-5;
 export const GPS_DIGITS = 7;
+export const GPS_TIMEOUT = 3000;
 export const MAP_BOX_SIZE = 250 * MAP_1M;
 export const OSM_URL = 'https://www.openstreetmap.org/export/embed.html';
 export const OSM_LIB = 'https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js';
