@@ -47,6 +47,8 @@ define(["require", "exports", "./config", "./log", "./gp", "./qargs", "./prop"],
             return json;
         }
         catch (err) {
+            if (err instanceof RpcError)
+                throw err;
             log.e('fetch() failed:', err);
             throw new RpcError(method, null);
         }

@@ -114,6 +114,8 @@ export async function invoke(method: string, args, retry?: boolean) {
     log.i(res.status, json);
     return json;
   } catch (err) {
+    if (err instanceof RpcError)
+      throw err;
     log.e('fetch() failed:', err);
     throw new RpcError(method, null);
   }
