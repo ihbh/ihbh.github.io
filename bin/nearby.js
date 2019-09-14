@@ -1,4 +1,4 @@
-define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", "./react"], function (require, exports, log_1, rpc, qargs, dom, conf, react_1) {
+define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", "./user", "./react"], function (require, exports, log_1, rpc, qargs, dom, conf, user, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('nearby');
@@ -51,6 +51,10 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", 
         let visitors = await rpc.invoke('Map.GetVisitors', { lat, lon });
         let uids = visitors.map(v => v.uid);
         log.i('People nearby:', uids);
+        let myuid = await user.uid.get();
+        uids = uids.filter(id => id != myuid);
+        if (!uids.length)
+            return [];
         let infos = await rpc.invoke('Users.GetDetails', { users: uids, props: ['name', 'photo'] });
         log.i('Users info:', infos);
         return uids.map((uid, i) => {

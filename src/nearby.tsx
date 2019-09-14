@@ -3,6 +3,7 @@ import * as rpc from './rpc';
 import * as qargs from './qargs';
 import * as dom from './dom';
 import * as conf from './config';
+import * as user from './user';
 import React from './react';
 
 interface UserInfo {
@@ -71,6 +72,10 @@ async function getPeopleNearby({ lat, lon }): Promise<UserInfo[]> {
     { lat, lon });
   let uids = visitors.map(v => v.uid);
   log.i('People nearby:', uids);
+
+  let myuid = await user.uid.get();
+  uids = uids.filter(id => id != myuid);
+  if (!uids.length) return [];
 
   let infos = await rpc.invoke(
     'Users.GetDetails',
