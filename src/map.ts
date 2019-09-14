@@ -73,10 +73,8 @@ function startWatchingGps() {
 }
 
 function onGpsUpdated(pos: Coordinates) {
-  if (bestPos && bestPos.accuracy >= pos.accuracy) {
-    log.d('Discarding less accurate coords:', pos);
-    return;
-  }
+  if (bestPos && bestPos.accuracy >= pos.accuracy)
+    log.d('This is a less accurate pos.');
 
   bestPos = pos;
   dom.id.sendLocation.disabled = false;

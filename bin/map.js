@@ -59,10 +59,8 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
         watcher = gps.watch(onGpsUpdated);
     }
     function onGpsUpdated(pos) {
-        if (bestPos && bestPos.accuracy >= pos.accuracy) {
-            log.d('Discarding less accurate coords:', pos);
-            return;
-        }
+        if (bestPos && bestPos.accuracy >= pos.accuracy)
+            log.d('This is a less accurate pos.');
         bestPos = pos;
         dom.id.sendLocation.disabled = false;
         try {
