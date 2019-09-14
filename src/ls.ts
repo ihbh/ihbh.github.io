@@ -2,8 +2,6 @@ import { TaggedLogger } from "./log";
 import { AsyncProp } from "./prop";
 
 const log = new TaggedLogger('ls');
-const strval = s => (s || '').slice(0, 20) +
-  ' (' + (s || '').length + ' chars)';
 
 export function prop<T>(name: string, defval: T = null): AsyncProp<T> {
   return new AsyncProp<T>({
@@ -12,10 +10,10 @@ export function prop<T>(name: string, defval: T = null): AsyncProp<T> {
     get(): T {
       let json = localStorage.getItem(name);
       let val = json ? JSON.parse(json) : defval;
-      log.i(name, '->', strval(json));
+      log.i(name, '->', json);
       return val;
     },
-    
+
     set(val: T) {
       if (val === null) {
         log.i(name, 'deleted');
@@ -24,7 +22,7 @@ export function prop<T>(name: string, defval: T = null): AsyncProp<T> {
         let prev = localStorage.getItem(name);
         let json = JSON.stringify(val);
         if (prev != json)
-          log.i(name, '<-', strval(json));
+          log.i(name, '<-', json);
         localStorage.setItem(name, json);
       }
     },

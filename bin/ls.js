@@ -2,15 +2,13 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('ls');
-    const strval = s => (s || '').slice(0, 20) +
-        ' (' + (s || '').length + ' chars)';
     function prop(name, defval = null) {
         return new prop_1.AsyncProp({
             nocache: true,
             get() {
                 let json = localStorage.getItem(name);
                 let val = json ? JSON.parse(json) : defval;
-                log.i(name, '->', strval(json));
+                log.i(name, '->', json);
                 return val;
             },
             set(val) {
@@ -22,7 +20,7 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
                     let prev = localStorage.getItem(name);
                     let json = JSON.stringify(val);
                     if (prev != json)
-                        log.i(name, '<-', strval(json));
+                        log.i(name, '<-', json);
                     localStorage.setItem(name, json);
                 }
             },
