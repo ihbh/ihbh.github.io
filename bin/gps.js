@@ -22,5 +22,11 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         };
     }
     exports.watch = watch;
+    function dist(p, q) {
+        let lat = p.latitude - q.latitude;
+        let lon = p.longitude - q.longitude;
+        return (lat ** 2 + lon ** 2) ** 0.5;
+    }
+    exports.dist = dist;
 });
 //# sourceMappingURL=gps.js.map

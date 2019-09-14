@@ -12,6 +12,7 @@ define(["require", "exports"], function (require, exports) {
     // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
     // 1e-5 corresponds to 1m precision
     exports.MAP_1M = 1e-5;
+    exports.MIN_SIGNIFICANT_DIST = 10 * exports.MAP_1M;
     exports.GPS_DIGITS = 7;
     exports.GPS_TIMEOUT = 15000; // ms
     exports.MAP_BOX_SIZE = 250 * exports.MAP_1M;

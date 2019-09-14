@@ -4,6 +4,7 @@ import * as gps from './gps';
 import { TaggedLogger } from './log';
 import { OSM } from './osm';
 import * as page from './page';
+import * as conf from './config';
 
 declare const PositionError;
 
@@ -73,8 +74,10 @@ function startWatchingGps() {
 }
 
 function onGpsUpdated(pos: Coordinates) {
-  if (bestPos && bestPos.accuracy >= pos.accuracy)
-    log.d('This is a less accurate pos.');
+  if (bestPos && gps.dist(bestPos, pos) < conf.MIN_SIGNIFICANT_DIST) {
+    log.i('Already seen these coords.');
+    return;
+  }
 
   bestPos = pos;
   dom.id.sendLocation.disabled = false;

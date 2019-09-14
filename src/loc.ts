@@ -28,7 +28,8 @@ export async function startSyncProcess() {
 
     let unsynced = Object.keys(places)
       .filter(tskey => !synced[tskey]);
-    log.i('Unsynced places:', unsynced);
+    if (!unsynced.length) return;
+    log.i('Unsynced places:', unsynced.length);
 
     let newplaces = {};
     for (let tskey of unsynced)

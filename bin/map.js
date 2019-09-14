@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", "./page"], function (require, exports, config_1, dom, gps, log_1, osm_1, page) {
+define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", "./page", "./config"], function (require, exports, config_1, dom, gps, log_1, osm_1, page, conf) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('map');
@@ -59,8 +59,10 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
         watcher = gps.watch(onGpsUpdated);
     }
     function onGpsUpdated(pos) {
-        if (bestPos && bestPos.accuracy >= pos.accuracy)
-            log.d('This is a less accurate pos.');
+        if (bestPos && gps.dist(bestPos, pos) < conf.MIN_SIGNIFICANT_DIST) {
+            log.i('Already seen these coords.');
+            return;
+        }
         bestPos = pos;
         dom.id.sendLocation.disabled = false;
         try {

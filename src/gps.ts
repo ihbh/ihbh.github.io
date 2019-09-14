@@ -32,3 +32,9 @@ export function watch(listener: (pos: Coordinates) => void): Watcher {
     }
   };
 }
+
+export function dist(p: Coordinates, q: Coordinates) {
+  let lat = p.latitude - q.latitude;
+  let lon = p.longitude - q.longitude;
+  return (lat ** 2 + lon ** 2) ** 0.5;
+}
