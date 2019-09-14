@@ -1,6 +1,7 @@
 import { TaggedLogger } from "./log";
 import * as qargs from './qargs';
 import { $, $$ } from './dom';
+import * as startup from './startup';
 
 const log = new TaggedLogger('page');
 
@@ -11,6 +12,8 @@ export async function init() {
   select(id);
   let mod = await import('./' + id);
   await mod.init();
+  log.i('Running the startup tasks.');
+  startup.run();
 }
 
 export function get(): PageId {

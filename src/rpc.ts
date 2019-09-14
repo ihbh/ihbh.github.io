@@ -27,10 +27,18 @@ export interface UserDetails {
   info: string;
 }
 
-export interface SharedLocation {
+export interface VisitedPlace {
   lat: number;
   lon: number;
   time: number;
+}
+
+export interface VisitedPlaces {
+  [tskey: string]: VisitedPlace;
+}
+
+export interface VisitorNote {
+  uid: string;
 }
 
 export interface ChatMessage {
@@ -62,15 +70,19 @@ export function invoke(
   : Promise<UserDetails[]>;
 
 export function invoke(
-  method: 'Map.ShareLocation',
-  args: SharedLocation,
-  retry: boolean)
-  : Promise<{}>;
+  method: 'Map.GetVisitedPlaces',
+  args: void)
+  : Promise<VisitedPlaces>;
 
 export function invoke(
-  method: 'Map.GetPeopleNearby',
+  method: 'Map.AddVisitedPlaces',
+  args: VisitedPlaces)
+  : Promise<void>;
+
+export function invoke(
+  method: 'Map.GetVisitors',
   args: { lat: number, lon: number })
-  : Promise<string[]>;
+  : Promise<VisitorNote[]>;
 
 export async function invoke(method: string, args, retry?: boolean) {
   log.i('invoke:', method, args, 'retry?', retry);

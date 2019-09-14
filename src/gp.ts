@@ -1,10 +1,17 @@
-import * as ls from './ls';
 import * as idb from './idb';
 
-const prop = idb.prop || ls.prop;
+const prop = idb.prop;
 
-export type Place = [number, number]; // [lat, lng]
-export interface Places { [time: string]: Place } // time = Date.now()/1000
+export interface Place {
+  time: number; // Date.now()/1000
+  lat: number;
+  lon: number;
+}
+
+export interface Places {
+  // tskey = Date.now()/1000/60 in hex, 8 digits
+  [tskey: string]: Place;
+}
 
 export interface RpcInfo {
   method: string;
@@ -24,7 +31,10 @@ export const privkey = prop<string>('user.privkey');
 export const pubkey = prop<string>('user.pubkey');
 export const uid = prop<string>('user.id');
 
-export const places = prop<Places>('places', {});
+export const visited = {
+  places: prop<Places>('visited.places', {}),
+  synced: prop<{ [tskey: string]: boolean }>('visited.synced', {}),
+};
 
 export const rpcs = {
   infos: prop<SMap<RpcInfo>>('rpcs.info', {}),

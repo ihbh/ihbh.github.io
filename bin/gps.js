@@ -2,7 +2,9 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('gps');
+    let options = { enableHighAccuracy: true };
     function watch(listener) {
+        navigator.geolocation.getCurrentPosition(pos => listener(pos.coords), err => log.w('error:', err), options);
         let wid = navigator.geolocation.watchPosition(pos => {
             let { latitude, longitude, altitude, accuracy } = pos.coords;
             log.i(`update: lat=${latitude.toFixed(4)} lon=${longitude.toFixed(4)} ` +
@@ -10,7 +12,7 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             listener(pos.coords);
         }, err => {
             log.w('error:', err);
-        }, { enableHighAccuracy: true });
+        }, options);
         log.i('Watch started:', wid);
         return {
             stop() {

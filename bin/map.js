@@ -114,7 +114,7 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
             throw new Error('GPS not ready.');
         let loc = await new Promise((resolve_4, reject_4) => { require(['./loc'], resolve_4, reject_4); });
         let { latitude: lat, longitude: lng } = bestPos;
-        await loc.shareLocation({ lat, lng });
+        await loc.shareLocation({ lat, lon: lng });
     }
 });
 //# sourceMappingURL=map.js.map

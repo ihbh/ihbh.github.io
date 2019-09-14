@@ -135,5 +135,5 @@ async function shareDisplayedLocation() {
   if (!bestPos) throw new Error('GPS not ready.');
   let loc = await import('./loc');
   let { latitude: lat, longitude: lng } = bestPos;
-  await loc.shareLocation({ lat, lng });
+  await loc.shareLocation({ lat, lon: lng });
 }

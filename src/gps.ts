@@ -1,12 +1,18 @@
 import { TaggedLogger } from './log';
 
 let log = new TaggedLogger('gps');
+let options = { enableHighAccuracy: true };
 
 export interface Watcher {
   stop(): void;
 }
 
 export function watch(listener: (pos: Coordinates) => void): Watcher {
+  navigator.geolocation.getCurrentPosition(
+    pos => listener(pos.coords),
+    err => log.w('error:', err),
+    options);
+
   let wid = navigator.geolocation.watchPosition(
     pos => {
       let { latitude, longitude, altitude, accuracy } = pos.coords;
@@ -15,7 +21,7 @@ export function watch(listener: (pos: Coordinates) => void): Watcher {
       listener(pos.coords);
     }, err => {
       log.w('error:', err);
-    }, { enableHighAccuracy: true });
+    }, options);
 
   log.i('Watch started:', wid);
 

@@ -1,7 +1,7 @@
-define(["require", "exports", "./ls", "./idb"], function (require, exports, ls, idb) {
+define(["require", "exports", "./idb"], function (require, exports, idb) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const prop = idb.prop || ls.prop;
+    const prop = idb.prop;
     exports.username = prop('user.name');
     exports.userimg = prop('user.img'); // data:image/jpeg;base64,...
     // ed25519
@@ -9,7 +9,10 @@ define(["require", "exports", "./ls", "./idb"], function (require, exports, ls, 
     exports.privkey = prop('user.privkey');
     exports.pubkey = prop('user.pubkey');
     exports.uid = prop('user.id');
-    exports.places = prop('places', {});
+    exports.visited = {
+        places: prop('visited.places', {}),
+        synced: prop('visited.synced', {}),
+    };
     exports.rpcs = {
         infos: prop('rpcs.info', {}),
         unsent: prop('rpcs.unsent', {}),

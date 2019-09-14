@@ -66,9 +66,10 @@ function makeUserCard(info: UserInfo) {
 }
 
 async function getPeopleNearby({ lat, lon }): Promise<UserInfo[]> {
-  let uids = await rpc.invoke(
-    'Map.GetPeopleNearby',
+  let visitors = await rpc.invoke(
+    'Map.GetVisitors',
     { lat, lon });
+  let uids = visitors.map(v => v.uid);
   log.i('People nearby:', uids);
 
   let infos = await rpc.invoke(

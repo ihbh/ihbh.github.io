@@ -1,4 +1,4 @@
-define(["require", "exports", "./log", "./qargs", "./dom"], function (require, exports, log_1, qargs, dom_1) {
+define(["require", "exports", "./log", "./qargs", "./dom", "./startup"], function (require, exports, log_1, qargs, dom_1, startup) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('page');
@@ -7,6 +7,8 @@ define(["require", "exports", "./log", "./qargs", "./dom"], function (require, e
         select(id);
         let mod = await new Promise((resolve_1, reject_1) => { require(['./' + id], resolve_1, reject_1); });
         await mod.init();
+        log.i('Running the startup tasks.');
+        startup.run();
     }
     exports.init = init;
     function get() {

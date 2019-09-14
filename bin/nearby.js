@@ -48,7 +48,8 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", 
             react_1.default.createElement("span", null, info.name));
     }
     async function getPeopleNearby({ lat, lon }) {
-        let uids = await rpc.invoke('Map.GetPeopleNearby', { lat, lon });
+        let visitors = await rpc.invoke('Map.GetVisitors', { lat, lon });
+        let uids = visitors.map(v => v.uid);
         log.i('People nearby:', uids);
         let infos = await rpc.invoke('Users.GetDetails', { users: uids, props: ['name', 'photo'] });
         log.i('Users info:', infos);
