@@ -5,6 +5,7 @@ export const DBG_MESSAGE_LEN = 100;
 export const DBG_TEST_USER_PHOTO = '/icons/test.jpeg';
 export const DBG_DATA_FILENAME = 'ihbh.json';
 export const DBG_MAX_SHOW_LOGS = 500;
+export const DBG_MAX_LOG_ARG_LEN = 100;
 // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
 // 1e-5 corresponds to 1m precision
 export const MAP_1M = 1e-5;

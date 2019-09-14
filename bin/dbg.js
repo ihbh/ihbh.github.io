@@ -65,15 +65,29 @@ define(["require", "exports", "./dom", "./log", "./logdb", "./config", "./qargs"
                 return;
             }
             log.i('Getting a copy of the logs.');
-            let json = await logdb.getLogs();
-            log.i('Got logs:', json.length);
-            let text = json.map(x => x.join(' ')).join('\n');
+            let logs = await logdb.getLogs();
+            log.i('Got logs:', logs.length);
+            let text = logs.map(args => args.map(serializeLogArg).join(' '))
+                .join('\n');
             div.textContent = text;
             div.style.display = '';
             div.scrollTop = div.scrollHeight;
         });
     }
     exports.init = init;
+    function serializeLogArg(x) {
+        if (!x || typeof x == 'number' || typeof x == 'string')
+            return x + '';
+        try {
+            let json = JSON.stringify(x);
+            let n = json.length - conf.DBG_MAX_LOG_ARG_LEN;
+            return n <= 0 ? json : json.slice(0, -n) +
+                ' (' + json.length + ' chars)';
+        }
+        catch (err) {
+            return x + '';
+        }
+    }
     async function getDebugPeopleNearby() {
         let ntest = +qargs.get('pnt') ||
             conf.DBG_N_USERS_NEARBY;

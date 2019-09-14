@@ -22,11 +22,21 @@ define(["require", "exports", "./config"], function (require, exports, conf) {
         let ts = Date.now();
         let dt = ((ts - time) / 1000).toFixed(3);
         let key = ts + '.' + logid;
-        let rec = [sev, dt, tag, ...args.map(x => x + '')];
+        let rec = [sev, dt, tag, ...args.map(getSerializiableCopy)];
         pending.push([key, rec]);
         timer = timer || setTimeout(flushLogs, conf.LOG_IDB_INTERVAL);
     }
     exports.writeLog = writeLog;
+    function getSerializiableCopy(x) {
+        if (!x || typeof x == 'number' || typeof x == 'string')
+            return x;
+        try {
+            return JSON.parse(JSON.stringify(x));
+        }
+        catch (err) {
+            return x + '';
+        }
+    }
     async function flushLogs() {
         await openTable();
         let ps = pending.map(([key, rec]) => dbt.add(key, rec));
