@@ -2,7 +2,6 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.USERDATA_DB_NAME = 'user';
-    exports.DEFAULT_USERDATA_TABLE_NAME = 'props';
     let log = new log_1.TaggedLogger('idb');
     class DB {
         constructor(name) {

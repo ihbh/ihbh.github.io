@@ -7,7 +7,6 @@ declare global {
 }
 
 export const USERDATA_DB_NAME = 'user';
-export const DEFAULT_USERDATA_TABLE_NAME = 'props';
 
 let log = new TaggedLogger('idb');
 
