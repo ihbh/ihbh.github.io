@@ -20,7 +20,7 @@ const idbfs: FS = {
 
     let db = DB.open(dbname);
     if (!tname)
-      return db.getTableNames();
+      return db.tnames();
 
     let keyprefix = props.join('.');
     let t = db.open(tname);

@@ -8,18 +8,18 @@ define(["require", "exports", "./fsprop", "./config", "./log"], function (requir
         log.i(path, '->', fspath, 'default:', defval);
         return fsprop_1.default(fspath, defval);
     }
-    exports.uid = prop('data.shared.profile.id');
-    exports.username = prop('data.shared.profile.name');
-    exports.userimg = prop('data.shared.profile.img'); // data:image/jpeg;base64,...
-    exports.pubkey = prop('data.shared.profile.pubkey');
-    exports.keyseed = prop('data.local.keys.keyseed');
-    exports.privkey = prop('data.local.keys.privkey');
-    exports.vsynced = prop('data.rsync.places', {});
+    exports.uid = prop('shared.profile.id');
+    exports.username = prop('shared.profile.name');
+    exports.userimg = prop('shared.profile.img'); // data:image/jpeg;base64,...
+    exports.pubkey = prop('shared.profile.pubkey');
+    exports.keyseed = prop('local.keys.keyseed');
+    exports.privkey = prop('local.keys.privkey');
+    exports.vsynced = prop('rsync.places', {});
     exports.rpcs = {
-        infos: prop('data.rsync.rpcs.info', {}),
-        unsent: prop('data.rsync.rpcs.unsent', {}),
-        failed: prop('data.rsync.rpcs.failed', {}),
+        infos: prop('rsync.rpcs.info', {}),
+        unsent: prop('rsync.rpcs.unsent', {}),
+        failed: prop('rsync.rpcs.failed', {}),
     };
-    exports.unsentMessages = prop('data.shared.chats.unsent', {});
+    exports.unsentMessages = prop('shared.chats.unsent', {});
 });
 //# sourceMappingURL=gp.js.map

@@ -145,9 +145,7 @@ export class DB {
   }
 
   async save() {
-    let db = await this.init();
-    let list = db.objectStoreNames;
-    let tnames = [].slice.call(list);
+    let tnames = await this.tnames();
     let json = {};
     for (let tname of tnames) {
       let t = this.open(tname);
@@ -155,6 +153,12 @@ export class DB {
       json[tname] = r;
     }
     return json;
+  }
+
+  async tnames(): Promise<string[]> {
+    let db = await this.init();
+    let list = db.objectStoreNames;
+    return [].slice.call(list);
   }
 }
 

@@ -16,7 +16,7 @@ define(["require", "exports", "./idb", "./log"], function (require, exports, idb
                 return idb_1.DB.names();
             let db = idb_1.DB.open(dbname);
             if (!tname)
-                return db.getTableNames();
+                return db.tnames();
             let keyprefix = props.join('.');
             let t = db.open(tname);
             let keys = await t.keys();

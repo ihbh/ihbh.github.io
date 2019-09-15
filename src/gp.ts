@@ -20,21 +20,21 @@ interface SMap<V> {
   [key: string]: V;
 }
 
-export const uid = prop<string>('data.shared.profile.id');
-export const username = prop<string>('data.shared.profile.name');
-export const userimg = prop<string>('data.shared.profile.img'); // data:image/jpeg;base64,...
-export const pubkey = prop<string>('data.shared.profile.pubkey');
+export const uid = prop<string>('shared.profile.id');
+export const username = prop<string>('shared.profile.name');
+export const userimg = prop<string>('shared.profile.img'); // data:image/jpeg;base64,...
+export const pubkey = prop<string>('shared.profile.pubkey');
 
-export const keyseed = prop<string>('data.local.keys.keyseed');
-export const privkey = prop<string>('data.local.keys.privkey');
+export const keyseed = prop<string>('local.keys.keyseed');
+export const privkey = prop<string>('local.keys.privkey');
 
-export const vsynced = prop<SMap<boolean>>('data.rsync.places', {});
+export const vsynced = prop<SMap<boolean>>('rsync.places', {});
 
 export const rpcs = {
-  infos: prop<SMap<RpcInfo>>('data.rsync.rpcs.info', {}),
-  unsent: prop<SMap<number>>('data.rsync.rpcs.unsent', {}),
-  failed: prop<SMap<string>>('data.rsync.rpcs.failed', {}),
+  infos: prop<SMap<RpcInfo>>('rsync.rpcs.info', {}),
+  unsent: prop<SMap<number>>('rsync.rpcs.unsent', {}),
+  failed: prop<SMap<string>>('rsync.rpcs.failed', {}),
 };
 
 export const unsentMessages =
-  prop<SMap<string>>('data.shared.chats.unsent', {});
+  prop<SMap<string>>('shared.chats.unsent', {});

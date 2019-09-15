@@ -128,9 +128,7 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             return this.ready;
         }
         async save() {
-            let db = await this.init();
-            let list = db.objectStoreNames;
-            let tnames = [].slice.call(list);
+            let tnames = await this.tnames();
             let json = {};
             for (let tname of tnames) {
                 let t = this.open(tname);
@@ -138,6 +136,11 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
                 json[tname] = r;
             }
             return json;
+        }
+        async tnames() {
+            let db = await this.init();
+            let list = db.objectStoreNames;
+            return [].slice.call(list);
         }
     }
     DB.idbs = new Map();
