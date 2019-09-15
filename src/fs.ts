@@ -3,6 +3,7 @@ import lsfs from './lsfs';
 import idbfs from './idbfs';
 import { TaggedLogger } from './log';
 import * as conf from './config';
+import { DerivedError } from './error';
 
 const PATH_REGEX = /^(\/[\w-_]+)+$/;
 const log = new TaggedLogger('fs');
@@ -38,6 +39,9 @@ let fs: FS = {
     try {
       let [handler, rempath] = parsePath(path);
       return handler.get(rempath);
+    } catch (err) {
+      throw new DerivedError(
+        'fs.get failed on ' + path, err);
     } finally {
       let diff = Date.now() - time;
       if (diff > conf.FS_SLOW_THRS)
@@ -51,6 +55,9 @@ let fs: FS = {
     try {
       let [handler, rempath] = parsePath(path);
       return handler.set(rempath, json);
+    } catch (err) {
+      throw new DerivedError(
+        'fs.set failed on ' + path, err);
     } finally {
       let diff = Date.now() - time;
       if (diff > conf.FS_SLOW_THRS)

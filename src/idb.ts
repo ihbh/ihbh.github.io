@@ -12,6 +12,8 @@ let log = new TaggedLogger('idb');
 
 export class DB {
   static idbs = new Map<string, DB>();
+  static time = Date.now();
+  static vidx = 1;
 
   static open(dbname: string) {
     let db = DB.idbs.get(dbname);
@@ -81,11 +83,9 @@ export class DB {
     }
   }
 
-  readonly version = 1;
-
   private idb: IDBDatabase;
-  private readonly tables = new Map<string, DBTable>();
   private ready: Promise<IDBDatabase>;
+  private readonly tables = new Map<string, DBTable>();
 
   constructor(public readonly name: string) {
 
@@ -99,18 +99,35 @@ export class DB {
     return t;
   }
 
+  async close() {
+    await this.ready;
+    let db = this.idb;
+    if (!db) return;
+    db.close();
+    this.idb = null;
+    this.ready = null;
+  }
+
   init(): Promise<IDBDatabase> {
     if (this.ready) return this.ready;
     let time = Date.now();
 
     this.ready = new Promise<IDBDatabase>((resolve, reject) => {
-      let req = indexedDB.open(this.name, this.version);
+      let version = (DB.time / 1000 | 0) + DB.vidx; // force upgradeneeded
+      DB.vidx++;
+      let req = indexedDB.open(this.name, version);
       req.onupgradeneeded = (e: any) => {
         log.i(this.name + ':upgradeneeded');
         let db: IDBDatabase = e.target.result;
+        let tnames = new Set([].slice.call(db.objectStoreNames));
         for (let tname of this.tables.keys()) {
-          log.i('Opening a table:', tname);
-          db.createObjectStore(tname);
+          let fqtn = this.name + '.' + tname;
+          if (tnames.has(tname)) {
+            log.i(`${fqtn} table already exists.`);
+          } else {
+            log.i(`Creating table: ${fqtn}`);
+            db.createObjectStore(tname);
+          }
         }
       };
       req.onsuccess = (e: any) => {
@@ -128,7 +145,9 @@ export class DB {
   }
 
   async save() {
-    let tnames = await this.getTableNames();
+    let db = await this.init();
+    let list = db.objectStoreNames;
+    let tnames = [].slice.call(list);
     let json = {};
     for (let tname of tnames) {
       let t = this.open(tname);
@@ -136,15 +155,6 @@ export class DB {
       json[tname] = r;
     }
     return json;
-  }
-
-  async getTableNames(): Promise<string[]> {
-    let idb = await this.init();
-    let list = idb.objectStoreNames;
-    let names = [];
-    for (let i = 0; i < list.length; i++)
-      names.push(list.item(i));
-    return names;
   }
 }
 
@@ -165,6 +175,10 @@ export class DBTable {
     this.logs = logs;
   }
 
+  get fqtn() {
+    return this.db.name + '.' + this.name;
+  }
+
   private log(...args) {
     if (this.logs) log.i(...args);
   }
@@ -181,6 +195,13 @@ export class DBTable {
 
   private async execPendingTransactions() {
     let db = await this.db.init();
+
+    if (!db.objectStoreNames.contains(this.name)) {
+      log.i(`${this.fqtn} does not exist. Re-opening the db.`);
+      await this.db.close();
+      db = await this.db.init();
+    }
+
     let t = db.transaction(this.name, 'readwrite');
     let s = t.objectStore(this.name);
 

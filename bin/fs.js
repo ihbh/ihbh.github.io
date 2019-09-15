@@ -1,4 +1,4 @@
-define(["require", "exports", "./lsfs", "./idbfs", "./log", "./config"], function (require, exports, lsfs_1, idbfs_1, log_1, conf) {
+define(["require", "exports", "./lsfs", "./idbfs", "./log", "./config", "./error"], function (require, exports, lsfs_1, idbfs_1, log_1, conf, error_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const PATH_REGEX = /^(\/[\w-_]+)+$/;
@@ -34,6 +34,9 @@ define(["require", "exports", "./lsfs", "./idbfs", "./log", "./config"], functio
                 let [handler, rempath] = parsePath(path);
                 return handler.get(rempath);
             }
+            catch (err) {
+                throw new error_1.DerivedError('fs.get failed on ' + path, err);
+            }
             finally {
                 let diff = Date.now() - time;
                 if (diff > conf.FS_SLOW_THRS)
@@ -46,6 +49,9 @@ define(["require", "exports", "./lsfs", "./idbfs", "./log", "./config"], functio
             try {
                 let [handler, rempath] = parsePath(path);
                 return handler.set(rempath, json);
+            }
+            catch (err) {
+                throw new error_1.DerivedError('fs.set failed on ' + path, err);
             }
             finally {
                 let diff = Date.now() - time;

@@ -6,7 +6,6 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     class DB {
         constructor(name) {
             this.name = name;
-            this.version = 1;
             this.tables = new Map();
         }
         static open(dbname) {
@@ -84,18 +83,36 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             this.tables.set(tableName, t);
             return t;
         }
+        async close() {
+            await this.ready;
+            let db = this.idb;
+            if (!db)
+                return;
+            db.close();
+            this.idb = null;
+            this.ready = null;
+        }
         init() {
             if (this.ready)
                 return this.ready;
             let time = Date.now();
             this.ready = new Promise((resolve, reject) => {
-                let req = indexedDB.open(this.name, this.version);
+                let version = (DB.time / 1000 | 0) + DB.vidx; // force upgradeneeded
+                DB.vidx++;
+                let req = indexedDB.open(this.name, version);
                 req.onupgradeneeded = (e) => {
                     log.i(this.name + ':upgradeneeded');
                     let db = e.target.result;
+                    let tnames = new Set([].slice.call(db.objectStoreNames));
                     for (let tname of this.tables.keys()) {
-                        log.i('Opening a table:', tname);
-                        db.createObjectStore(tname);
+                        let fqtn = this.name + '.' + tname;
+                        if (tnames.has(tname)) {
+                            log.i(`${fqtn} table already exists.`);
+                        }
+                        else {
+                            log.i(`Creating table: ${fqtn}`);
+                            db.createObjectStore(tname);
+                        }
                     }
                 };
                 req.onsuccess = (e) => {
@@ -111,7 +128,9 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             return this.ready;
         }
         async save() {
-            let tnames = await this.getTableNames();
+            let db = await this.init();
+            let list = db.objectStoreNames;
+            let tnames = [].slice.call(list);
             let json = {};
             for (let tname of tnames) {
                 let t = this.open(tname);
@@ -120,16 +139,10 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             }
             return json;
         }
-        async getTableNames() {
-            let idb = await this.init();
-            let list = idb.objectStoreNames;
-            let names = [];
-            for (let i = 0; i < list.length; i++)
-                names.push(list.item(i));
-            return names;
-        }
     }
     DB.idbs = new Map();
+    DB.time = Date.now();
+    DB.vidx = 1;
     exports.DB = DB;
     class DBTable {
         constructor(name, db, { logs = true } = {}) {
@@ -138,6 +151,9 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             this.pending = [];
             this.timer = 0;
             this.logs = logs;
+        }
+        get fqtn() {
+            return this.db.name + '.' + this.name;
         }
         log(...args) {
             if (this.logs)
@@ -154,6 +170,11 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         }
         async execPendingTransactions() {
             let db = await this.db.init();
+            if (!db.objectStoreNames.contains(this.name)) {
+                log.i(`${this.fqtn} does not exist. Re-opening the db.`);
+                await this.db.close();
+                db = await this.db.init();
+            }
             let t = db.transaction(this.name, 'readwrite');
             let s = t.objectStore(this.name);
             let ts = this.pending;
