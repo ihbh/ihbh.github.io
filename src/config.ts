@@ -27,3 +27,4 @@ export const RPC_DELAY = 0;
 export const CHAT_AUTOSAVE_INTERVAL = 1; // seconds
 export const LOG_IDB_NAME = 'logs';
 export const LOG_IDB_INTERVAL = 5; // ms
+export const FS_SLOW_THRS = 10; // ms

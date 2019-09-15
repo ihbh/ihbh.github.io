@@ -1,5 +1,6 @@
 import { TaggedLogger } from "./log";
 import { AsyncProp } from "./prop";
+import {FS} from './fs-api';
 
 declare global {
   interface IDBFactory {

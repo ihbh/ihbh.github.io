@@ -20,6 +20,9 @@ define(["require", "exports", "./dbg", "./dom", "./log", "./gp", "./page", "./pw
             log.i('Page explicitly selected:', page.get());
             await page.init();
         }
+        let fs = await new Promise((resolve_1, reject_1) => { require(['./fs'], resolve_1, reject_1); });
+        window['fs'] = fs.default;
+        log.w('window.fs:', fs.default);
     }).catch(err => {
         log.e('failed:', err);
     });
