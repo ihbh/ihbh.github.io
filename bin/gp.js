@@ -1,7 +1,13 @@
-define(["require", "exports", "./idb"], function (require, exports, idb) {
+define(["require", "exports", "./fsprop", "./config", "./log"], function (require, exports, fsprop_1, conf, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const prop = idb.prop;
+    const log = new log_1.TaggedLogger('gp');
+    function prop(path, defval = null) {
+        let fspath = conf.USERDATA_DIR + '/' +
+            path.split('.').join('/');
+        log.i(path, '->', fspath, 'default:', defval);
+        return fsprop_1.default(fspath, defval);
+    }
     exports.username = prop('user.name');
     exports.userimg = prop('user.img'); // data:image/jpeg;base64,...
     // ed25519

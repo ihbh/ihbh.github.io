@@ -1,9 +1,13 @@
 import { FS } from './fs-api';
 import { DB } from './idb';
+import { TaggedLogger } from './log';
+
+const log = new TaggedLogger('idbfs');
 
 const idbfs: FS = {
   async get(path: string): Promise<any> {
     let { dbname, table, key } = parsePath(path);
+    log.d('get', dbname + '.' + table + ':' + key);
     let db = DB.open(dbname);
     let t = db.open(table);
     return t.get(key);
@@ -11,6 +15,7 @@ const idbfs: FS = {
 
   async set(path: string, json): Promise<void> {
     let { dbname, table, key } = parsePath(path);
+    log.d('set', dbname + '.' + table + ':' + key, json);
     let db = DB.open(dbname);
     let t = db.open(table);
     return t.set(key, json);

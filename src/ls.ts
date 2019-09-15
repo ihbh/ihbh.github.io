@@ -1,44 +1,20 @@
 import { TaggedLogger } from "./log";
-import { AsyncProp } from "./prop";
 
 const log = new TaggedLogger('ls');
 
-export function prop<T>(name: string, defval: T = null): AsyncProp<T> {
-  return new AsyncProp<T>({
-    nocache: true,
-
-    get(): T {
-      let json = localStorage.getItem(name);
-      let val = json ? JSON.parse(json) : defval;
-      log.i(name, '->', json);
-      return val;
-    },
-
-    set(val: T) {
-      if (val === null) {
-        log.i(name, 'deleted');
-        localStorage.removeItem(name);
-      } else {
-        let prev = localStorage.getItem(name);
-        let json = JSON.stringify(val);
-        if (prev != json)
-          log.i(name, '<-', json);
-        localStorage.setItem(name, json);
-      }
-    },
-  });
-}
-
 export function clear() {
+  log.i('clear');
   localStorage.clear();
 }
 
 export function save() {
   let json = JSON.stringify(localStorage);
+  log.i('save', json);
   return JSON.parse(json);
 }
 
 export function load(json) {
+  log.i('load', json);
   for (let i in json)
     localStorage.setItem(i, json[i]);
 }

@@ -1,6 +1,15 @@
-import * as idb from './idb';
+import fsprop from './fsprop';
+import * as conf from './config';
+import { TaggedLogger } from './log';
 
-const prop = idb.prop;
+const log = new TaggedLogger('gp');
+
+function prop<T>(path: string, defval: T = null) {
+  let fspath = conf.USERDATA_DIR + '/' +
+    path.split('.').join('/');
+  log.i(path, '->', fspath, 'default:', defval);
+  return fsprop(fspath, defval);
+}
 
 export interface Place {
   time: number; // Date.now()/1000

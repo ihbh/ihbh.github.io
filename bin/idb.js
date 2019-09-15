@@ -1,4 +1,4 @@
-define(["require", "exports", "./log", "./prop"], function (require, exports, log_1, prop_1) {
+define(["require", "exports", "./log"], function (require, exports, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.USERDATA_DB_NAME = 'user';
@@ -200,32 +200,18 @@ define(["require", "exports", "./log", "./prop"], function (require, exports, lo
         }
     }
     exports.DBTable = DBTable;
-    function prop(keyname, defval = null) {
-        return new prop_1.AsyncProp({
-            nocache: true,
-            async get() {
-                let db = DB.open(exports.USERDATA_DB_NAME);
-                let t = db.open(exports.DEFAULT_USERDATA_TABLE_NAME);
-                let v = await t.get(keyname);
-                return v === undefined ? defval : v;
-            },
-            async set(value) {
-                let db = DB.open(exports.USERDATA_DB_NAME);
-                let t = db.open(exports.DEFAULT_USERDATA_TABLE_NAME);
-                await t.set(keyname, value);
-            },
-        });
-    }
-    exports.prop = prop;
     async function clear() {
+        log.i('clear');
         await DB.clear();
     }
     exports.clear = clear;
     function save(filter) {
+        log.i('save');
         return DB.save(filter);
     }
     exports.save = save;
     function load(json) {
+        log.i('load');
         DB.load(json);
     }
     exports.load = load;

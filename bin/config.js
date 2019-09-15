@@ -31,5 +31,6 @@ define(["require", "exports"], function (require, exports) {
     exports.LOG_IDB_NAME = 'logs';
     exports.LOG_IDB_INTERVAL = 5; // ms
     exports.FS_SLOW_THRS = 10; // ms
+    exports.USERDATA_DIR = '/idb/user/props';
 });
 //# sourceMappingURL=config.js.map

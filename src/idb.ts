@@ -1,6 +1,4 @@
 import { TaggedLogger } from "./log";
-import { AsyncProp } from "./prop";
-import {FS} from './fs-api';
 
 declare global {
   interface IDBFactory {
@@ -248,33 +246,17 @@ export class DBTable {
   }
 }
 
-export function prop<T>(keyname: string, defval: T = null) {
-  return new AsyncProp<T>({
-    nocache: true,
-
-    async get() {
-      let db = DB.open(USERDATA_DB_NAME);
-      let t = db.open(DEFAULT_USERDATA_TABLE_NAME);
-      let v = await t.get(keyname);
-      return v === undefined ? defval : v;
-    },
-
-    async set(value: T) {
-      let db = DB.open(USERDATA_DB_NAME);
-      let t = db.open(DEFAULT_USERDATA_TABLE_NAME);
-      await t.set(keyname, value);
-    },
-  });
-}
-
 export async function clear() {
+  log.i('clear');
   await DB.clear();
 }
 
 export function save(filter: (dbname: string) => boolean) {
+  log.i('save');
   return DB.save(filter);
 }
 
 export function load(json) {
+  log.i('load');
   DB.load(json);
 }

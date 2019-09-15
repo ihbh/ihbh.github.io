@@ -28,3 +28,4 @@ export const CHAT_AUTOSAVE_INTERVAL = 1; // seconds
 export const LOG_IDB_NAME = 'logs';
 export const LOG_IDB_INTERVAL = 5; // ms
 export const FS_SLOW_THRS = 10; // ms
+export const USERDATA_DIR = '/idb/user/props';
