@@ -34,7 +34,6 @@ define(["require", "exports"], function (require, exports) {
     exports.USERDATA_DIR = '/idb/user';
     exports.VPLACES_DIR = '/idb/user/shared/places';
     exports.RSYNC_DIR_DATA = '/idb/user/shared';
-    exports.RSYNC_UNSYNCED = '/idb/user/rsync/unsynced';
-    exports.RSYNC_FAILED = '/idb/user/rsync/failed';
+    exports.RSYNC_SYNCED = '/idb/user/rsync/status';
 });
 //# sourceMappingURL=config.js.map

@@ -1,4 +1,4 @@
-define(["require", "exports", "./log", "./fs", "./rpc", "./config"], function (require, exports, log_1, fs_1, rpc, conf) {
+define(["require", "exports", "./log", "./fs", "./rpc", "./config", "./error"], function (require, exports, log_1, fs_1, rpc, conf, error_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('rsync');
@@ -11,10 +11,11 @@ define(["require", "exports", "./log", "./fs", "./rpc", "./config"], function (r
         log.i('Started syncing.');
         try {
             let upaths = await getUnsyncedPaths();
-            log.d('Files to be synced:', upaths);
-            if (!upaths.length)
+            if (!upaths.length) {
+                log.i('Nothing to sync.');
                 return;
-            log.i('Reading files.');
+            }
+            log.d('Files to be synced:', upaths);
             let ufdata = new Map();
             await Promise.all(upaths.map(path => fs_1.default.get(path).then(data => ufdata.set(path, data))));
             log.d('Building RPC.');
@@ -28,33 +29,32 @@ define(["require", "exports", "./log", "./fs", "./rpc", "./config"], function (r
                     data: ufdata.get(path),
                 });
             }
-            let results = await rpc.invoke('RSync.AddFiles', rpcargs);
-            if (results.length != upaths.length)
-                throw new Error('Wrong number of results: ' + results.length);
-            let spaths = [];
-            let epaths = new Map();
+            let rpcres = await rpc.invoke('RSync.AddFiles', rpcargs);
+            if (rpcres.length != upaths.length)
+                throw new Error('Wrong number of results: ' + rpcres.length);
+            let updates = new Map();
             for (let i = 0; i < upaths.length; i++) {
                 let path = upaths[i];
-                let { err, res } = results[i];
+                let { err, res } = rpcres[i];
                 if (!err) {
                     log.d('File synced:', path, res);
-                    spaths.push(path);
+                    updates.set(path, { res });
                 }
                 else if (isPermanentError(err.status)) {
                     log.d('Permanently rejected:', path, err);
-                    epaths.set(path, err);
+                    updates.set(path, { err });
                 }
                 else {
                     log.d('Temporary error:', path, err);
                 }
             }
-            log.i('Finalizing the sync status updates.');
-            await removeUnsyncedPaths(spaths);
-            await addPermanentErrors(epaths);
+            if (updates.size > 0) {
+                log.i('Finalizing the sync status updates.');
+                await addSyncedPaths(updates);
+            }
         }
         catch (err) {
-            log.e('Failed to sync:', err);
-            throw err;
+            log.w('Failed to sync:', err);
         }
         finally {
             syncing = false;
@@ -65,30 +65,22 @@ define(["require", "exports", "./log", "./fs", "./rpc", "./config"], function (r
     exports.start = start;
     // Full paths that can be used with fs.get().
     async function getUnsyncedPaths() {
-        let paths = await fs_1.default.get(conf.RSYNC_UNSYNCED);
-        if (!paths) {
-            log.i('The unsynced list is missing. Marking everything as unsynced.');
-            paths = await fs_1.default.find(conf.RSYNC_DIR_DATA);
-            if (paths.length > 0)
-                await fs_1.default.set(conf.RSYNC_UNSYNCED, paths);
-        }
-        return paths;
-    }
-    async function removeUnsyncedPaths(spaths) {
-        if (spaths.length > 0) {
-            let paths = new Set(await fs_1.default.get(conf.RSYNC_UNSYNCED));
-            for (let path of spaths)
+        try {
+            let synced = await fs_1.default.get(conf.RSYNC_SYNCED);
+            let paths = new Set(await fs_1.default.find(conf.RSYNC_DIR_DATA));
+            for (let path in synced)
                 paths.delete(path);
-            await fs_1.default.set(conf.RSYNC_UNSYNCED, [...paths]);
+            return [...paths];
+        }
+        catch (err) {
+            throw new error_1.DerivedError('Failed to get unsynced paths.', err);
         }
     }
-    async function addPermanentErrors(epaths) {
-        if (epaths.size > 0) {
-            let errors = await fs_1.default.get(conf.RSYNC_FAILED) || {};
-            for (let [path, err] of epaths)
-                errors[path] = err;
-            await fs_1.default.set(conf.RSYNC_FAILED, errors);
-        }
+    async function addSyncedPaths(updates) {
+        let synced = await fs_1.default.get(conf.RSYNC_SYNCED);
+        for (let [path, status] of updates)
+            synced[path] = status;
+        await fs_1.default.set(conf.RSYNC_SYNCED, synced);
     }
     function isPermanentError(status) {
         return status >= 400 && status < 500;

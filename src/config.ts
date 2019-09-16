@@ -31,5 +31,4 @@ export const FS_SLOW_THRS = 10; // ms
 export const USERDATA_DIR = '/idb/user';
 export const VPLACES_DIR = '/idb/user/shared/places';
 export const RSYNC_DIR_DATA = '/idb/user/shared';
-export const RSYNC_UNSYNCED = '/idb/user/rsync/unsynced';
-export const RSYNC_FAILED = '/idb/user/rsync/failed';
+export const RSYNC_SYNCED = '/idb/user/rsync/status';
