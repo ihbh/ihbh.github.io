@@ -29,3 +29,4 @@ export const LOG_IDB_NAME = 'logs';
 export const LOG_IDB_INTERVAL = 5; // ms
 export const FS_SLOW_THRS = 10; // ms
 export const USERDATA_DIR = '/idb/user';
+export const VPLACES_DIR = '/idb/user/data/shared/places';

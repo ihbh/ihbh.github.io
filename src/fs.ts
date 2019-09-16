@@ -4,14 +4,29 @@ import idbfs from './idbfs';
 import { TaggedLogger } from './log';
 import * as conf from './config';
 
-const PATH_REGEX = /^(\/[\w-_]+){2,}$/;
+const PATH_REGEX = /^(\/[\w-_]+)+$/;
 const log = new TaggedLogger('fs');
 const handlers = {
-  '/ls/': lsfs,
-  '/idb/': idbfs,
+  '/ls': lsfs,
+  '/idb': idbfs,
 };
 
 let fs: FS = {
+  async dir(path: string): Promise<any> {
+    log.d('dir', path);
+    if (path == '/')
+      return Object.keys(handlers).map(s => s.slice(1));
+    let time = Date.now();
+    try {
+      let [handler, rempath] = parsePath(path);
+      return handler.dir(rempath);
+    } finally {
+      let diff = Date.now() - time;
+      if (diff > conf.FS_SLOW_THRS)
+        log.d('Slow dir', path, diff, 'ms');
+    }
+  },
+
   async get(path: string): Promise<any> {
     log.d('get', path);
     let time = Date.now();
@@ -43,11 +58,15 @@ function parsePath(path: string): [FS, string] {
   if (!PATH_REGEX.test(path))
     throw new SyntaxError('Invalid fs path: ' + path);
   let i = path.indexOf('/', 1);
-  let s = path.slice(0, i + 1);
-  let handler = handlers[s];
+  if (i < 0) i = path.length;
+  let rootdir = path.slice(0, i);
+  let handler = handlers[rootdir];
   if (!handler)
-    throw new TypeError('Invalid root level dir: ' + path);
-  return [handler, path.slice(i + 1)];
+    throw new TypeError('Invalid root dir: ' + path);
+  let rempath = path.slice(i) || '/';
+  return [handler, rempath];
 }
+
+window['fs'] = fs;
 
 export default fs;

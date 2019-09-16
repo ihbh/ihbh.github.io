@@ -11,17 +11,6 @@ function prop<T>(path: string, defval: T = null) {
   return fsprop(fspath, defval);
 }
 
-export interface Place {
-  time: number; // Date.now()/1000
-  lat: number;
-  lon: number;
-}
-
-export interface Places {
-  // tskey = Date.now()/1000/60 in hex, 8 digits
-  [tskey: string]: Place;
-}
-
 export interface RpcInfo {
   method: string;
   args: any;
@@ -39,10 +28,7 @@ export const pubkey = prop<string>('data.shared.profile.pubkey');
 export const keyseed = prop<string>('data.local.keys.keyseed');
 export const privkey = prop<string>('data.local.keys.privkey');
 
-export const visited = {
-  places: prop<Places>('data.shared.visited.places', {}),
-  synced: prop<{ [tskey: string]: boolean }>('data.rsync.visited.synced', {}),
-};
+export const vsynced = prop<SMap<boolean>>('data.rsync.places', {});
 
 export const rpcs = {
   infos: prop<SMap<RpcInfo>>('data.rsync.rpcs.info', {}),

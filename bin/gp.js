@@ -14,10 +14,7 @@ define(["require", "exports", "./fsprop", "./config", "./log"], function (requir
     exports.pubkey = prop('data.shared.profile.pubkey');
     exports.keyseed = prop('data.local.keys.keyseed');
     exports.privkey = prop('data.local.keys.privkey');
-    exports.visited = {
-        places: prop('data.shared.visited.places', {}),
-        synced: prop('data.rsync.visited.synced', {}),
-    };
+    exports.vsynced = prop('data.rsync.places', {});
     exports.rpcs = {
         infos: prop('data.rsync.rpcs.info', {}),
         unsent: prop('data.rsync.rpcs.unsent', {}),

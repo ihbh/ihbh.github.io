@@ -4,7 +4,6 @@ import * as loc from './loc';
 import { OSM, BBox } from './osm';
 import { MAP_BOX_SIZE } from './config';
 import * as qargs from './qargs';
-import { Place } from './gp';
 
 const log = new TaggedLogger('places');
 
@@ -49,7 +48,7 @@ async function loadMap() {
   }
 }
 
-function getBBox(places: Place[]): BBox {
+function getBBox(places: loc.Place[]): BBox {
   let bbox: BBox = {
     min: { lat: +Infinity, lon: +Infinity },
     max: { lat: -Infinity, lon: -Infinity },
