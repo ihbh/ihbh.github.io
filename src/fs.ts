@@ -1,16 +1,20 @@
 import * as conf from './config';
 import { DerivedError } from './error';
 import { FS } from './fs-api';
-import idbfs from './idbfs';
 import { TaggedLogger } from './log';
-import lsfs from './lsfs';
+import { AsyncProp } from './prop';
 
 const PATH_REGEX = /^(\/[\w-_]+)+$/;
 const ROOT_REGEX = /^\/\w+/;
 const log = new TaggedLogger('fs');
+
+const pfsmod = path => new AsyncProp<FS>(
+  () => import(path).then(
+    mod => mod.default));
+
 const handlers = {
-  '/ls': lsfs,
-  '/idb': idbfs,
+  '/ls': pfsmod('./lsfs'),
+  '/idb': pfsmod('./idbfs'),
 };
 
 let fs: FS = {
@@ -55,7 +59,8 @@ async function invokeHandler(method: string, path: string, ...args) {
   log.d(method + '()', path);
   let time = Date.now();
   try {
-    let [handler, rempath] = parsePath(path);
+    let [phandler, rempath] = parsePath(path);
+    let handler = await phandler.get();
     let result = await handler[method](rempath, ...args);
     return result;
   } catch (err) {
@@ -68,13 +73,13 @@ async function invokeHandler(method: string, path: string, ...args) {
   }
 }
 
-function parsePath(path: string): [FS, string] {
+function parsePath(path: string): [AsyncProp<FS>, string] {
   if (!PATH_REGEX.test(path))
     throw new SyntaxError('Invalid fs path: ' + path);
   let i = path.indexOf('/', 1);
   if (i < 0) i = path.length;
   let rootdir = path.slice(0, i);
-  let handler = handlers[rootdir];
+  let handler: AsyncProp<FS> = handlers[rootdir];
   if (!handler)
     throw new TypeError('Invalid root dir: ' + path);
   let rempath = path.slice(i) || '/';

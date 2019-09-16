@@ -1,12 +1,13 @@
-define(["require", "exports", "./config", "./error", "./idbfs", "./log", "./lsfs"], function (require, exports, conf, error_1, idbfs_1, log_1, lsfs_1) {
+define(["require", "exports", "./config", "./error", "./log", "./prop"], function (require, exports, conf, error_1, log_1, prop_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const PATH_REGEX = /^(\/[\w-_]+)+$/;
     const ROOT_REGEX = /^\/\w+/;
     const log = new log_1.TaggedLogger('fs');
+    const pfsmod = path => new prop_1.AsyncProp(() => new Promise((resolve_1, reject_1) => { require([path], resolve_1, reject_1); }).then(mod => mod.default));
     const handlers = {
-        '/ls': lsfs_1.default,
-        '/idb': idbfs_1.default,
+        '/ls': pfsmod('./lsfs'),
+        '/idb': pfsmod('./idbfs'),
     };
     let fs = {
         async find(path) {
@@ -46,7 +47,8 @@ define(["require", "exports", "./config", "./error", "./idbfs", "./log", "./lsfs
         log.d(method + '()', path);
         let time = Date.now();
         try {
-            let [handler, rempath] = parsePath(path);
+            let [phandler, rempath] = parsePath(path);
+            let handler = await phandler.get();
             let result = await handler[method](rempath, ...args);
             return result;
         }
