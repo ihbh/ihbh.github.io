@@ -1,4 +1,4 @@
-define(["require", "exports", "./fsprop", "./config", "./log"], function (require, exports, fsprop_1, conf, log_1) {
+define(["require", "exports", "./config", "./fsprop", "./log"], function (require, exports, conf, fsprop_1, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('gp');
@@ -14,11 +14,6 @@ define(["require", "exports", "./fsprop", "./config", "./log"], function (requir
     exports.pubkey = prop('shared.profile.pubkey');
     exports.keyseed = prop('local.keys.keyseed');
     exports.privkey = prop('local.keys.privkey');
-    exports.rpcs = {
-        infos: prop('rsync.rpcs.info', {}),
-        unsent: prop('rsync.rpcs.unsent', {}),
-        failed: prop('rsync.rpcs.failed', {}),
-    };
-    exports.unsentMessages = prop('shared.chats.unsent', {});
+    exports.chats = prop('local.chat.drafts');
 });
 //# sourceMappingURL=gp.js.map

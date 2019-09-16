@@ -32,8 +32,10 @@ define(["require", "exports"], function (require, exports) {
     exports.LOG_IDB_INTERVAL = 5; // ms
     exports.FS_SLOW_THRS = 10; // ms
     exports.USERDATA_DIR = '/idb/user';
-    exports.VPLACES_DIR = '/idb/user/shared/places';
-    exports.RSYNC_DIR_DATA = '/idb/user/shared';
-    exports.RSYNC_SYNCED = '/idb/user/rsync/status';
+    exports.SHARED_DIR = `${exports.USERDATA_DIR}/shared`;
+    exports.VPLACES_DIR = `${exports.SHARED_DIR}/places`;
+    exports.RSYNC_DIR_DATA = exports.SHARED_DIR;
+    exports.RSYNC_SYNCED = `${exports.USERDATA_DIR}/rsync/status`;
+    exports.CHAT_DIR = `${exports.USERDATA_DIR}/chats`;
 });
 //# sourceMappingURL=config.js.map

@@ -6,7 +6,6 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", 
     let isValidLon = lon => lon >= -180 && lon <= +180;
     async function init() {
         log.i('init()');
-        rpc.sendall();
         try {
             let lat = +qargs.get('lat');
             let lon = +qargs.get('lon');

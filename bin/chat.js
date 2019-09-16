@@ -15,18 +15,20 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./qargs", "
     exports.init = init;
     async function setSendButtonHandler() {
         let input = dom.id.chatReplyText;
-        dom.id.chatReplySend.addEventListener('click', () => {
+        dom.id.chatReplySend.addEventListener('click', async () => {
             try {
                 let text = input.textContent.trim();
                 if (!text)
                     return;
                 log.i('Sending message:', text);
+                let time = Date.now() / 1000 | 0;
                 let message = {
                     user: ruid,
                     text: text,
-                    time: Date.now() / 1000 | 0,
+                    time: time,
                 };
-                rpc.invoke('Chat.SendMessage', message, true);
+                let { default: fs } = await new Promise((resolve_1, reject_1) => { require(['./fs'], resolve_1, reject_1); });
+                await fs.set(`${conf.CHAT_DIR}/${ruid}/${time}`, message);
                 let container = dom.id.chatMessages;
                 let div = renderMessage(message);
                 container.append(div);
@@ -42,7 +44,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./qargs", "
             let newText = input.textContent;
             if (newText == autoSavedText)
                 return;
-            await gp.unsentMessages.modify(unsent => {
+            await gp.chats.modify(unsent => {
                 if (!newText)
                     delete unsent[ruid];
                 else
@@ -51,7 +53,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./qargs", "
                 return unsent;
             });
         }, conf.CHAT_AUTOSAVE_INTERVAL * 1000);
-        autoSavedText = (await gp.unsentMessages.get()[ruid]) || '';
+        autoSavedText = (await gp.chats.get()[ruid]) || '';
         input.textContent = autoSavedText;
     }
     async function getUserInfo() {
@@ -61,7 +63,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./qargs", "
         }).catch(async (err) => {
             if (!conf.DEBUG)
                 throw err;
-            let dbg = await new Promise((resolve_1, reject_1) => { require(['./dbg'], resolve_1, reject_1); });
+            let dbg = await new Promise((resolve_2, reject_2) => { require(['./dbg'], resolve_2, reject_2); });
             let res = await dbg.getTestUserDetails(ruid);
             return [res];
         });
@@ -74,7 +76,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./qargs", "
         }).catch(async (err) => {
             if (!conf.DEBUG)
                 throw err;
-            let dbg = await new Promise((resolve_2, reject_2) => { require(['./dbg'], resolve_2, reject_2); });
+            let dbg = await new Promise((resolve_3, reject_3) => { require(['./dbg'], resolve_3, reject_3); });
             return dbg.getTestMessages(ruid);
         });
         let container = dom.id.chatMessages;

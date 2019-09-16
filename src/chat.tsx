@@ -25,17 +25,19 @@ export async function init() {
 async function setSendButtonHandler() {
   let input = dom.id.chatReplyText;
 
-  dom.id.chatReplySend.addEventListener('click', () => {
+  dom.id.chatReplySend.addEventListener('click', async () => {
     try {
       let text = input.textContent.trim();
       if (!text) return;
       log.i('Sending message:', text);
+      let time = Date.now() / 1000 | 0;
       let message: rpc.ChatMessage = {
         user: ruid,
         text: text,
-        time: Date.now() / 1000 | 0,
+        time: time,
       };
-      rpc.invoke('Chat.SendMessage', message, true);
+      let { default: fs } = await import('./fs');
+      await fs.set(`${conf.CHAT_DIR}/${ruid}/${time}`, message);
       let container = dom.id.chatMessages;
       let div = renderMessage(message);
       container.append(div);
@@ -51,7 +53,7 @@ async function setSendButtonHandler() {
     let newText = input.textContent;
     if (newText == autoSavedText) return;
 
-    await gp.unsentMessages.modify(unsent => {
+    await gp.chats.modify(unsent => {
       if (!newText)
         delete unsent[ruid];
       else
@@ -61,7 +63,7 @@ async function setSendButtonHandler() {
     });
   }, conf.CHAT_AUTOSAVE_INTERVAL * 1000);
 
-  autoSavedText = (await gp.unsentMessages.get()[ruid]) || '';
+  autoSavedText = (await gp.chats.get()[ruid]) || '';
   input.textContent = autoSavedText;
 }
 

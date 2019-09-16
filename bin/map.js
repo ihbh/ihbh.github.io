@@ -100,8 +100,6 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
             finally {
                 button.disabled = false;
             }
-            let rpc = await new Promise((resolve_3, reject_3) => { require(['./rpc'], resolve_3, reject_3); });
-            rpc.sendall();
             page.set('nearby', {
                 lat: bestPos.latitude,
                 lon: bestPos.longitude,
@@ -114,7 +112,7 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
     async function shareDisplayedLocation() {
         if (!bestPos)
             throw new Error('GPS not ready.');
-        let loc = await new Promise((resolve_4, reject_4) => { require(['./loc'], resolve_4, reject_4); });
+        let loc = await new Promise((resolve_3, reject_3) => { require(['./loc'], resolve_3, reject_3); });
         let { latitude: lat, longitude: lng } = bestPos;
         await loc.shareLocation({ lat, lon: lng });
     }

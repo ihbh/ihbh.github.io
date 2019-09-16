@@ -120,9 +120,6 @@ async function initSendButton() {
       button.disabled = false;
     }
 
-    let rpc = await import('./rpc');
-    rpc.sendall();
-
     page.set('nearby', {
       lat: bestPos.latitude,
       lon: bestPos.longitude,

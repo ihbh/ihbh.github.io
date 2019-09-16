@@ -3,11 +3,6 @@ import * as rpc from './rpc';
 
 const log = new TaggedLogger('usr');
 
-export async function setDetails(details: rpc.UserDetails) {
-  log.i('details:', details);
-  await rpc.invoke('Users.SetDetails', details, true);
-}
-
 export async function getPhotoUri() {
   let time = Date.now();
   let gp = await import('./gp');

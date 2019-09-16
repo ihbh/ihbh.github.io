@@ -1,12 +1,7 @@
-define(["require", "exports", "./log", "./rpc"], function (require, exports, log_1, rpc) {
+define(["require", "exports", "./log"], function (require, exports, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('usr');
-    async function setDetails(details) {
-        log.i('details:', details);
-        await rpc.invoke('Users.SetDetails', details, true);
-    }
-    exports.setDetails = setDetails;
     async function getPhotoUri() {
         let time = Date.now();
         let gp = await new Promise((resolve_1, reject_1) => { require(['./gp'], resolve_1, reject_1); });

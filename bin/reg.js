@@ -83,20 +83,6 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./page", ".
                 throw new Error('Need to set user photo.');
             await gp.userimg.set(imgurl);
             await gp.username.set(username);
-            try {
-                let user = await new Promise((resolve_1, reject_1) => { require(['./user'], resolve_1, reject_1); });
-                let pubkey = await user.pubkey.get();
-                await usr.setDetails({
-                    pubkey: pubkey,
-                    photo: imgurl,
-                    name: username,
-                    info: new Date().toJSON(),
-                });
-                log.i('Registered!');
-            }
-            catch (err) {
-                log.e('Failed to register user info:', err);
-            }
             page.set('map');
         }
         catch (err) {

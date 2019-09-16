@@ -92,22 +92,6 @@ async function registerProfile() {
     await gp.userimg.set(imgurl);
     await gp.username.set(username);
 
-    try {
-      let user = await import('./user');
-      let pubkey = await user.pubkey.get();
-
-      await usr.setDetails({
-        pubkey: pubkey,
-        photo: imgurl,
-        name: username,
-        info: new Date().toJSON(),
-      });
-
-      log.i('Registered!');
-    } catch (err) {
-      log.e('Failed to register user info:', err);
-    }
-
     page.set('map');
   } catch (err) {
     log.e('Failed to register profile:', err);

@@ -19,7 +19,6 @@ let isValidLon = lon => lon >= -180 && lon <= +180;
 
 export async function init() {
   log.i('init()');
-  rpc.sendall();
 
   try {
     let lat = +qargs.get('lat');
