@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./fs", "./gp"], function (require, exports, conf, fs_1, gp) {
+define(["require", "exports", "./config", "./fs"], function (require, exports, conf, fs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     async function getPlace(tskey) {
@@ -28,10 +28,6 @@ define(["require", "exports", "./config", "./fs", "./gp"], function (require, ex
         let time = Date.now() / 1000 | 0;
         let tskey = deriveTsKey(time);
         await setPlace(tskey, { lat, lon, time });
-        await gp.vsynced.modify(synced => {
-            delete synced[tskey];
-            return synced;
-        });
     }
     exports.shareLocation = shareLocation;
     async function getVisitedPlaces() {

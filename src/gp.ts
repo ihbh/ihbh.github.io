@@ -28,8 +28,6 @@ export const pubkey = prop<string>('shared.profile.pubkey');
 export const keyseed = prop<string>('local.keys.keyseed');
 export const privkey = prop<string>('local.keys.privkey');
 
-export const vsynced = prop<SMap<boolean>>('rsync.places', {});
-
 export const rpcs = {
   infos: prop<SMap<RpcInfo>>('rsync.rpcs.info', {}),
   unsent: prop<SMap<number>>('rsync.rpcs.unsent', {}),

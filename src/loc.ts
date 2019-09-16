@@ -54,11 +54,6 @@ export async function shareLocation({ lat, lon }: GpsCoords) {
   let time = Date.now() / 1000 | 0;
   let tskey = deriveTsKey(time);
   await setPlace(tskey, { lat, lon, time });
-
-  await gp.vsynced.modify(synced => {
-    delete synced[tskey];
-    return synced;
-  });
 }
 
 export async function getVisitedPlaces(): Promise<Place[]> {
