@@ -47,6 +47,21 @@ export interface ChatMessage {
   time: number;
 }
 
+export interface RSyncFile {
+  path: string;
+  data: any;
+}
+
+export interface RSyncResult {
+  err?: { status: number };
+  res?: any;
+}
+
+export function invoke(
+  method: 'RSync.AddFiles',
+  args: RSyncFile[])
+  : Promise<RSyncResult[]>;
+
 export function invoke(
   method: 'Chat.GetMessages',
   args: { user: string, time?: number })

@@ -4,6 +4,9 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     const log = new log_1.TaggedLogger('lsfs');
     const parsePath = (path) => path.slice(1).split('/').join('.');
     const lsfs = {
+        async find(dir) {
+            return [];
+        },
         async dir(path) {
             path = parsePath(path);
             log.d('dir', path);

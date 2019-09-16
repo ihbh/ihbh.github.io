@@ -8,6 +8,10 @@ define(["require", "exports", "./lsfs", "./idbfs", "./log", "./config"], functio
         '/idb': idbfs_1.default,
     };
     let fs = {
+        async find(dir) {
+            log.d('find()', dir);
+            throw new Error('Not implemented.');
+        },
         async dir(path) {
             log.d('dir', path);
             if (path == '/')

@@ -1,8 +1,12 @@
+// IDBFS path: /<db-name>/<table-name>/<record-key>
 define(["require", "exports", "./idb", "./log"], function (require, exports, idb_1, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('idbfs');
     const idbfs = {
+        async find(dir) {
+            return [];
+        },
         async dir(path) {
             log.d('dir', path);
             if (path[0] != '/')

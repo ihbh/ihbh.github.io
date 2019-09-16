@@ -1,3 +1,5 @@
+// IDBFS path: /<db-name>/<table-name>/<record-key>
+
 import { FS } from './fs-api';
 import { DB } from './idb';
 import { TaggedLogger } from './log';
@@ -5,6 +7,10 @@ import { TaggedLogger } from './log';
 const log = new TaggedLogger('idbfs');
 
 const idbfs: FS = {
+  async find(dir: string): Promise<string[]> {
+    return [];
+  },
+
   async dir(path: string): Promise<string[]> {
     log.d('dir', path);
     if (path[0] != '/') throw new TypeError('Bad path: ' + path);

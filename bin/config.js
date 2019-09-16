@@ -33,5 +33,8 @@ define(["require", "exports"], function (require, exports) {
     exports.FS_SLOW_THRS = 10; // ms
     exports.USERDATA_DIR = '/idb/user';
     exports.VPLACES_DIR = '/idb/user/data/shared/places';
+    exports.RSYNC_DIR_DATA = '/idb/user/data/shared';
+    exports.RSYNC_UNSYNCED = '/idb/user/data/rsync/unsynced';
+    exports.RSYNC_FAILED = '/idb/user/data/rsync/failed';
 });
 //# sourceMappingURL=config.js.map

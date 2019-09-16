@@ -12,7 +12,12 @@ const handlers = {
 };
 
 let fs: FS = {
-  async dir(path: string): Promise<any> {
+  async find(dir: string): Promise<string[]> {
+    log.d('find()', dir);
+    throw new Error('Not implemented.');
+  },
+
+  async dir(path: string): Promise<string[]> {
     log.d('dir', path);
     if (path == '/')
       return Object.keys(handlers).map(s => s.slice(1));

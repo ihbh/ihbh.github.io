@@ -6,6 +6,10 @@ const parsePath = (path: string) =>
   path.slice(1).split('/').join('.');
 
 const lsfs: FS = {
+  async find(dir: string): Promise<string[]> {
+    return [];
+  },
+  
   async dir(path: string): Promise<string[]> {
     path = parsePath(path);
     log.d('dir', path);
