@@ -6,6 +6,7 @@ import { TaggedLogger } from './log';
 import lsfs from './lsfs';
 
 const PATH_REGEX = /^(\/[\w-_]+)+$/;
+const ROOT_REGEX = /^\/\w+/;
 const log = new TaggedLogger('fs');
 const handlers = {
   '/ls': lsfs,
@@ -13,23 +14,39 @@ const handlers = {
 };
 
 let fs: FS = {
-  async find(dir: string): Promise<string[]> {
-    log.d('find()', dir);
-    throw new Error('Not implemented.');
+  async find(path: string): Promise<string[]> {
+    if (path == '/') {
+      // find() via recursive dir()
+      let res: string[] = [];
+      let names = await this.dir('/');
+      for (let name of names) {
+        let paths = await this.find('/' + name);
+        res.push(...paths);
+      }
+      return res;
+    }
+    let relpaths = await invokeHandler('find', path);
+    let prefix = ROOT_REGEX.exec(path);
+    return relpaths.map(rel => prefix + rel);
   },
 
   async dir(path: string): Promise<string[]> {
-    if (path == '/')
+    if (path == '/') {
       return Object.keys(handlers)
         .map(s => s.slice(1));
+    }
     return invokeHandler('dir', path);
   },
 
   async get(path: string): Promise<any> {
+    if (path == '/')
+      throw new TypeError('Cannot fs.get() on /');
     return invokeHandler('get', path);
   },
 
   async set(path: string, json): Promise<void> {
+    if (path == '/')
+      throw new TypeError('Cannot fs.set() on /');
     return invokeHandler('set', path, json);
   }
 };

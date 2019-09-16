@@ -3,21 +3,26 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('lsfs');
     const parsePath = (path) => path.slice(1).split('/').join('.');
+    const matches = (prefix, key) => !prefix || prefix == key || key.startsWith(prefix + '.');
     const lsfs = {
-        async find(dir) {
-            return [];
+        async find(path) {
+            let prefix = parsePath(path);
+            log.d('find()', prefix);
+            return Object.keys(localStorage)
+                .filter(key => matches(prefix, key))
+                .map(key => '/' + key.split('.').join('/'));
         },
         async dir(path) {
-            path = parsePath(path);
-            log.d('dir', path);
+            log.d('dir()', path);
+            let keys = await lsfs.find(path);
             let names = new Set();
-            for (let key of Object.keys(localStorage)) {
-                if (!path || key.startsWith(path + '.')) {
-                    let j = path ? path.length + 1 : 0;
-                    let i = key.indexOf('.', j);
-                    let name = key.slice(j, i < 0 ? key.length : i);
-                    names.add(name);
-                }
+            for (let key of keys) {
+                let suffix = path == '/' ?
+                    key : key.slice(path.length);
+                if (!suffix)
+                    continue;
+                let name = suffix.split('.')[0];
+                names.add(name);
             }
             return [...names];
         },

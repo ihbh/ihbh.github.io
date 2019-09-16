@@ -3,7 +3,7 @@ define(["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     class DerivedError extends Error {
         constructor(message, innerError) {
-            super(message + '(' + innerError.message + ')');
+            super(message + ' (' + innerError.message + ')');
             this.innerError = innerError;
         }
     }
