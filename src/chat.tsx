@@ -37,7 +37,7 @@ async function setSendButtonHandler() {
         time: time,
       };
       let { default: fs } = await import('./fs');
-      await fs.set(`${conf.CHAT_DIR}/${ruid}/${time}`, message);
+      await fs.set(`${conf.CHAT_DIR}/${ruid}/${time}/text`, text);
       let container = dom.id.chatMessages;
       let div = renderMessage(message);
       container.append(div);

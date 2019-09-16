@@ -23,4 +23,4 @@ export const pubkey = prop<string>('shared.profile.pubkey');
 
 export const keyseed = prop<string>('local.keys.keyseed');
 export const privkey = prop<string>('local.keys.privkey');
-export const chats = prop<any>('local.chat.drafts');
+export const chats = prop<any>('local.chat.drafts', {});

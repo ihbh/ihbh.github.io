@@ -28,7 +28,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./qargs", "
                     time: time,
                 };
                 let { default: fs } = await new Promise((resolve_1, reject_1) => { require(['./fs'], resolve_1, reject_1); });
-                await fs.set(`${conf.CHAT_DIR}/${ruid}/${time}`, message);
+                await fs.set(`${conf.CHAT_DIR}/${ruid}/${time}/text`, text);
                 let container = dom.id.chatMessages;
                 let div = renderMessage(message);
                 container.append(div);

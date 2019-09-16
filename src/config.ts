@@ -33,4 +33,4 @@ export const SHARED_DIR = `${USERDATA_DIR}/shared`;
 export const VPLACES_DIR = `${SHARED_DIR}/places`;
 export const RSYNC_DIR_DATA = SHARED_DIR;
 export const RSYNC_SYNCED = `${USERDATA_DIR}/rsync/status`;
-export const CHAT_DIR = `${USERDATA_DIR}/chats`;
+export const CHAT_DIR = `${SHARED_DIR}/chats`;

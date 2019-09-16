@@ -14,6 +14,6 @@ define(["require", "exports", "./config", "./fsprop", "./log"], function (requir
     exports.pubkey = prop('shared.profile.pubkey');
     exports.keyseed = prop('local.keys.keyseed');
     exports.privkey = prop('local.keys.privkey');
-    exports.chats = prop('local.chat.drafts');
+    exports.chats = prop('local.chat.drafts', {});
 });
 //# sourceMappingURL=gp.js.map
