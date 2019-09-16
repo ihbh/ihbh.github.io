@@ -1,9 +1,9 @@
-import { FS } from './fs-api';
-import lsfs from './lsfs';
-import idbfs from './idbfs';
-import { TaggedLogger } from './log';
 import * as conf from './config';
 import { DerivedError } from './error';
+import { FS } from './fs-api';
+import idbfs from './idbfs';
+import { TaggedLogger } from './log';
+import lsfs from './lsfs';
 
 const PATH_REGEX = /^(\/[\w-_]+)+$/;
 const log = new TaggedLogger('fs');
@@ -19,52 +19,37 @@ let fs: FS = {
   },
 
   async dir(path: string): Promise<string[]> {
-    log.d('dir', path);
     if (path == '/')
-      return Object.keys(handlers).map(s => s.slice(1));
-    let time = Date.now();
-    try {
-      let [handler, rempath] = parsePath(path);
-      return handler.dir(rempath);
-    } finally {
-      let diff = Date.now() - time;
-      if (diff > conf.FS_SLOW_THRS)
-        log.d('Slow dir', path, diff, 'ms');
-    }
+      return Object.keys(handlers)
+        .map(s => s.slice(1));
+    return invokeHandler('dir', path);
   },
 
   async get(path: string): Promise<any> {
-    log.d('get', path);
-    let time = Date.now();
-    try {
-      let [handler, rempath] = parsePath(path);
-      return handler.get(rempath);
-    } catch (err) {
-      throw new DerivedError(
-        'fs.get failed on ' + path, err);
-    } finally {
-      let diff = Date.now() - time;
-      if (diff > conf.FS_SLOW_THRS)
-        log.d('Slow get', path, diff, 'ms');
-    }
+    return invokeHandler('get', path);
   },
 
   async set(path: string, json): Promise<void> {
-    log.d('set', path, json);
-    let time = Date.now();
-    try {
-      let [handler, rempath] = parsePath(path);
-      return handler.set(rempath, json);
-    } catch (err) {
-      throw new DerivedError(
-        'fs.set failed on ' + path, err);
-    } finally {
-      let diff = Date.now() - time;
-      if (diff > conf.FS_SLOW_THRS)
-        log.d('Slow set', path, diff, 'ms');
-    }
+    return invokeHandler('set', path, json);
   }
 };
+
+async function invokeHandler(method: string, path: string, ...args) {
+  log.d(method + '()', path);
+  let time = Date.now();
+  try {
+    let [handler, rempath] = parsePath(path);
+    let result = await handler[method](rempath, ...args);
+    return result;
+  } catch (err) {
+    throw new DerivedError(
+      `fs.${method}() failed on ${path}`, err);
+  } finally {
+    let diff = Date.now() - time;
+    if (diff > conf.FS_SLOW_THRS)
+      log.d(method + '() is slow:', diff, 'ms', path);
+  }
+}
 
 function parsePath(path: string): [FS, string] {
   if (!PATH_REGEX.test(path))
