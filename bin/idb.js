@@ -162,9 +162,9 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             if (this.logs)
                 log.i(...args);
         }
-        schedule(name, fn) {
+        schedule(name, mode, fn, defval) {
             return new Promise((resolve, reject) => {
-                this.pending.push([name, fn, resolve, reject]);
+                this.pending.push({ name, fn, mode, defval, resolve, reject });
                 this.timer = this.timer || setTimeout(() => {
                     this.timer = 0;
                     this.execPendingTransactions();
@@ -173,36 +173,45 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         }
         async execPendingTransactions() {
             let db = await this.db.init();
-            if (!db.objectStoreNames.contains(this.name)) {
-                log.i(`${this.fqtn} does not exist. Re-opening the db.`);
+            let modes = new Set(this.pending.map(ts => ts.mode));
+            let texists = db.objectStoreNames.contains(this.name);
+            if (modes.has('readwrite') && !texists) {
+                log.i(`Need to create ${this.fqtn} for a readwrite transaction.`);
                 await this.db.close();
                 db = await this.db.init();
+                // New transactons may have been added.
+                return this.execPendingTransactions();
             }
-            let t = db.transaction(this.name, 'readwrite');
-            let s = t.objectStore(this.name);
-            let ts = this.pending;
+            let t = texists && db.transaction(this.name, modes.has('readwrite') ? 'readwrite' : 'readonly');
+            let s = t && t.objectStore(this.name);
+            let ptss = this.pending;
             this.pending = [];
-            for (let [name, fn, resolve, reject] of ts) {
-                this.log('exec:', name);
-                let r = fn(s);
-                r.onerror = () => reject(new Error(`Transaction ${name} failed: ${r.error}`));
-                r.onsuccess = () => resolve(r.result);
+            for (let { name, fn, defval, resolve, reject } of ptss) {
+                if (s) {
+                    this.log('exec:', name);
+                    let r = fn(s);
+                    r.onerror = () => reject(new Error(`Transaction ${name} failed: ${r.error}`));
+                    r.onsuccess = () => resolve(r.result);
+                }
+                else {
+                    resolve(defval);
+                }
             }
         }
         get(key) {
-            return this.schedule(`${this.name}.get(${key})`, s => s.get(key));
+            return this.schedule(`${this.name}.get(${key})`, 'readonly', s => s.get(key), null);
         }
         set(key, value) {
-            return this.schedule(`${this.name}.set(${key})`, s => s.put(value, key));
+            return this.schedule(`${this.name}.set(${key})`, 'readwrite', s => s.put(value, key));
         }
         add(key, value) {
-            return this.schedule(`${this.name}.add(${key})`, s => s.add(value, key));
+            return this.schedule(`${this.name}.add(${key})`, 'readwrite', s => s.add(value, key));
         }
         remove(key) {
-            return this.schedule(`${this.name}.remove(${key})`, s => s.delete(key));
+            return this.schedule(`${this.name}.remove(${key})`, 'readwrite', s => s.delete(key));
         }
         keys() {
-            return this.schedule(`${this.name}.keys()`, s => s.getAllKeys());
+            return this.schedule(`${this.name}.keys()`, 'readonly', s => s.getAllKeys(), []);
         }
         save() {
             return this.keys().then(keys => {

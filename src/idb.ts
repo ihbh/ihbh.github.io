@@ -164,12 +164,21 @@ export class DB {
 
 type TransactionFn = (store: IDBObjectStore) => IDBRequest<any>;
 
+interface PendingTransaction {
+  name: string;
+  fn: TransactionFn;
+  defval?: any;
+  mode: IDBTransactionMode;
+  resolve: Function;
+  reject: Function;
+}
+
 interface DBTableArgs {
   logs?: boolean;
 }
 
 export class DBTable {
-  private pending: [string, TransactionFn, Function, Function][] = [];
+  private pending: PendingTransaction[] = [];
   private timer = 0;
   private logs: boolean;
 
@@ -187,9 +196,11 @@ export class DBTable {
     if (this.logs) log.i(...args);
   }
 
-  private schedule(name: string, fn: TransactionFn): Promise<any> {
+  private schedule(name: string, mode: IDBTransactionMode,
+    fn: TransactionFn, defval?): Promise<any> {
+
     return new Promise((resolve, reject) => {
-      this.pending.push([name, fn, resolve, reject]);
+      this.pending.push({ name, fn, mode, defval, resolve, reject });
       this.timer = this.timer || setTimeout(() => {
         this.timer = 0;
         this.execPendingTransactions();
@@ -199,55 +210,71 @@ export class DBTable {
 
   private async execPendingTransactions() {
     let db = await this.db.init();
+    let modes = new Set(this.pending.map(ts => ts.mode));
+    let texists = db.objectStoreNames.contains(this.name);
 
-    if (!db.objectStoreNames.contains(this.name)) {
-      log.i(`${this.fqtn} does not exist. Re-opening the db.`);
+    if (modes.has('readwrite') && !texists) {
+      log.i(`Need to create ${this.fqtn} for a readwrite transaction.`);
       await this.db.close();
       db = await this.db.init();
+      // New transactons may have been added.
+      return this.execPendingTransactions();
     }
 
-    let t = db.transaction(this.name, 'readwrite');
-    let s = t.objectStore(this.name);
+    let t = texists && db.transaction(this.name,
+      modes.has('readwrite') ? 'readwrite' : 'readonly');
+    let s = t && t.objectStore(this.name);
 
-    let ts = this.pending;
+    let ptss = this.pending;
     this.pending = [];
 
-    for (let [name, fn, resolve, reject] of ts) {
-      this.log('exec:', name);
-      let r = fn(s);
-      r.onerror = () => reject(new Error(`Transaction ${name} failed: ${r.error}`));
-      r.onsuccess = () => resolve(r.result);
+    for (let { name, fn, defval, resolve, reject } of ptss) {
+      if (s) {
+        this.log('exec:', name);
+        let r = fn(s);
+        r.onerror = () => reject(new Error(`Transaction ${name} failed: ${r.error}`));
+        r.onsuccess = () => resolve(r.result);
+      } else {
+        resolve(defval);
+      }
     }
   }
 
   get(key: string): Promise<any> {
     return this.schedule(
       `${this.name}.get(${key})`,
-      s => s.get(key));
+      'readonly',
+      s => s.get(key),
+      null);
   }
 
   set(key: string, value: any): Promise<void> {
     return this.schedule(
       `${this.name}.set(${key})`,
+      'readwrite',
       s => s.put(value, key));
   }
 
   add(key: any, value: any): Promise<void> {
     return this.schedule(
       `${this.name}.add(${key})`,
+      'readwrite',
       s => s.add(value, key));
   }
 
   remove(key: string): Promise<void> {
     return this.schedule(
       `${this.name}.remove(${key})`,
+      'readwrite',
       s => s.delete(key));
   }
 
   keys(): Promise<string[]> {
     return this.schedule(
       `${this.name}.keys()`,
-      s => s.getAllKeys());
+      'readonly',
+      s => s.getAllKeys(),
+      []);
   }
 
   save(): Promise<any> {
