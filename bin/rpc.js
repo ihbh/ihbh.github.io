@@ -25,7 +25,6 @@ define(["require", "exports", "./config", "./log", "./qargs", "./prop"], functio
             'Content-Length': body.length + '',
         };
         await new Promise(resolve => setTimeout(resolve, config.RPC_DELAY * 1000));
-        url = url.replace('/User.', '/Users.');
         try {
             let res = await fetch(url, {
                 method: 'POST',

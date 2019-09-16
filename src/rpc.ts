@@ -108,8 +108,6 @@ export async function invoke(method: string, args) {
   await new Promise(resolve =>
     setTimeout(resolve, config.RPC_DELAY * 1000));
 
-  url = url.replace('/User.', '/Users.');
-
   try {
     let res = await fetch(url, {
       method: 'POST',
