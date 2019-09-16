@@ -16,6 +16,7 @@ export async function start() {
   try {
     let upaths = await getUnsyncedPaths();
     log.d('Files to be synced:', upaths);
+    if (!upaths.length) return;
 
     log.i('Reading files.');
     let ufdata = new Map<string, string>();
@@ -77,7 +78,8 @@ async function getUnsyncedPaths(): Promise<string[]> {
   if (!paths) {
     log.i('The unsynced list is missing. Marking everything as unsynced.');
     paths = await fs.find(conf.RSYNC_DIR_DATA);
-    await fs.set(conf.RSYNC_UNSYNCED, paths);
+    if (paths.length > 0)
+      await fs.set(conf.RSYNC_UNSYNCED, paths);
   }
 
   return paths;

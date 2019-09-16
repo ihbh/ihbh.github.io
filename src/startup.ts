@@ -1,8 +1,8 @@
-import * as loc from './loc';
+import * as rsync from './rsync';
 
 let callbacks = [];
 
-register(() => void loc.startSyncProcess());
+register(() => void rsync.start());
 
 function register(callback: () => void) {
   callbacks.push(callback);

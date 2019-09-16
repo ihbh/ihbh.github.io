@@ -1,8 +1,8 @@
-define(["require", "exports", "./loc"], function (require, exports, loc) {
+define(["require", "exports", "./rsync"], function (require, exports, rsync) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let callbacks = [];
-    register(() => void loc.startSyncProcess());
+    register(() => void rsync.start());
     function register(callback) {
         callbacks.push(callback);
     }

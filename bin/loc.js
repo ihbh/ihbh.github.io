@@ -1,8 +1,6 @@
-define(["require", "exports", "./log", "./rpc", "./gp", "./fs", "./config"], function (require, exports, log_1, rpc, gp, fs_1, conf) {
+define(["require", "exports", "./config", "./fs", "./gp"], function (require, exports, conf, fs_1, gp) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const log = new log_1.TaggedLogger('loc');
-    let syncing = false;
     async function getPlace(tskey) {
         let dir = conf.VPLACES_DIR + '/' + tskey;
         let [lat, lon, time] = await Promise.all([
@@ -26,35 +24,6 @@ define(["require", "exports", "./log", "./rpc", "./gp", "./fs", "./config"], fun
             tskey = '0' + tskey;
         return tskey;
     }
-    async function startSyncProcess() {
-        if (syncing)
-            return;
-        syncing = true;
-        log.i('Started syncing.');
-        try {
-            let synced = await gp.vsynced.get();
-            let tskeys = await fs_1.default.dir(conf.VPLACES_DIR);
-            let places = {};
-            for (let tskey of tskeys)
-                if (!synced[tskey])
-                    places[tskey] = await getPlace(tskey);
-            if (!Object.keys(places).length) {
-                log.i('Nothing to sync.');
-                return;
-            }
-            await rpc.invoke('Map.AddVisitedPlaces', places);
-            await gp.vsynced.modify(synced => {
-                for (let tskey in places)
-                    synced[tskey] = true;
-                return synced;
-            });
-        }
-        finally {
-            log.i('Done syncing.');
-            syncing = false;
-        }
-    }
-    exports.startSyncProcess = startSyncProcess;
     async function shareLocation({ lat, lon }) {
         let time = Date.now() / 1000 | 0;
         let tskey = deriveTsKey(time);
@@ -63,7 +32,6 @@ define(["require", "exports", "./log", "./rpc", "./gp", "./fs", "./config"], fun
             delete synced[tskey];
             return synced;
         });
-        startSyncProcess();
     }
     exports.shareLocation = shareLocation;
     async function getVisitedPlaces() {

@@ -1,10 +1,6 @@
-import { TaggedLogger } from "./log";
-import * as rpc from './rpc';
-import * as gp from './gp';
-import fs from './fs';
 import * as conf from './config';
-
-const log = new TaggedLogger('loc');
+import fs from './fs';
+import * as gp from './gp';
 
 export interface Place {
   time: number; // Date.now()/1000
@@ -16,8 +12,6 @@ export interface Places {
   // tskey = Date.now()/1000/60 in hex, 8 digits
   [tskey: string]: Place;
 }
-
-let syncing = false;
 
 export interface GpsCoords {
   lat: number;
@@ -56,38 +50,6 @@ function deriveTsKey(time: number) {
   return tskey;
 }
 
-export async function startSyncProcess() {
-  if (syncing) return;
-  syncing = true;
-  log.i('Started syncing.');
-
-  try {
-    let synced = await gp.vsynced.get();
-    let tskeys: string[] = await fs.dir(conf.VPLACES_DIR);
-    let places: Places = {};
-
-    for (let tskey of tskeys)
-      if (!synced[tskey])
-        places[tskey] = await getPlace(tskey);
-
-    if (!Object.keys(places).length) {
-      log.i('Nothing to sync.');
-      return;
-    }
-
-    await rpc.invoke('Map.AddVisitedPlaces', places);
-
-    await gp.vsynced.modify(synced => {
-      for (let tskey in places)
-        synced[tskey] = true;
-      return synced;
-    });
-  } finally {
-    log.i('Done syncing.');
-    syncing = false;
-  }
-}
-
 export async function shareLocation({ lat, lon }: GpsCoords) {
   let time = Date.now() / 1000 | 0;
   let tskey = deriveTsKey(time);
@@ -97,8 +59,6 @@ export async function shareLocation({ lat, lon }: GpsCoords) {
     delete synced[tskey];
     return synced;
   });
-
-  startSyncProcess();
 }
 
 export async function getVisitedPlaces(): Promise<Place[]> {
