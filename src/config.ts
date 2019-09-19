@@ -24,6 +24,7 @@ export const MARKER_ICON_SCALE = 0.5;
 export const DEFAULT_RPC_URL = 'https://ihbh.org:3921';
 export const DEFAULT_RPC_PORT = 3921;
 export const RPC_DELAY = 0;
+export const RPC_MAX_BATCH_SIZE = 1024; // bytes
 export const CHAT_AUTOSAVE_INTERVAL = 1; // seconds
 export const LOG_IDB_NAME = 'logs';
 export const LOG_IDB_INTERVAL = 5; // ms

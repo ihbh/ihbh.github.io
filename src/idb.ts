@@ -193,7 +193,7 @@ export class DBTable {
   }
 
   private log(...args) {
-    if (this.logs) log.i(...args);
+    if (this.logs) log.d(...args);
   }
 
   private schedule(name: string, mode: IDBTransactionMode,

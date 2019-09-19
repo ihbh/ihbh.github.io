@@ -27,6 +27,7 @@ define(["require", "exports"], function (require, exports) {
     exports.DEFAULT_RPC_URL = 'https://ihbh.org:3921';
     exports.DEFAULT_RPC_PORT = 3921;
     exports.RPC_DELAY = 0;
+    exports.RPC_MAX_BATCH_SIZE = 1024; // bytes
     exports.CHAT_AUTOSAVE_INTERVAL = 1; // seconds
     exports.LOG_IDB_NAME = 'logs';
     exports.LOG_IDB_INTERVAL = 5; // ms

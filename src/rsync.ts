@@ -21,19 +21,19 @@ export async function start() {
       return;
     }
 
-    log.d('Files to be synced:', upaths);
-    let ufdata = new Map<string, string>();
+    log.i('Files to be synced:', upaths.length);
+    let ufdata = new Map<string, any>();
     await Promise.all(
       upaths.map(
         path => fs.get(path).then(
           data => ufdata.set(path, data))));
 
-    log.d('Building RPC.');
+    log.i('Building RPCs.');
     let rpcargs: rpc.BatchEntry[] = [];
     for (let path of upaths) {
       let relpath = path.slice(conf.RSYNC_DIR_DATA.length);
-      if (relpath[0] != '/') throw new Error('Bad rel path: ' + relpath);
-
+      if (relpath[0] != '/')
+        throw new Error('Bad rel path: ' + relpath);
       rpcargs.push({
         name: 'RSync.AddFile',
         args: {
@@ -43,30 +43,50 @@ export async function start() {
       });
     }
 
-    let rpcres = await rpc.invoke('Batch.Run', rpcargs);
-    if (rpcres.length != upaths.length)
-      throw new Error('Wrong number of results: ' + rpcres.length);
+    log.i('Building RPC batches.');
+    rpcargs.sort((p, q) => jsonlen(p) - jsonlen(q));
 
-    let updates = new Map<string, { res } | { err }>();
+    while (rpcargs.length > 0) {
+      let batchsize = 0;
+      let batch: rpc.BatchEntry[] = [];
 
-    for (let i = 0; i < upaths.length; i++) {
-      let path = upaths[i];
-      let { err, res } = rpcres[i];
+      do {
+        let entry = rpcargs[0];
+        batchsize += jsonlen(entry);
+        batch.push(entry);
+        rpcargs.splice(0, 1);
+      } while (rpcargs.length > 0 &&
+        batchsize < conf.RPC_MAX_BATCH_SIZE);
 
-      if (!err) {
-        log.d('File synced:', path, res);
-        updates.set(path, { res });
-      } else if (isPermanentError(err.code)) {
-        log.d('Permanently rejected:', path, err);
-        updates.set(path, { err });
-      } else {
-        log.d('Temporary error:', path, err);
+      log.i('RPC batch:', batch.length, 'rpcs',
+        (batchsize / 1024).toFixed(1), 'KB');
+
+      let rpcres = await rpc.invoke('Batch.Run', batch);
+      if (rpcres.length != batch.length)
+        throw new Error('Wrong number of results: ' + rpcres.length);
+
+      let updates = new Map<string, { res } | { err }>();
+
+      for (let i = 0; i < rpcres.length; i++) {
+        let path = batch[i].args.path
+          .replace(/^~/, conf.RSYNC_DIR_DATA);
+        let { err, res } = rpcres[i];
+
+        if (!err) {
+          log.d('File synced:', path, res);
+          updates.set(path, { res });
+        } else if (isPermanentError(err.code)) {
+          log.i('Permanently rejected:', path, err);
+          updates.set(path, { err });
+        } else {
+          log.w('Temporary error:', path, err);
+        }
       }
-    }
 
-    if (updates.size > 0) {
-      log.i('Finalizing the sync status updates.');
-      await addSyncedPaths(updates);
+      if (updates.size > 0) {
+        log.i('Finalizing the sync status updates.');
+        await addSyncedPaths(updates);
+      }
     }
   } catch (err) {
     log.w('Failed to sync:', err);
@@ -100,4 +120,8 @@ async function addSyncedPaths(updates: Map<string, { res } | { err }>) {
 
 function isPermanentError(status: number) {
   return status >= 400 && status < 500;
+}
+
+function jsonlen(x) {
+  return JSON.stringify(x).length;
 }

@@ -160,7 +160,7 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         }
         log(...args) {
             if (this.logs)
-                log.i(...args);
+                log.d(...args);
         }
         schedule(name, mode, fn, defval) {
             return new Promise((resolve, reject) => {
