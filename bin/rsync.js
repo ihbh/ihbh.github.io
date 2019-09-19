@@ -25,11 +25,14 @@ define(["require", "exports", "./log", "./fs", "./rpc", "./config", "./error"], 
                 if (relpath[0] != '/')
                     throw new Error('Bad rel path: ' + relpath);
                 rpcargs.push({
-                    path: relpath,
-                    data: ufdata.get(path),
+                    name: 'RSync.AddFile',
+                    args: {
+                        path: '~' + relpath,
+                        data: ufdata.get(path),
+                    }
                 });
             }
-            let rpcres = await rpc.invoke('RSync.AddFiles', rpcargs);
+            let rpcres = await rpc.invoke('Batch.Run', rpcargs);
             if (rpcres.length != upaths.length)
                 throw new Error('Wrong number of results: ' + rpcres.length);
             let updates = new Map();
@@ -40,7 +43,7 @@ define(["require", "exports", "./log", "./fs", "./rpc", "./config", "./error"], 
                     log.d('File synced:', path, res);
                     updates.set(path, { res });
                 }
-                else if (isPermanentError(err.status)) {
+                else if (isPermanentError(err.code)) {
                     log.d('Permanently rejected:', path, err);
                     updates.set(path, { err });
                 }
@@ -77,7 +80,7 @@ define(["require", "exports", "./log", "./fs", "./rpc", "./config", "./error"], 
         }
     }
     async function addSyncedPaths(updates) {
-        let synced = await fs_1.default.get(conf.RSYNC_SYNCED);
+        let synced = await fs_1.default.get(conf.RSYNC_SYNCED) || {};
         for (let [path, status] of updates)
             synced[path] = status;
         await fs_1.default.set(conf.RSYNC_SYNCED, synced);

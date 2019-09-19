@@ -49,15 +49,25 @@ export interface RSyncFile {
   data: any;
 }
 
-export interface RSyncResult {
-  err?: { status: number };
+export interface BatchEntry {
+  name: string;
+  args: any;
+}
+
+export interface BatchResult {
+  err?: { code: number };
   res?: any;
 }
 
 export function invoke(
-  method: 'RSync.AddFiles',
-  args: RSyncFile[])
-  : Promise<RSyncResult[]>;
+  method: 'Batch.Run',
+  args: BatchEntry[])
+  : Promise<BatchResult[]>;
+
+export function invoke(
+  method: 'RSync.AddFile',
+  args: RSyncFile)
+  : Promise<void>;
 
 export function invoke(
   method: 'Chat.GetMessages',
