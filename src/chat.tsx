@@ -68,7 +68,7 @@ async function setSendButtonHandler() {
 }
 
 async function getUserInfo() {
-  let [details] = await rpc.invoke('Users.GetDetails', {
+  let [details] = await (rpc.invoke as any)('Users.GetDetails', {
     users: [ruid],
     props: ['name', 'photo'],
   }).catch(async err => {
@@ -84,7 +84,7 @@ async function getUserInfo() {
 }
 
 async function getMessages() {
-  let messages = await rpc.invoke('Chat.GetMessages', {
+  let messages = await (rpc.invoke as any)('Chat.GetMessages', {
     user: ruid,
   }).catch(async err => {
     if (!conf.DEBUG)

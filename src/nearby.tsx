@@ -34,6 +34,7 @@ export async function init() {
       infos = await getPeopleNearby({ lat, lon });
     } catch (err) {
       if (!conf.DEBUG) throw err;
+      log.e('Failed to get visitors:', err);
       let dbg = await import('./dbg');
       infos = await dbg.getDebugPeopleNearby();
     }
@@ -69,19 +70,18 @@ async function getPeopleNearby({ lat, lon }): Promise<UserInfo[]> {
   let visitors = await rpc.invoke(
     'Map.GetVisitors',
     { lat, lon });
-  let uids = visitors.map(v => v.uid);
+
+  let uids = Object.keys(visitors);
   log.i('People nearby:', uids);
 
-  let myuid = await user.uid.get();
-  uids = uids.filter(id => id != myuid);
-  if (!uids.length) return [];
+  let infos: UserInfo[] = await Promise.all(
+    uids.map(uid => Promise.all([
+      rpc.invoke('RSync.GetFile', `/users/${uid}/name`),
+      rpc.invoke('RSync.GetFile', `/users/${uid}/photo`),
+    ]).then(([name, photo]) => {
+      return { uid, name, photo };
+    })));
 
-  let infos = await rpc.invoke(
-    'Users.GetDetails',
-    { users: uids, props: ['name', 'photo'] });
   log.i('Users info:', infos);
-
-  return uids.map((uid, i) => {
-    return {uid, ...infos[i]} as UserInfo;
-  });
+  return infos;
 }

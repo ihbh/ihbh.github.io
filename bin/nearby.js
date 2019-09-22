@@ -1,4 +1,4 @@
-define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", "./user", "./react"], function (require, exports, log_1, rpc, qargs, dom, conf, user, react_1) {
+define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", "./react"], function (require, exports, log_1, rpc, qargs, dom, conf, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('nearby');
@@ -19,6 +19,7 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", 
             catch (err) {
                 if (!conf.DEBUG)
                     throw err;
+                log.e('Failed to get visitors:', err);
                 let dbg = await new Promise((resolve_1, reject_1) => { require(['./dbg'], resolve_1, reject_1); });
                 infos = await dbg.getDebugPeopleNearby();
             }
@@ -48,17 +49,16 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", 
     }
     async function getPeopleNearby({ lat, lon }) {
         let visitors = await rpc.invoke('Map.GetVisitors', { lat, lon });
-        let uids = visitors.map(v => v.uid);
+        let uids = Object.keys(visitors);
         log.i('People nearby:', uids);
-        let myuid = await user.uid.get();
-        uids = uids.filter(id => id != myuid);
-        if (!uids.length)
-            return [];
-        let infos = await rpc.invoke('Users.GetDetails', { users: uids, props: ['name', 'photo'] });
+        let infos = await Promise.all(uids.map(uid => Promise.all([
+            rpc.invoke('RSync.GetFile', `/users/${uid}/name`),
+            rpc.invoke('RSync.GetFile', `/users/${uid}/photo`),
+        ]).then(([name, photo]) => {
+            return { uid, name, photo };
+        })));
         log.i('Users info:', infos);
-        return uids.map((uid, i) => {
-            return Object.assign({ uid }, infos[i]);
-        });
+        return infos;
     }
 });
 //# sourceMappingURL=nearby.js.map

@@ -34,8 +34,8 @@ export interface VisitedPlaces {
   [tskey: string]: VisitedPlace;
 }
 
-export interface VisitorNote {
-  uid: string;
+export interface Visitors {
+  [uid: string]: any;
 }
 
 export interface ChatMessage {
@@ -70,34 +70,14 @@ export function invoke(
   : Promise<void>;
 
 export function invoke(
-  method: 'Chat.GetMessages',
-  args: { user: string, time?: number })
-  : Promise<ChatMessage[]>;
-
-export function invoke(
-  method: 'Users.SetDetails',
-  args: UserDetails)
-  : Promise<void>;
-
-export function invoke(
-  method: 'Users.GetDetails',
-  args: { users: string[], props?: string[] })
-  : Promise<UserDetails[]>;
-
-export function invoke(
-  method: 'Map.GetVisitedPlaces',
-  args: void)
-  : Promise<VisitedPlaces>;
-
-export function invoke(
-  method: 'Map.AddVisitedPlaces',
-  args: VisitedPlaces)
-  : Promise<void>;
+  method: 'RSync.GetFile',
+  path: string)
+  : Promise<any>;
 
 export function invoke(
   method: 'Map.GetVisitors',
   args: { lat: number, lon: number })
-  : Promise<VisitorNote[]>;
+  : Promise<Visitors>;
 
 export async function invoke(method: string, args) {
   log.i('invoke:', method, args);
