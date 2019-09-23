@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./log", "./qargs", "./react", "./rpc", "./fs", "./user"], function (require, exports, conf, dom, log_1, qargs, react_1, rpc, fs_1, user) {
+define(["require", "exports", "./config", "./dom", "./fs", "./log", "./qargs", "./react", "./rpc", "./user"], function (require, exports, conf, dom, fs_1, log_1, qargs, react_1, rpc, user) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('nearby');
@@ -44,7 +44,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./qargs", "./react"
     function makeUserCard(info) {
         let href = '?page=chat&uid=' + info.uid;
         return react_1.default.createElement("a", { href: href },
-            react_1.default.createElement("img", { src: info.photo }),
+            react_1.default.createElement("img", { src: info.photo || 'data:image/jpeg;base64,' }),
             react_1.default.createElement("span", null, info.name || info.uid));
     }
     async function getPeopleNearby({ lat, lon }) {
