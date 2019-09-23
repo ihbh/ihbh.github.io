@@ -10,6 +10,7 @@ define(["require", "exports"], function (require, exports) {
         get showLogs() { return $('#show-logs'); },
         get exportDB() { return $('#export-db'); },
         get importDB() { return $('#import-db'); },
+        get unsync() { return $('#unsync'); },
         get noGPS() { return $('#no-gps'); },
         get regPhoto() { return $('#photo-frame > img'); },
         get regName() { return $('#reg-name'); },

@@ -1,12 +1,16 @@
-import { TaggedLogger } from "./log";
-import fs from './fs';
-import * as rpc from './rpc';
 import * as conf from './config';
 import { DerivedError } from "./error";
+import fs from './fs';
+import { TaggedLogger } from "./log";
+import * as rpc from './rpc';
 
 const log = new TaggedLogger('rsync');
 
 let syncing = false;
+
+export async function reset() {
+  await fs.set(conf.RSYNC_SYNCED, null);
+}
 
 export async function start() {
   if (syncing) return;

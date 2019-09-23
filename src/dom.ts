@@ -8,6 +8,7 @@ export const id = {
   get showLogs() { return $('#show-logs'); },
   get exportDB() { return $('#export-db'); },
   get importDB() { return $('#import-db'); },
+  get unsync() { return $('#unsync'); },
   get noGPS() { return $('#no-gps'); },
   get regPhoto() { return $<HTMLImageElement>('#photo-frame > img'); },
   get regName() { return $<HTMLInputElement>('#reg-name'); },

@@ -7,6 +7,11 @@ define(["require", "exports", "./dom", "./log", "./logdb", "./config", "./qargs"
         if (!conf.DEBUG)
             return;
         document.body.classList.add(dom.CSS_DEBUG);
+        dom.id.unsync.onclick = async () => {
+            log.i('Resetting the rsync state.');
+            let rsync = await new Promise((resolve_1, reject_1) => { require(['./rsync'], resolve_1, reject_1); });
+            await rsync.reset();
+        };
         dom.id.exportDB.addEventListener('click', async () => {
             log.i('Exporting data...');
             try {
@@ -104,7 +109,7 @@ define(["require", "exports", "./dom", "./log", "./logdb", "./config", "./qargs"
     }
     exports.getDebugPeopleNearby = getDebugPeopleNearby;
     async function getTestMessages(user) {
-        let { default: text } = await new Promise((resolve_1, reject_1) => { require(['./lorem'], resolve_1, reject_1); });
+        let { default: text } = await new Promise((resolve_2, reject_2) => { require(['./lorem'], resolve_2, reject_2); });
         let messages = [];
         for (let i = 0; i < conf.DBG_N_MESSAGES; i++) {
             messages.push({
@@ -117,7 +122,7 @@ define(["require", "exports", "./dom", "./log", "./logdb", "./config", "./qargs"
     }
     exports.getTestMessages = getTestMessages;
     async function getTestUserDetails(user) {
-        let { default: text } = await new Promise((resolve_2, reject_2) => { require(['./lorem'], resolve_2, reject_2); });
+        let { default: text } = await new Promise((resolve_3, reject_3) => { require(['./lorem'], resolve_3, reject_3); });
         return {
             photo: conf.DBG_TEST_USER_PHOTO,
             name: 'Joe-' + user,

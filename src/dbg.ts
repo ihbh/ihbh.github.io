@@ -17,6 +17,12 @@ export function init() {
 
   document.body.classList.add(dom.CSS_DEBUG);
 
+  dom.id.unsync.onclick = async () => {
+    log.i('Resetting the rsync state.');
+    let rsync = await import('./rsync');
+    await rsync.reset();
+  };
+
   dom.id.exportDB.addEventListener('click', async () => {
     log.i('Exporting data...');
     try {

@@ -1,8 +1,12 @@
-define(["require", "exports", "./log", "./fs", "./rpc", "./config", "./error"], function (require, exports, log_1, fs_1, rpc, conf, error_1) {
+define(["require", "exports", "./config", "./error", "./fs", "./log", "./rpc"], function (require, exports, conf, error_1, fs_1, log_1, rpc) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('rsync');
     let syncing = false;
+    async function reset() {
+        await fs_1.default.set(conf.RSYNC_SYNCED, null);
+    }
+    exports.reset = reset;
     async function start() {
         if (syncing)
             return;
