@@ -8,6 +8,7 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
     const handlers = {
         '/ls': pfsmod('./lsfs'),
         '/idb': pfsmod('./idbfs'),
+        '/srv': pfsmod('./srvfs'),
     };
     let fs = {
         async find(path) {

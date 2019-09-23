@@ -1,15 +1,16 @@
-import { TaggedLogger } from './log';
-import * as rpc from './rpc';
-import * as qargs from './qargs';
-import * as dom from './dom';
 import * as conf from './config';
-import * as user from './user';
+import * as dom from './dom';
+import fs from './fs';
+import { TaggedLogger } from './log';
+import * as qargs from './qargs';
 import React from './react';
+import * as rpc from './rpc';
+import * as user from './user';
 
 interface UserInfo {
   uid: string;
-  name: string;
-  photo: string;
+  name?: string;
+  photo?: string;
 }
 
 let log = new TaggedLogger('nearby');
@@ -62,7 +63,7 @@ function makeUserCard(info: UserInfo) {
   let href = '?page=chat&uid=' + info.uid;
   return <a href={href}>
     <img src={info.photo} />
-    <span>{info.name}</span>
+    <span>{info.name || info.uid}</span>
   </a>;
 }
 
@@ -74,14 +75,21 @@ async function getPeopleNearby({ lat, lon }): Promise<UserInfo[]> {
   let uids = Object.keys(visitors);
   log.i('People nearby:', uids);
 
-  let infos: UserInfo[] = await Promise.all(
-    uids.map(uid => Promise.all([
-      rpc.invoke('RSync.GetFile', `/users/${uid}/name`),
-      rpc.invoke('RSync.GetFile', `/users/${uid}/photo`),
-    ]).then(([name, photo]) => {
-      return { uid, name, photo };
-    })));
+  let myuid = await user.uid.get();
+  uids = uids.filter(uid => uid != myuid);
 
-  log.i('Users info:', infos);
-  return infos;
+  let ps = uids.map(uid => {
+    let base = `/srv/users/${uid}/profile`;
+    let info: UserInfo = { uid };
+    return Promise.all([
+      fs.get(base + '/name')
+        .then(res => info.name = res),
+      fs.get(base + '/img')
+        .then(res => info.photo = res),
+    ]).then(() => {
+      return info;
+    });
+  });
+
+  return Promise.all(ps);
 }

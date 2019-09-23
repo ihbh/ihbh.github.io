@@ -15,6 +15,7 @@ const pfsmod = path => new AsyncProp<FS>(
 const handlers = {
   '/ls': pfsmod('./lsfs'),
   '/idb': pfsmod('./idbfs'),
+  '/srv': pfsmod('./srvfs'),
 };
 
 let fs: FS = {

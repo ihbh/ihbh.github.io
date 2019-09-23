@@ -1,4 +1,4 @@
-define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", "./react"], function (require, exports, log_1, rpc, qargs, dom, conf, react_1) {
+define(["require", "exports", "./config", "./dom", "./log", "./qargs", "./react", "./rpc", "./fs", "./user"], function (require, exports, conf, dom, log_1, qargs, react_1, rpc, fs_1, user) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('nearby');
@@ -45,20 +45,27 @@ define(["require", "exports", "./log", "./rpc", "./qargs", "./dom", "./config", 
         let href = '?page=chat&uid=' + info.uid;
         return react_1.default.createElement("a", { href: href },
             react_1.default.createElement("img", { src: info.photo }),
-            react_1.default.createElement("span", null, info.name));
+            react_1.default.createElement("span", null, info.name || info.uid));
     }
     async function getPeopleNearby({ lat, lon }) {
         let visitors = await rpc.invoke('Map.GetVisitors', { lat, lon });
         let uids = Object.keys(visitors);
         log.i('People nearby:', uids);
-        let infos = await Promise.all(uids.map(uid => Promise.all([
-            rpc.invoke('RSync.GetFile', `/users/${uid}/name`),
-            rpc.invoke('RSync.GetFile', `/users/${uid}/photo`),
-        ]).then(([name, photo]) => {
-            return { uid, name, photo };
-        })));
-        log.i('Users info:', infos);
-        return infos;
+        let myuid = await user.uid.get();
+        uids = uids.filter(uid => uid != myuid);
+        let ps = uids.map(uid => {
+            let base = `/srv/users/${uid}/profile`;
+            let info = { uid };
+            return Promise.all([
+                fs_1.default.get(base + '/name')
+                    .then(res => info.name = res),
+                fs_1.default.get(base + '/img')
+                    .then(res => info.photo = res),
+            ]).then(() => {
+                return info;
+            });
+        });
+        return Promise.all(ps);
     }
 });
 //# sourceMappingURL=nearby.js.map

@@ -8,5 +8,8 @@ define(["require", "exports"], function (require, exports) {
         }
     }
     exports.DerivedError = DerivedError;
+    class NotImplementedError extends Error {
+    }
+    exports.NotImplementedError = NotImplementedError;
 });
 //# sourceMappingURL=error.js.map
