@@ -9,7 +9,7 @@ import * as idb from './idb';
 
 const log = new TaggedLogger('dbg');
 
-export function init() {
+export async function init() {
   log.i('Debug mode?', conf.DEBUG);
 
   if (!conf.DEBUG)
