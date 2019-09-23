@@ -11,6 +11,17 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
         '/srv': pfsmod('./srvfs'),
     };
     let fs = {
+        mget(path, schema) {
+            log.d('mget()', path, schema);
+            let results = {};
+            let keys = Object.keys(schema);
+            let ps = keys.map(key => {
+                return fs.get(path + '/' + key)
+                    .then(res => results[key] = res);
+            });
+            return Promise.all(ps)
+                .then(() => results);
+        },
         async find(path) {
             if (path == '/') {
                 // find() via recursive dir()

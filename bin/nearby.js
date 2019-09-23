@@ -55,14 +55,15 @@ define(["require", "exports", "./config", "./dom", "./fs", "./log", "./qargs", "
         uids = uids.filter(uid => uid != myuid);
         let ps = uids.map(uid => {
             let base = `/srv/users/${uid}/profile`;
-            let info = { uid };
-            return Promise.all([
-                fs_1.default.get(base + '/name')
-                    .then(res => info.name = res),
-                fs_1.default.get(base + '/img')
-                    .then(res => info.photo = res),
-            ]).then(() => {
-                return info;
+            return fs_1.default.mget(base, {
+                name: true,
+                img: true,
+            }).then(res => {
+                return {
+                    uid,
+                    name: res.name,
+                    photo: res.img,
+                };
             });
         });
         return Promise.all(ps);

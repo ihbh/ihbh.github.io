@@ -80,14 +80,15 @@ async function getPeopleNearby({ lat, lon }): Promise<UserInfo[]> {
 
   let ps = uids.map(uid => {
     let base = `/srv/users/${uid}/profile`;
-    let info: UserInfo = { uid };
-    return Promise.all([
-      fs.get(base + '/name')
-        .then(res => info.name = res),
-      fs.get(base + '/img')
-        .then(res => info.photo = res),
-    ]).then(() => {
-      return info;
+    return fs.mget(base, {
+      name: true,
+      img: true,
+    }).then(res => {
+      return {
+        uid,
+        name: res.name,
+        photo: res.img,
+      } as UserInfo;
     });
   });
 

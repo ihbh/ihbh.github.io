@@ -19,6 +19,20 @@ const handlers = {
 };
 
 let fs: FS = {
+  mget(path: string, schema) {
+    log.d('mget()', path, schema);
+    let results: any = {};
+    let keys = Object.keys(schema);
+
+    let ps = keys.map(key => {
+      return fs.get(path + '/' + key)
+        .then(res => results[key] = res);
+    });
+
+    return Promise.all(ps)
+      .then(() => results);
+  },
+
   async find(path: string): Promise<string[]> {
     if (path == '/') {
       // find() via recursive dir()
