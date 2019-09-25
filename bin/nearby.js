@@ -49,24 +49,19 @@ define(["require", "exports", "./config", "./dom", "./fs", "./log", "./qargs", "
     }
     async function getPeopleNearby({ lat, lon }) {
         let visitors = await rpc.invoke('Map.GetVisitors', { lat, lon });
-        let uids = Object.keys(visitors);
-        log.i('People nearby:', uids);
-        let myuid = await user.uid.get();
-        uids = uids.filter(uid => uid != myuid);
-        let ps = uids.map(uid => {
-            let base = `/srv/users/${uid}/profile`;
-            return fs_1.default.mget(base, {
-                name: true,
-                img: true,
-            }).then(res => {
-                return {
-                    uid,
-                    name: res.name,
-                    photo: res.img,
-                };
-            });
+        let vuids = Object.keys(visitors);
+        let uid = await user.uid.get();
+        vuids = vuids.filter(vuid => vuid != uid);
+        log.i('People nearby:', vuids);
+        let infos = new Map();
+        let ps = vuids.map(async (vuid) => {
+            let dir = `/srv/users/${vuid}/profile`;
+            let name = await fs_1.default.get(dir + '/name');
+            let photo = await fs_1.default.get(dir + '/img');
+            infos.set(vuid, { uid: vuid, name, photo });
         });
-        return Promise.all(ps);
+        await Promise.all(ps);
+        return [...infos.values()];
     }
 });
 //# sourceMappingURL=nearby.js.map

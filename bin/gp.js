@@ -5,7 +5,7 @@ define(["require", "exports", "./config", "./fsprop", "./log"], function (requir
     function prop(path, defval = null) {
         let fspath = conf.USERDATA_DIR + '/' +
             path.split('.').join('/');
-        log.i(path, '->', fspath, 'default:', defval);
+        log.d(path, '->', fspath, 'default:', defval);
         return fsprop_1.default(fspath, defval);
     }
     exports.uid = prop('shared.profile.id');

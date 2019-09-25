@@ -72,25 +72,19 @@ async function getPeopleNearby({ lat, lon }): Promise<UserInfo[]> {
     'Map.GetVisitors',
     { lat, lon });
 
-  let uids = Object.keys(visitors);
-  log.i('People nearby:', uids);
+  let vuids = Object.keys(visitors);
+  let uid = await user.uid.get();
+  vuids = vuids.filter(vuid => vuid != uid);
+  log.i('People nearby:', vuids);
 
-  let myuid = await user.uid.get();
-  uids = uids.filter(uid => uid != myuid);
-
-  let ps = uids.map(uid => {
-    let base = `/srv/users/${uid}/profile`;
-    return fs.mget(base, {
-      name: true,
-      img: true,
-    }).then(res => {
-      return {
-        uid,
-        name: res.name,
-        photo: res.img,
-      } as UserInfo;
-    });
+  let infos = new Map<string, UserInfo>();
+  let ps = vuids.map(async vuid => {
+    let dir = `/srv/users/${vuid}/profile`;
+    let name = await fs.get(dir + '/name');
+    let photo = await fs.get(dir + '/img');
+    infos.set(vuid, { uid: vuid, name, photo });
   });
 
-  return Promise.all(ps);
+  await Promise.all(ps);
+  return [...infos.values()];
 }

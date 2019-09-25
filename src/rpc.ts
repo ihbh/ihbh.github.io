@@ -96,22 +96,13 @@ export function invoke(
 
 export async function invoke(method: string, args) {
   let reqid = genRequestId();
-  log.i(reqid, 'invoke:', method, args);
-
   if (method != 'Batch.Run')
     return schedule(method, args, reqid);
-
-  try {
-    let res = await invokeInternal(method, args, reqid);
-    log.i(reqid, 'result:', res);
-    return res;
-  } catch (err) {
-    log.e(reqid, 'error:', err);
-    throw err;
-  }
+  return invokeInternal(method, args, reqid);
 }
 
 async function invokeInternal(method: string, args, reqid: string) {
+  log.i(reqid, method, args);
   let user = await import('./user');
   let path = '/rpc/' + method;
   let url = (await rpcurl.get()) + path;
@@ -141,8 +132,10 @@ async function invokeInternal(method: string, args, reqid: string) {
 
     let text = await res.text();
     let json = text ? JSON.parse(text) : null;
+    log.i(reqid, 'result:', json);
     return json;
   } catch (err) {
+    log.w(reqid, 'error:', err);
     if (err instanceof RpcError)
       throw err;
     throw new RpcError(method, null);
@@ -174,8 +167,9 @@ async function sendPendingBatch() {
   if (batch.length == 1) {
     log.d('The batch has only 1 rpc.');
     let { name, args, reqid, resolve, reject } = batch[0];
-    return invokeInternal(name, args, reqid)
+    await invokeInternal(name, args, reqid)
       .then(resolve, reject);
+    return;
   }
 
   let args = batch.map(b => {
@@ -194,7 +188,6 @@ async function sendPendingBatch() {
       let { name, reqid, resolve, reject } = batch[i];
 
       if (!err) {
-        log.i(reqid, 'result:', res);
         resolve(res);
         continue;
       }
@@ -205,11 +198,10 @@ async function sendPendingBatch() {
         description: err.description,
       });
 
-      log.e(reqid, 'error:', err);
       reject(rpcerr);
     }
   } catch (err) {
-    log.e('The entire batch failed:', err);
+    log.w('The entire batch failed:', err);
     for (let { reject } of batch) {
       reject(err instanceof RpcError ?
         err : new RpcError('Batch.Run', null));

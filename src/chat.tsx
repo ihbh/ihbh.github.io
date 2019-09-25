@@ -34,7 +34,7 @@ let autoSavedText = '';
 export async function init() {
   log.i('init()');
   ruid = qargs.get('uid');
-  log.i('user:', ruid);
+  log.i('Remote user:', ruid);
   getUserInfo().catch(err =>
     log.e('Failed to get user info:', err));
   getMessages().catch(err =>
@@ -58,8 +58,9 @@ async function setSendButtonHandler() {
 
   async function sendMessage(text: string) {
     log.i('Sending message:', text);
+    let uid = await user.uid.get();
     let message: ChatMessage = {
-      user: ruid,
+      user: uid,
       text: text,
       date: new Date,
     };
@@ -97,7 +98,7 @@ async function setSendButtonHandler() {
 }
 
 async function getUserInfo() {
-  log.i('Getting user details for:', ruid);
+  log.i('Getting user details for', ruid);
   let name, photo;
 
   try {
@@ -119,6 +120,7 @@ async function getUserInfo() {
 
 async function getMessages() {
   log.i('Syncing chat messages with', ruid);
+  let time = Date.now();
   let uid = await user.uid.get();
 
   let rm2cm = (sender: string, remote: RemoteMessages) =>
@@ -147,6 +149,9 @@ async function getMessages() {
   container.append(...divs);
   let lastDiv = divs[divs.length - 1];
   lastDiv && lastDiv.scrollIntoView();
+
+  let diff = Date.now() - time;
+  log.i('Rendered all messages in', diff, 'ms');
 }
 
 async function getIncomingMessages() {
@@ -162,8 +167,14 @@ async function getIncomingMessages() {
 
 async function getOutgoingMessages() {
   try {
-    let outgoing: RemoteMessages = await fs.get(`~/chats/${ruid}`);
-    return outgoing || {};
+    let outgoing: RemoteMessages = {};
+    let dirs = await fs.dir(`~/chats/${ruid}`);
+    let ps = dirs.map(async tsid => {
+      let text = await fs.get(`~/chats/${ruid}/${tsid}/text`);
+      outgoing[tsid] = { text };
+    });
+    await Promise.all(ps);
+    return outgoing;
   } catch (err) {
     log.w('Failed to get outgoing messages:', err);
     return {};

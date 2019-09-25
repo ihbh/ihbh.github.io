@@ -18,26 +18,10 @@ const handlers = {
   '/srv': pfsmod('./srvfs'),
 };
 
-const abspath = (path:string) =>
+const abspath = (path: string) =>
   path.replace('~', conf.SHARED_DIR);
 
 let fs: FS = {
-  mget(path: string, schema) {
-    log.d('mget()', path, schema);
-    path = abspath(path);
-
-    let results: any = {};
-    let keys = Object.keys(schema);
-
-    let ps = keys.map(key => {
-      return fs.get(path + '/' + key)
-        .then(res => results[key] = res);
-    });
-
-    return Promise.all(ps)
-      .then(() => results);
-  },
-
   async find(path: string): Promise<string[]> {
     if (path == '/') {
       // find() via recursive dir()
@@ -96,7 +80,7 @@ async function invokeHandler(method: string, path: string, ...args) {
 }
 
 function parsePath(path: string): [AsyncProp<FS>, string] {
-  path = abspath(path);  
+  path = abspath(path);
   if (!PATH_REGEX.test(path))
     throw new SyntaxError('Invalid fs path: ' + path);
   let i = path.indexOf('/', 1);
@@ -109,6 +93,6 @@ function parsePath(path: string): [AsyncProp<FS>, string] {
   return [handler, rempath];
 }
 
-window['fs'] = fs;
-
 export default fs;
+
+window['fs'] = fs;

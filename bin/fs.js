@@ -12,18 +12,6 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
     };
     const abspath = (path) => path.replace('~', conf.SHARED_DIR);
     let fs = {
-        mget(path, schema) {
-            log.d('mget()', path, schema);
-            path = abspath(path);
-            let results = {};
-            let keys = Object.keys(schema);
-            let ps = keys.map(key => {
-                return fs.get(path + '/' + key)
-                    .then(res => results[key] = res);
-            });
-            return Promise.all(ps)
-                .then(() => results);
-        },
         async find(path) {
             if (path == '/') {
                 // find() via recursive dir()
@@ -90,7 +78,7 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
         let rempath = path.slice(i) || '/';
         return [handler, rempath];
     }
-    window['fs'] = fs;
     exports.default = fs;
+    window['fs'] = fs;
 });
 //# sourceMappingURL=fs.js.map

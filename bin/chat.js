@@ -12,7 +12,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
     async function init() {
         log.i('init()');
         ruid = qargs.get('uid');
-        log.i('user:', ruid);
+        log.i('Remote user:', ruid);
         getUserInfo().catch(err => log.e('Failed to get user info:', err));
         getMessages().catch(err => log.e('Failed to get messages:', err));
         setSendButtonHandler();
@@ -34,8 +34,9 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
         });
         async function sendMessage(text) {
             log.i('Sending message:', text);
+            let uid = await user.uid.get();
             let message = {
-                user: ruid,
+                user: uid,
                 text: text,
                 date: new Date,
             };
@@ -67,7 +68,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
         input.textContent = autoSavedText;
     }
     async function getUserInfo() {
-        log.i('Getting user details for:', ruid);
+        log.i('Getting user details for', ruid);
         let name, photo;
         try {
             name = await fs_1.default.get(`/srv/users/${ruid}/profile/name`);
@@ -87,6 +88,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
     }
     async function getMessages() {
         log.i('Syncing chat messages with', ruid);
+        let time = Date.now();
         let uid = await user.uid.get();
         let rm2cm = (sender, remote) => Object.keys(remote).map(tsid => {
             return {
@@ -108,6 +110,8 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
         container.append(...divs);
         let lastDiv = divs[divs.length - 1];
         lastDiv && lastDiv.scrollIntoView();
+        let diff = Date.now() - time;
+        log.i('Rendered all messages in', diff, 'ms');
     }
     async function getIncomingMessages() {
         try {
@@ -122,8 +126,14 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
     }
     async function getOutgoingMessages() {
         try {
-            let outgoing = await fs_1.default.get(`~/chats/${ruid}`);
-            return outgoing || {};
+            let outgoing = {};
+            let dirs = await fs_1.default.dir(`~/chats/${ruid}`);
+            let ps = dirs.map(async (tsid) => {
+                let text = await fs_1.default.get(`~/chats/${ruid}/${tsid}/text`);
+                outgoing[tsid] = { text };
+            });
+            await Promise.all(ps);
+            return outgoing;
         }
         catch (err) {
             log.w('Failed to get outgoing messages:', err);
