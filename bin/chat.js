@@ -1,7 +1,12 @@
-define(["require", "exports", "./config", "./dom", "./log", "./gp", "./qargs", "./react", "./rpc"], function (require, exports, conf, dom, log_1, gp, qargs, react_1, rpc) {
+define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "./react", "./fs", "./user"], function (require, exports, conf, dom, gp, log_1, qargs, react_1, fs_1, user) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('chat');
+    const date2tsid = (date) => date.toJSON()
+        .replace(/[^\d]/g, '-')
+        .slice(0, 19);
+    const tsid2date = (tsid) => new Date(tsid.slice(0, 10) + 'T' +
+        tsid.slice(11) + 'Z');
     let ruid = ''; // remote user id
     let autoSavedText = '';
     async function init() {
@@ -20,26 +25,31 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./qargs", "
                 let text = input.textContent.trim();
                 if (!text)
                     return;
-                log.i('Sending message:', text);
-                let time = Date.now() / 1000 | 0;
-                let message = {
-                    user: ruid,
-                    text: text,
-                    time: time,
-                };
-                let { default: fs } = await new Promise((resolve_1, reject_1) => { require(['./fs'], resolve_1, reject_1); });
-                await fs.set(`${conf.CHAT_DIR}/${ruid}/${time}/text`, text);
-                let container = dom.id.chatMessages;
-                let div = renderMessage(message);
-                container.append(div);
-                div.scrollIntoView();
+                await sendMessage(text);
                 input.textContent = '';
-                log.i('Message sent.');
             }
             catch (err) {
                 log.e('Failed to send message:', err);
             }
         });
+        async function sendMessage(text) {
+            log.i('Sending message:', text);
+            let message = {
+                user: ruid,
+                text: text,
+                date: new Date,
+            };
+            let tsid = date2tsid(message.date);
+            await fs_1.default.set(`~/chats/${ruid}/${tsid}/text`, text);
+            log.i('Message saved.');
+            let container = dom.id.chatMessages;
+            let div = renderMessage(message);
+            container.append(div);
+            div.scrollIntoView();
+            log.i('Sending the message to the server.');
+            let rsync = await new Promise((resolve_1, reject_1) => { require(['./rsync'], resolve_1, reject_1); });
+            rsync.start();
+        }
         setInterval(async () => {
             let newText = input.textContent;
             if (newText == autoSavedText)
@@ -57,36 +67,73 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./qargs", "
         input.textContent = autoSavedText;
     }
     async function getUserInfo() {
-        let [details] = await rpc.invoke('Users.GetDetails', {
-            users: [ruid],
-            props: ['name', 'photo'],
-        }).catch(async (err) => {
-            if (!conf.DEBUG)
-                throw err;
-            let dbg = await new Promise((resolve_2, reject_2) => { require(['./dbg'], resolve_2, reject_2); });
-            let res = await dbg.getTestUserDetails(ruid);
-            return [res];
-        });
-        dom.id.chatUserName.textContent = details ? details.name : ruid;
-        dom.id.chatUserIcon.src = details && details.photo;
+        log.i('Getting user details for:', ruid);
+        let name, photo;
+        try {
+            name = await fs_1.default.get(`/srv/users/${ruid}/profile/name`);
+            photo = await fs_1.default.get(`/srv/users/${ruid}/profile/img`);
+        }
+        catch (err) {
+            log.w('Failed to get user details:', err);
+            if (conf.DEBUG) {
+                let dbg = await new Promise((resolve_2, reject_2) => { require(['./dbg'], resolve_2, reject_2); });
+                let res = await dbg.getTestUserDetails(ruid);
+                name = res.name;
+                photo = res.photo;
+            }
+        }
+        dom.id.chatUserName.textContent = name || ruid;
+        dom.id.chatUserIcon.src = photo || 'data:image/jpeg;base64,';
     }
     async function getMessages() {
-        let messages = await rpc.invoke('Chat.GetMessages', {
-            user: ruid,
-        }).catch(async (err) => {
-            if (!conf.DEBUG)
-                throw err;
-            let dbg = await new Promise((resolve_3, reject_3) => { require(['./dbg'], resolve_3, reject_3); });
-            return dbg.getTestMessages(ruid);
+        log.i('Syncing chat messages with', ruid);
+        let uid = await user.uid.get();
+        let rm2cm = (sender, remote) => Object.keys(remote).map(tsid => {
+            return {
+                user: sender,
+                text: remote[tsid].text,
+                date: tsid2date(tsid),
+            };
         });
+        let outgoing = await getOutgoingMessages();
+        let incoming = await getIncomingMessages();
+        let messages = [
+            ...rm2cm(uid, outgoing),
+            ...rm2cm(ruid, incoming),
+        ];
+        messages.sort((p, q) => p.date.getTime() - q.date.getTime());
         let container = dom.id.chatMessages;
         let divs = messages.map(renderMessage);
+        container.innerHTML = '';
         container.append(...divs);
-        divs && divs[divs.length - 1].scrollIntoView();
+        let lastDiv = divs[divs.length - 1];
+        lastDiv && lastDiv.scrollIntoView();
+    }
+    async function getIncomingMessages() {
+        try {
+            let uid = await user.uid.get();
+            let incoming = await fs_1.default.get(`/srv/users/${ruid}/chats/${uid}`);
+            return incoming || {};
+        }
+        catch (err) {
+            log.w('Failed to get incoming messages:', err);
+            return {};
+        }
+    }
+    async function getOutgoingMessages() {
+        try {
+            let outgoing = await fs_1.default.get(`~/chats/${ruid}`);
+            return outgoing || {};
+        }
+        catch (err) {
+            log.w('Failed to get outgoing messages:', err);
+            return {};
+        }
     }
     function renderMessage(message) {
         let cs = message.user == ruid ? 'theirs' : 'yours';
-        return react_1.default.createElement("div", { class: cs, time: message.time }, message.text);
+        let ts = message.date.getTime() / 1000 | 0;
+        return react_1.default.createElement("div", { class: cs, time: ts }, message.text);
     }
 });
 //# sourceMappingURL=chat.js.map

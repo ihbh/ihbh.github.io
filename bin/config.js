@@ -37,6 +37,5 @@ define(["require", "exports"], function (require, exports) {
     exports.VPLACES_DIR = `${exports.SHARED_DIR}/places`;
     exports.RSYNC_DIR_DATA = exports.SHARED_DIR;
     exports.RSYNC_SYNCED = `${exports.USERDATA_DIR}/rsync/status`;
-    exports.CHAT_DIR = `${exports.SHARED_DIR}/chats`;
 });
 //# sourceMappingURL=config.js.map

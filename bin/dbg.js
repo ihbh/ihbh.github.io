@@ -108,24 +108,11 @@ define(["require", "exports", "./dom", "./log", "./logdb", "./config", "./qargs"
         return res;
     }
     exports.getDebugPeopleNearby = getDebugPeopleNearby;
-    async function getTestMessages(user) {
+    async function getTestUserDetails(uid) {
         let { default: text } = await new Promise((resolve_2, reject_2) => { require(['./lorem'], resolve_2, reject_2); });
-        let messages = [];
-        for (let i = 0; i < conf.DBG_N_MESSAGES; i++) {
-            messages.push({
-                user: Math.random() > 0.5 ? user : null,
-                time: new Date('Jan 3 2010').getTime() / 1000 | 0,
-                text: text.slice(0, conf.DBG_MESSAGE_LEN),
-            });
-        }
-        return messages;
-    }
-    exports.getTestMessages = getTestMessages;
-    async function getTestUserDetails(user) {
-        let { default: text } = await new Promise((resolve_3, reject_3) => { require(['./lorem'], resolve_3, reject_3); });
         return {
             photo: conf.DBG_TEST_USER_PHOTO,
-            name: 'Joe-' + user,
+            name: uid.slice(0, 8),
             info: text,
         };
     }

@@ -18,9 +18,14 @@ const handlers = {
   '/srv': pfsmod('./srvfs'),
 };
 
+const abspath = (path:string) =>
+  path.replace('~', conf.SHARED_DIR);
+
 let fs: FS = {
   mget(path: string, schema) {
     log.d('mget()', path, schema);
+    path = abspath(path);
+
     let results: any = {};
     let keys = Object.keys(schema);
 
@@ -44,6 +49,8 @@ let fs: FS = {
       }
       return res;
     }
+
+    path = abspath(path);
     let relpaths = await invokeHandler('find', path);
     let prefix = ROOT_REGEX.exec(path);
     return relpaths.map(rel => prefix + rel);
@@ -89,6 +96,7 @@ async function invokeHandler(method: string, path: string, ...args) {
 }
 
 function parsePath(path: string): [AsyncProp<FS>, string] {
+  path = abspath(path);  
   if (!PATH_REGEX.test(path))
     throw new SyntaxError('Invalid fs path: ' + path);
   let i = path.indexOf('/', 1);

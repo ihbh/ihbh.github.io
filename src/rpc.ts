@@ -55,12 +55,6 @@ export interface Visitors {
   [uid: string]: any;
 }
 
-export interface ChatMessage {
-  user: string;
-  text: string;
-  time: number;
-}
-
 export interface RSyncFile {
   path: string;
   data: any;

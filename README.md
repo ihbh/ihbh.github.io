@@ -10,4 +10,4 @@ Icons made by Prosymbols and Freepik from flaticon.com.
 
 # License
 
-GPLv3
+GNU AGPLv3

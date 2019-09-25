@@ -10,9 +10,11 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
         '/idb': pfsmod('./idbfs'),
         '/srv': pfsmod('./srvfs'),
     };
+    const abspath = (path) => path.replace('~', conf.SHARED_DIR);
     let fs = {
         mget(path, schema) {
             log.d('mget()', path, schema);
+            path = abspath(path);
             let results = {};
             let keys = Object.keys(schema);
             let ps = keys.map(key => {
@@ -33,6 +35,7 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
                 }
                 return res;
             }
+            path = abspath(path);
             let relpaths = await invokeHandler('find', path);
             let prefix = ROOT_REGEX.exec(path);
             return relpaths.map(rel => prefix + rel);
@@ -74,6 +77,7 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
         }
     }
     function parsePath(path) {
+        path = abspath(path);
         if (!PATH_REGEX.test(path))
             throw new SyntaxError('Invalid fs path: ' + path);
         let i = path.indexOf('/', 1);

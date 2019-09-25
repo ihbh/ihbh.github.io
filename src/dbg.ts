@@ -132,24 +132,11 @@ export async function getDebugPeopleNearby() {
   return res;
 }
 
-export async function getTestMessages(user: string) {
-  let { default: text } = await import('./lorem');
-  let messages: rpc.ChatMessage[] = [];
-  for (let i = 0; i < conf.DBG_N_MESSAGES; i++) {
-    messages.push({
-      user: Math.random() > 0.5 ? user : null,
-      time: new Date('Jan 3 2010').getTime() / 1000 | 0,
-      text: text.slice(0, conf.DBG_MESSAGE_LEN),
-    });
-  }
-  return messages;
-}
-
-export async function getTestUserDetails(user: string) {
+export async function getTestUserDetails(uid: string) {
   let { default: text } = await import('./lorem');
   return {
     photo: conf.DBG_TEST_USER_PHOTO,
-    name: 'Joe-' + user,
+    name: uid.slice(0, 8),
     info: text,
   };
 }
