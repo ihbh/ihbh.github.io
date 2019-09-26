@@ -23,10 +23,11 @@ const date2tsid = (date: Date) =>
   date.toJSON()
     .replace(/[^\d]/g, '-')
     .slice(0, 19);
+
 const tsid2date = (tsid: string) =>
   new Date(
     tsid.slice(0, 10) + 'T' +
-    tsid.slice(11) + 'Z');
+    tsid.slice(11).replace(/-/g, ':') + 'Z');
 
 let ruid = ''; // remote user id
 let autoSavedText = '';
@@ -157,7 +158,15 @@ async function getMessages() {
 async function getIncomingMessages() {
   try {
     let uid = await user.uid.get();
-    let incoming: RemoteMessages = await fs.get(`/srv/users/${ruid}/chats/${uid}`);
+    let incoming: RemoteMessages = {};
+    let base = `/srv/users/${ruid}/chats/${uid}`;
+    let dirs = await fs.dir(base) || [];
+    let ps = dirs.map(async tsid => {
+      let text = await fs.get(`${base}/${tsid}/text`);
+      incoming[tsid] = { text };
+    });
+    await Promise.all(ps);
+    log.i('Incoming messages:', Object.keys(incoming).length);
     return incoming || {};
   } catch (err) {
     log.w('Failed to get incoming messages:', err);
@@ -174,6 +183,7 @@ async function getOutgoingMessages() {
       outgoing[tsid] = { text };
     });
     await Promise.all(ps);
+    log.i('Outgoing messages:', Object.keys(outgoing).length);
     return outgoing;
   } catch (err) {
     log.w('Failed to get outgoing messages:', err);
@@ -183,7 +193,7 @@ async function getOutgoingMessages() {
 
 function renderMessage(message: ChatMessage): HTMLDivElement {
   let cs = message.user == ruid ? 'theirs' : 'yours';
-  let ts = message.date.getTime() / 1000 | 0;
+  let ts = date2tsid(message.date);
   return <div class={cs} time={ts}>
     {message.text}
   </div>;

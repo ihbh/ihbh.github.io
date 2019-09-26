@@ -11,7 +11,7 @@ class SrvFS implements FS {
   }
 
   async dir(path: string): Promise<string[]> {
-    throw new NotImplementedError;
+    return rpc.invoke('RSync.Dir', path);
   }
 
   async get(path: string): Promise<any> {

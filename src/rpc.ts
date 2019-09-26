@@ -90,6 +90,11 @@ export function invoke(
   : Promise<any>;
 
 export function invoke(
+  method: 'RSync.Dir',
+  path: string)
+  : Promise<string[]>;
+
+export function invoke(
   method: 'Map.GetVisitors',
   args: { lat: number, lon: number })
   : Promise<Visitors>;

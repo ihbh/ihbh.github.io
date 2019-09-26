@@ -6,7 +6,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
         .replace(/[^\d]/g, '-')
         .slice(0, 19);
     const tsid2date = (tsid) => new Date(tsid.slice(0, 10) + 'T' +
-        tsid.slice(11) + 'Z');
+        tsid.slice(11).replace(/-/g, ':') + 'Z');
     let ruid = ''; // remote user id
     let autoSavedText = '';
     async function init() {
@@ -116,7 +116,15 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
     async function getIncomingMessages() {
         try {
             let uid = await user.uid.get();
-            let incoming = await fs_1.default.get(`/srv/users/${ruid}/chats/${uid}`);
+            let incoming = {};
+            let base = `/srv/users/${ruid}/chats/${uid}`;
+            let dirs = await fs_1.default.dir(base) || [];
+            let ps = dirs.map(async (tsid) => {
+                let text = await fs_1.default.get(`${base}/${tsid}/text`);
+                incoming[tsid] = { text };
+            });
+            await Promise.all(ps);
+            log.i('Incoming messages:', Object.keys(incoming).length);
             return incoming || {};
         }
         catch (err) {
@@ -133,6 +141,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
                 outgoing[tsid] = { text };
             });
             await Promise.all(ps);
+            log.i('Outgoing messages:', Object.keys(outgoing).length);
             return outgoing;
         }
         catch (err) {
@@ -142,7 +151,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
     }
     function renderMessage(message) {
         let cs = message.user == ruid ? 'theirs' : 'yours';
-        let ts = message.date.getTime() / 1000 | 0;
+        let ts = date2tsid(message.date);
         return react_1.default.createElement("div", { class: cs, time: ts }, message.text);
     }
 });

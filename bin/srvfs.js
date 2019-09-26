@@ -7,7 +7,7 @@ define(["require", "exports", "./error", "./log", "./rpc"], function (require, e
             throw new error_1.NotImplementedError;
         }
         async dir(path) {
-            throw new error_1.NotImplementedError;
+            return rpc.invoke('RSync.Dir', path);
         }
         async get(path) {
             return rpc.invoke('RSync.GetFile', path);
