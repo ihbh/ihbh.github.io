@@ -1,11 +1,10 @@
+import * as conf from './config';
 import * as dom from './dom';
+import * as idb from './idb';
 import { TaggedLogger } from './log';
 import * as logdb from './logdb';
-import * as conf from './config';
-import * as qargs from './qargs';
-import * as rpc from './rpc';
 import * as ls from './ls';
-import * as idb from './idb';
+import * as qargs from './qargs';
 
 const log = new TaggedLogger('dbg');
 
@@ -16,6 +15,15 @@ export async function init() {
     return;
 
   document.body.classList.add(dom.CSS_DEBUG);
+
+  dom.id.gotoLondon.onclick = async () => {
+    let lat = 51.5073509;
+    let lon = -0.1277583;
+    let loc = await import('./loc');
+    await loc.shareLocation({ lat, lon });
+    let page = await import('./page');
+    page.set('nearby', { lat, lon });
+  };
 
   dom.id.unsync.onclick = async () => {
     log.i('Resetting the rsync state.');

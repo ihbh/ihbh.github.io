@@ -8,7 +8,10 @@ import * as pwa from './pwa';
 const log = new TaggedLogger('index');
 
 dom.whenLoaded().then(async () => {
-  await dbg.init();
+  await dbg.init().catch(err => {
+    log.w('dbg.init() failed:', err);
+  });
+  
   await pwa.init();
 
   let isUserRegistered = !!await gp.username.get();

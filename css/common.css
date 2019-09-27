@@ -17,7 +17,7 @@ body {
   flex-direction: column;
 }
 
-button.btn {
+.btn {
   font-size: 0.75em;
   padding: 1em;
   background: #800;
@@ -25,9 +25,12 @@ button.btn {
   border: none;
   box-shadow: 0 0 7pt 1pt #000;
   user-select: none;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
 }
 
-button.btn:focus {
+.btn:focus {
   outline: none;
 }
 
@@ -54,14 +57,14 @@ body.debug #debug {
   display: flex;
 }
 
-#debug button {
-  color: #444;
+#debug .btn {
+  color: #fff;
   font-size: 12pt;
-  box-shadow: none;
-  background: none;
-  padding: 0;
-  margin: 1em;
-  text-decoration: underline;
+  box-shadow: 0 0 3pt 1pt #000;
+  background: #000;
+  padding: 0.5em;
+  margin: 0.5em;
+  opacity: 0.5;
 }
 
 #logs {
@@ -239,6 +242,7 @@ body .page .ol-attribution * {
 }
 
 /* ?page=nearby */
+
 /* ?page=unread */
 
 .user-cards {

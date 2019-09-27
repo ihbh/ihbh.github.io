@@ -3,7 +3,9 @@ define(["require", "exports", "./dbg", "./dom", "./log", "./gp", "./page", "./pw
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('index');
     dom.whenLoaded().then(async () => {
-        await dbg.init();
+        await dbg.init().catch(err => {
+            log.w('dbg.init() failed:', err);
+        });
         await pwa.init();
         let isUserRegistered = !!await gp.username.get();
         log.i('user registered?', isUserRegistered);

@@ -1,4 +1,4 @@
-define(["require", "exports", "./dom", "./log", "./logdb", "./config", "./qargs", "./ls", "./idb"], function (require, exports, dom, log_1, logdb, conf, qargs, ls, idb) {
+define(["require", "exports", "./config", "./dom", "./idb", "./log", "./logdb", "./ls", "./qargs"], function (require, exports, conf, dom, idb, log_1, logdb, ls, qargs) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('dbg');
@@ -7,9 +7,17 @@ define(["require", "exports", "./dom", "./log", "./logdb", "./config", "./qargs"
         if (!conf.DEBUG)
             return;
         document.body.classList.add(dom.CSS_DEBUG);
+        dom.id.gotoLondon.onclick = async () => {
+            let lat = 51.5073509;
+            let lon = -0.1277583;
+            let loc = await new Promise((resolve_1, reject_1) => { require(['./loc'], resolve_1, reject_1); });
+            await loc.shareLocation({ lat, lon });
+            let page = await new Promise((resolve_2, reject_2) => { require(['./page'], resolve_2, reject_2); });
+            page.set('nearby', { lat, lon });
+        };
         dom.id.unsync.onclick = async () => {
             log.i('Resetting the rsync state.');
-            let rsync = await new Promise((resolve_1, reject_1) => { require(['./rsync'], resolve_1, reject_1); });
+            let rsync = await new Promise((resolve_3, reject_3) => { require(['./rsync'], resolve_3, reject_3); });
             await rsync.reset();
         };
         dom.id.exportDB.addEventListener('click', async () => {
@@ -109,7 +117,7 @@ define(["require", "exports", "./dom", "./log", "./logdb", "./config", "./qargs"
     }
     exports.getDebugPeopleNearby = getDebugPeopleNearby;
     async function getTestUserDetails(uid) {
-        let { default: text } = await new Promise((resolve_2, reject_2) => { require(['./lorem'], resolve_2, reject_2); });
+        let { default: text } = await new Promise((resolve_4, reject_4) => { require(['./lorem'], resolve_4, reject_4); });
         return {
             photo: conf.DBG_TEST_USER_PHOTO,
             name: uid.slice(0, 8),
