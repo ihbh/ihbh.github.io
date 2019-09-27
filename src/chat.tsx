@@ -45,7 +45,7 @@ export async function init() {
   log.i('init()');
   remoteUid = qargs.get('uid');
   log.i('Remote user:', remoteUid);
-  getUserInfo().catch(err =>
+  getRemoteUserInfo().catch(err =>
     log.e('Failed to get user info:', err));
   fetchAndRenderMessages().catch(err =>
     log.e('Failed to render messages:', err));
@@ -107,13 +107,28 @@ async function setSendButtonHandler() {
   input.textContent = autoSavedText;
 }
 
-async function getUserInfo() {
-  log.i('Getting remote user details.');
+async function getRemoteUserInfo() {
+  dom.id.chatUserName.textContent = remoteUid;
+  dom.id.chatUserIcon.src = conf.NULL_IMG;
+
+  let dir = `/srv/users/${remoteUid}/profile`;
+  let dirCached = `${conf.USERDATA_DIR}/users`;
   let name, photo;
 
   try {
-    name = await fs.get(`/srv/users/${remoteUid}/profile/name`);
-    photo = await fs.get(`/srv/users/${remoteUid}/profile/img`);
+    log.i('Getting remote user details from cache.');
+    name = await fs.get(`${dirCached}/name`);
+    photo = await fs.get(`${dirCached}/img`);
+
+    if (!name || !photo) {
+      log.i('Getting remote user details from server.');
+      name = await fs.get(`${dir}/name`);
+      photo = await fs.get(`${dir}/img`);
+
+      log.i('Saving remote user details to cache.');
+      await fs.set(`${dirCached}/name`, name);
+      await fs.set(`${dirCached}/img`, photo);
+    }
   } catch (err) {
     log.w('Failed to get user details:', err);
     if (conf.DEBUG) {
@@ -124,8 +139,8 @@ async function getUserInfo() {
     }
   }
 
-  dom.id.chatUserName.textContent = name || remoteUid;
-  dom.id.chatUserIcon.src = photo || 'data:image/jpeg;base64,';
+  if (name) dom.id.chatUserName.textContent = name;
+  if (photo) dom.id.chatUserIcon.src = photo;
 }
 
 async function fetchAndRenderMessages() {
@@ -185,16 +200,19 @@ function selectLastMessage() {
 }
 
 async function cachedIncomingMessages(messages: RemoteMessages) {
+  log.i('Saving new incoming messages to cache.');
   let dir = `${conf.USERDATA_DIR}/chats/${remoteUid}`;
   await addMessageTexts(dir, messages);
 }
 
 async function getCachedIncomingMessages() {
+  log.i('Getting cached incoming messages.');
   let dir = `${conf.USERDATA_DIR}/chats/${remoteUid}`;
   return getMessageTexts(dir);
 }
 
 async function getNewIncomingMessages() {
+  log.i('Getting new incoming messages.');
   let uid = await user.uid.get();
   let dir = `/srv/users/${remoteUid}/chats/${uid}`;
   let tsids = (await fs.dir(dir)) || [];
@@ -205,6 +223,7 @@ async function getNewIncomingMessages() {
 }
 
 async function getOutgoingMessages() {
+  log.i('Getting outgoing messages.');
   let dir = `~/chats/${remoteUid}`;
   return await getMessageTexts(dir);
 }
