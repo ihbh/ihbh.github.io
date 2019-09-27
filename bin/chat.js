@@ -68,10 +68,13 @@ define(["require", "exports", "./config", "./dom", "./fs", "./gp", "./log", "./q
                 else
                     unsent[remoteUid] = newText;
                 autoSavedText = newText;
+                log.d('Text autosaved:', autoSavedText);
                 return unsent;
             });
         }, conf.CHAT_AUTOSAVE_INTERVAL * 1000);
-        autoSavedText = (await gp.chats.get()[remoteUid]) || '';
+        let savedTexts = await gp.chats.get();
+        log.i('Saved texts:', savedTexts);
+        autoSavedText = savedTexts[remoteUid] || '';
         input.textContent = autoSavedText;
     }
     async function getRemoteUserInfo() {
