@@ -49,6 +49,7 @@ define(["require", "exports", "./buffer", "./log", "./gp", "./prop"], function (
             privkey = new buffer_1.default(keys.secretKey).toString('hex');
             await gp.pubkey.set(pubkey);
             await gp.privkey.set(privkey);
+            log.i('pubkey:', pubkey);
         }
         return { pubkey, privkey };
     });
@@ -56,11 +57,6 @@ define(["require", "exports", "./buffer", "./log", "./gp", "./prop"], function (
     exports.pubkey = new prop_1.AsyncProp(async () => {
         let keys = await keypair.get();
         return keys.pubkey;
-    });
-    // 512 bits = 64 bytes.
-    let privkey = new prop_1.AsyncProp(async () => {
-        let keys = await keypair.get();
-        return keys.privkey;
     });
     // First 64 bits of sha256(pubkey).
     exports.uid = new prop_1.AsyncProp(async () => {
@@ -72,6 +68,7 @@ define(["require", "exports", "./buffer", "./log", "./gp", "./prop"], function (
         let hash = await crypto.subtle.digest(UID_HASH, bytes);
         let subhash = hash.slice(0, UID_SIZE / 8);
         id = new buffer_1.default(subhash).toString('hex');
+        log.i('id:', id);
         await gp.uid.set(id);
         return id;
     });

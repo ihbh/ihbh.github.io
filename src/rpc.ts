@@ -233,6 +233,6 @@ let rpcurl = new AsyncProp<string>(() => {
   if (!/:\d+$/.test(url))
     url = url + ':' + config.DEFAULT_RPC_PORT;
 
-  log.i('RPC URL:', url);
+  log.i('Server:', url);
   return url;
 });

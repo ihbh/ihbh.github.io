@@ -1,7 +1,6 @@
-define(["require", "exports", "./error", "./log", "./rpc"], function (require, exports, error_1, log_1, rpc) {
+define(["require", "exports", "./error", "./rpc"], function (require, exports, error_1, rpc) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const log = new log_1.TaggedLogger('srvfs');
     class SrvFS {
         async find(path) {
             throw new error_1.NotImplementedError;

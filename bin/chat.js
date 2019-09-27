@@ -7,14 +7,21 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
         .slice(0, 19);
     const tsid2date = (tsid) => new Date(tsid.slice(0, 10) + 'T' +
         tsid.slice(11).replace(/-/g, ':') + 'Z');
-    let ruid = ''; // remote user id
+    const rm2cm = (sender, remote) => Object.keys(remote).map(tsid => {
+        return {
+            user: sender,
+            text: remote[tsid].text,
+            date: tsid2date(tsid),
+        };
+    });
+    let remoteUid = ''; // remote user id
     let autoSavedText = '';
     async function init() {
         log.i('init()');
-        ruid = qargs.get('uid');
-        log.i('Remote user:', ruid);
+        remoteUid = qargs.get('uid');
+        log.i('Remote user:', remoteUid);
         getUserInfo().catch(err => log.e('Failed to get user info:', err));
-        getMessages().catch(err => log.e('Failed to get messages:', err));
+        fetchAndRenderMessages().catch(err => log.e('Failed to render messages:', err));
         setSendButtonHandler();
     }
     exports.init = init;
@@ -41,7 +48,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
                 date: new Date,
             };
             let tsid = date2tsid(message.date);
-            await fs_1.default.set(`~/chats/${ruid}/${tsid}/text`, text);
+            await fs_1.default.set(`~/chats/${remoteUid}/${tsid}/text`, text);
             log.i('Message saved.');
             let container = dom.id.chatMessages;
             let div = renderMessage(message);
@@ -57,102 +64,145 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
                 return;
             await gp.chats.modify(unsent => {
                 if (!newText)
-                    delete unsent[ruid];
+                    delete unsent[remoteUid];
                 else
-                    unsent[ruid] = newText;
+                    unsent[remoteUid] = newText;
                 autoSavedText = newText;
                 return unsent;
             });
         }, conf.CHAT_AUTOSAVE_INTERVAL * 1000);
-        autoSavedText = (await gp.chats.get()[ruid]) || '';
+        autoSavedText = (await gp.chats.get()[remoteUid]) || '';
         input.textContent = autoSavedText;
     }
     async function getUserInfo() {
-        log.i('Getting user details for', ruid);
+        log.i('Getting remote user details.');
         let name, photo;
         try {
-            name = await fs_1.default.get(`/srv/users/${ruid}/profile/name`);
-            photo = await fs_1.default.get(`/srv/users/${ruid}/profile/img`);
+            name = await fs_1.default.get(`/srv/users/${remoteUid}/profile/name`);
+            photo = await fs_1.default.get(`/srv/users/${remoteUid}/profile/img`);
         }
         catch (err) {
             log.w('Failed to get user details:', err);
             if (conf.DEBUG) {
                 let dbg = await new Promise((resolve_2, reject_2) => { require(['./dbg'], resolve_2, reject_2); });
-                let res = await dbg.getTestUserDetails(ruid);
+                let res = await dbg.getTestUserDetails(remoteUid);
                 name = res.name;
                 photo = res.photo;
             }
         }
-        dom.id.chatUserName.textContent = name || ruid;
+        dom.id.chatUserName.textContent = name || remoteUid;
         dom.id.chatUserIcon.src = photo || 'data:image/jpeg;base64,';
     }
-    async function getMessages() {
-        log.i('Syncing chat messages with', ruid);
+    async function fetchAndRenderMessages() {
+        log.i('Syncing chat messages.');
         let time = Date.now();
         let uid = await user.uid.get();
-        let rm2cm = (sender, remote) => Object.keys(remote).map(tsid => {
-            return {
-                user: sender,
-                text: remote[tsid].text,
-                date: tsid2date(tsid),
-            };
-        });
+        let cached = await getCachedIncomingMessages();
+        addMessagesToDOM(rm2cm(remoteUid, cached));
+        selectLastMessage();
         let outgoing = await getOutgoingMessages();
-        let incoming = await getIncomingMessages();
-        let messages = [
-            ...rm2cm(uid, outgoing),
-            ...rm2cm(ruid, incoming),
-        ];
-        messages.sort((p, q) => p.date.getTime() - q.date.getTime());
-        let container = dom.id.chatMessages;
-        let divs = messages.map(renderMessage);
-        container.innerHTML = '';
-        container.append(...divs);
-        let lastDiv = divs[divs.length - 1];
-        lastDiv && lastDiv.scrollIntoView();
+        addMessagesToDOM(rm2cm(uid, outgoing));
+        selectLastMessage();
+        let incoming = await getNewIncomingMessages();
+        addMessagesToDOM(rm2cm(remoteUid, incoming));
+        selectLastMessage();
+        await cachedIncomingMessages(incoming);
         let diff = Date.now() - time;
         log.i('Rendered all messages in', diff, 'ms');
     }
-    async function getIncomingMessages() {
+    function addMessagesToDOM(messages) {
+        if (!messages.length)
+            return;
+        log.i('Adding new messages to DOM:', messages.length);
+        let container = dom.id.chatMessages;
+        for (let message of messages) {
+            let div = renderMessage(message);
+            let next = findNextMessage(div.getAttribute('time'));
+            container.insertBefore(div, next);
+        }
+    }
+    function findNextMessage(tsid) {
+        let container = dom.id.chatMessages;
+        let list = container.children;
+        for (let i = 0; i < list.length; i++) {
+            let next = list.item(i);
+            if (next instanceof HTMLElement)
+                if (tsid <= next.getAttribute('time'))
+                    return next;
+        }
+        return null;
+    }
+    function selectLastMessage() {
+        let container = dom.id.chatMessages;
+        let divs = container.children;
+        let lastDiv = divs.item(divs.length - 1);
+        lastDiv && lastDiv.scrollIntoView();
+    }
+    async function cachedIncomingMessages(messages) {
+        let dir = `${conf.USERDATA_DIR}/chats/${remoteUid}`;
+        await addMessageTexts(dir, messages);
+    }
+    async function getCachedIncomingMessages() {
+        let dir = `${conf.USERDATA_DIR}/chats/${remoteUid}`;
+        return getMessageTexts(dir);
+    }
+    async function getNewIncomingMessages() {
+        let uid = await user.uid.get();
+        let dir = `/srv/users/${remoteUid}/chats/${uid}`;
+        let tsids = (await fs_1.default.dir(dir)) || [];
+        let dirCached = `${conf.USERDATA_DIR}/chats/${remoteUid}`;
+        let tsidsCached = (await fs_1.default.dir(dirCached)) || [];
+        let tsidsNew = diff(tsids, tsidsCached);
+        return getMessageTexts(dir, tsidsNew);
+    }
+    async function getOutgoingMessages() {
+        let dir = `~/chats/${remoteUid}`;
+        return await getMessageTexts(dir);
+    }
+    async function getMessageTexts(dir, tsids) {
         try {
-            let uid = await user.uid.get();
-            let incoming = {};
-            let base = `/srv/users/${ruid}/chats/${uid}`;
-            let dirs = await fs_1.default.dir(base) || [];
-            let ps = dirs.map(async (tsid) => {
-                let text = await fs_1.default.get(`${base}/${tsid}/text`);
-                incoming[tsid] = { text };
+            let messages = {};
+            if (!tsids)
+                tsids = (await fs_1.default.dir(dir)) || [];
+            log.i(`Getting ${tsids.length} messages from ${dir}/*/text`);
+            let ps = tsids.map(async (tsid) => {
+                let text = await fs_1.default.get(`${dir}/${tsid}/text`);
+                messages[tsid] = { text };
             });
             await Promise.all(ps);
-            log.i('Incoming messages:', Object.keys(incoming).length);
-            return incoming || {};
+            return messages;
         }
         catch (err) {
-            log.w('Failed to get incoming messages:', err);
+            log.w('Failed to get message texts:', dir, err);
             return {};
         }
     }
-    async function getOutgoingMessages() {
+    async function addMessageTexts(dir, messages) {
         try {
-            let outgoing = {};
-            let dirs = await fs_1.default.dir(`~/chats/${ruid}`);
-            let ps = dirs.map(async (tsid) => {
-                let text = await fs_1.default.get(`~/chats/${ruid}/${tsid}/text`);
-                outgoing[tsid] = { text };
+            let tsids = Object.keys(messages);
+            let ps = tsids.map(async (tsid) => {
+                let text = messages[tsid].text;
+                if (!text)
+                    throw new Error(`No text at ${tsid} for ${dir}.`);
+                await fs_1.default.set(`${dir}/${tsid}/text`, text);
             });
             await Promise.all(ps);
-            log.i('Outgoing messages:', Object.keys(outgoing).length);
-            return outgoing;
+            log.i('Added message texts:', dir, tsids.length);
         }
         catch (err) {
-            log.w('Failed to get outgoing messages:', err);
-            return {};
+            log.w('Failed to add message texts:', dir, err);
         }
     }
     function renderMessage(message) {
-        let cs = message.user == ruid ? 'theirs' : 'yours';
+        let cs = message.user == remoteUid ? 'theirs' : 'yours';
         let ts = date2tsid(message.date);
         return react_1.default.createElement("div", { class: cs, time: ts }, message.text);
+    }
+    function diff(a, b) {
+        let s = new Set(a);
+        for (let x of b)
+            s.delete(x);
+        return [...s];
     }
 });
 //# sourceMappingURL=chat.js.map

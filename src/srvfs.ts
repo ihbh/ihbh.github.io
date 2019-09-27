@@ -1,9 +1,6 @@
 import { NotImplementedError } from './error';
 import { FS } from './fs-api';
-import { TaggedLogger } from './log';
 import * as rpc from './rpc';
-
-const log = new TaggedLogger('srvfs');
 
 class SrvFS implements FS {
   async find(path: string): Promise<string[]> {
