@@ -44,7 +44,7 @@ define(["require", "exports", "./config", "./dom", "./fs", "./log", "./qargs", "
     function makeUserCard(info) {
         let href = '?page=chat&uid=' + info.uid;
         return react_1.default.createElement("a", { href: href },
-            react_1.default.createElement("img", { src: info.photo || 'data:image/jpeg;base64,' }),
+            react_1.default.createElement("img", { src: info.photo || conf.NULL_IMG }),
             react_1.default.createElement("span", null, info.name || info.uid));
     }
     async function getPeopleNearby({ lat, lon }) {

@@ -239,15 +239,16 @@ body .page .ol-attribution * {
 }
 
 /* ?page=nearby */
+/* ?page=unread */
 
-#visitors {
+.user-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-gap: 1em;
   padding: 1em;
 }
 
-#visitors a {
+.user-cards a {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -255,13 +256,13 @@ body .page .ol-attribution * {
   color: inherit;
 }
 
-#visitors img {
+.user-cards img {
   width: 64px;
   height: 64px;
   border-radius: 50%;
 }
 
-#visitors span {
+.user-cards span {
   font-size: 0.5em;
   text-align: center;
   word-break: break-word;

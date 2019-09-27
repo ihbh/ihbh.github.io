@@ -19,6 +19,7 @@ export const id = {
   get showPlaces() { return $('#show-places'); },
   get refreshGps() { return $<HTMLButtonElement>('#refresh-gps'); },
   get visitors() { return $('#visitors'); },
+  get activeChats() { return $('#p-unread > .user-cards'); },
   get nearbyStatus() { return $('#nearby-status'); },
   get chatUserIcon() { return $<HTMLImageElement>('#chat-u-icon'); },
   get chatUserName() { return $('#chat-u-name'); },

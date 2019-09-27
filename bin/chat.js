@@ -78,7 +78,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
         dom.id.chatUserName.textContent = remoteUid;
         dom.id.chatUserIcon.src = conf.NULL_IMG;
         let dir = `/srv/users/${remoteUid}/profile`;
-        let dirCached = `${conf.USERDATA_DIR}/users`;
+        let dirCached = `${conf.USERDATA_DIR}/users/${remoteUid}`;
         let name, photo;
         try {
             log.i('Getting remote user details from cache.');

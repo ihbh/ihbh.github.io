@@ -62,7 +62,7 @@ function setStatus(text: string) {
 function makeUserCard(info: UserInfo) {
   let href = '?page=chat&uid=' + info.uid;
   return <a href={href}>
-    <img src={info.photo || 'data:image/jpeg;base64,'} />
+    <img src={info.photo || conf.NULL_IMG} />
     <span>{info.name || info.uid}</span>
   </a>;
 }

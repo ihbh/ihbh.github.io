@@ -61,11 +61,17 @@
     <div id="all-places"></div>
   </div>
 
-  <!-- Lst of other visitors nearby. -->
+  <!-- List of other visitors nearby. -->
 
   <div id="p-nearby" class="page">
     <div id="nearby-status"></div>
-    <div id="visitors"></div>
+    <div id="visitors" class="user-cards"></div>
+  </div>
+
+  <!-- All chats, unread first. -->
+
+  <div id="p-unread" class="page">
+    <div class="user-cards"></div>
   </div>
 
   <!-- The main page with the map. -->
@@ -79,7 +85,7 @@
       </a>
       <img id="show-places" src="icons/globe.png">
       <a href="?page=unread">
-        <img id="show-unread-messages" src="icons/chat.png">
+        <img src="icons/chat.png">
       </a>
       <img id="refresh-gps" src="icons/gps.png" alt="+">
     </div>
@@ -90,8 +96,8 @@
 
   <div id="p-chat" class="page">
     <div id="u-header">
-      <img id="chat-u-icon" src="/favicon.ico" />
-      <span id="chat-u-name">FooBar</span>
+      <img id="chat-u-icon" />
+      <span id="chat-u-name">[?]</span>
     </div>
     <div id="messages"></div>
     <div id="u-footer">

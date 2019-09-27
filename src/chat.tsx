@@ -112,7 +112,7 @@ async function getRemoteUserInfo() {
   dom.id.chatUserIcon.src = conf.NULL_IMG;
 
   let dir = `/srv/users/${remoteUid}/profile`;
-  let dirCached = `${conf.USERDATA_DIR}/users`;
+  let dirCached = `${conf.USERDATA_DIR}/users/${remoteUid}`;
   let name, photo;
 
   try {

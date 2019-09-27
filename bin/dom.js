@@ -21,6 +21,7 @@ define(["require", "exports"], function (require, exports) {
         get showPlaces() { return $('#show-places'); },
         get refreshGps() { return $('#refresh-gps'); },
         get visitors() { return $('#visitors'); },
+        get activeChats() { return $('#p-unread > .user-cards'); },
         get nearbyStatus() { return $('#nearby-status'); },
         get chatUserIcon() { return $('#chat-u-icon'); },
         get chatUserName() { return $('#chat-u-name'); },
