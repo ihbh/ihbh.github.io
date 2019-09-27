@@ -1,10 +1,11 @@
 import * as conf from './config';
 import * as dom from './dom';
+import fs from './fs';
 import * as gp from './gp';
 import { TaggedLogger } from './log';
 import * as qargs from './qargs';
 import React from './react';
-import fs from './fs';
+import * as ucache from './ucache';
 import * as user from './user';
 
 let log = new TaggedLogger('chat');
@@ -111,36 +112,10 @@ async function getRemoteUserInfo() {
   dom.id.chatUserName.textContent = remoteUid;
   dom.id.chatUserIcon.src = conf.NULL_IMG;
 
-  let dir = `/srv/users/${remoteUid}/profile`;
-  let dirCached = `${conf.USERDATA_DIR}/users/${remoteUid}`;
-  let name, photo;
+  let info = await ucache.getUserInfo(remoteUid);
 
-  try {
-    log.i('Getting remote user details from cache.');
-    name = await fs.get(`${dirCached}/name`);
-    photo = await fs.get(`${dirCached}/img`);
-
-    if (!name || !photo) {
-      log.i('Getting remote user details from server.');
-      name = await fs.get(`${dir}/name`);
-      photo = await fs.get(`${dir}/img`);
-
-      log.i('Saving remote user details to cache.');
-      await fs.set(`${dirCached}/name`, name);
-      await fs.set(`${dirCached}/img`, photo);
-    }
-  } catch (err) {
-    log.w('Failed to get user details:', err);
-    if (conf.DEBUG) {
-      let dbg = await import('./dbg');
-      let res = await dbg.getTestUserDetails(remoteUid);
-      name = res.name;
-      photo = res.photo;
-    }
-  }
-
-  if (name) dom.id.chatUserName.textContent = name;
-  if (photo) dom.id.chatUserIcon.src = photo;
+  dom.id.chatUserName.textContent = info.name || info.uid;
+  dom.id.chatUserIcon.src = info.photo || conf.NULL_IMG;
 }
 
 async function fetchAndRenderMessages() {

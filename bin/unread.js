@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./fs", "./log", "./react"], function (require, exports, conf, dom, fs_1, log_1, react_1) {
+define(["require", "exports", "./config", "./dom", "./fs", "./log", "./react", "./ucache"], function (require, exports, conf, dom, fs_1, log_1, react_1, ucache_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('unread');
@@ -29,19 +29,12 @@ define(["require", "exports", "./config", "./dom", "./fs", "./log", "./react"], 
     }
     async function getActiveChats() {
         log.i('Getting the list of chats.');
-        let list = (await fs_1.default.dir('~/chats')) || [];
-        if (!list.length)
+        let uids = await fs_1.default.dir('~/chats');
+        if (!uids || !uids.length)
             return [];
-        log.i('Getting user details:', list.length);
-        let infos = new Map();
-        let ps = list.map(async (id) => {
-            let dir = `/srv/users/${id}/profile`;
-            let name = await fs_1.default.get(dir + '/name');
-            let photo = await fs_1.default.get(dir + '/img');
-            infos.set(id, { uid: id, name, photo });
-        });
-        await Promise.all(ps);
-        return [...infos.values()];
+        log.i('Getting user details:', uids.length);
+        let ps = uids.map(ucache_1.getUserInfo);
+        return Promise.all(ps);
     }
 });
 //# sourceMappingURL=unread.js.map

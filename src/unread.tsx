@@ -3,15 +3,9 @@ import * as dom from './dom';
 import fs from './fs';
 import { TaggedLogger } from './log';
 import React from './react';
-import * as user from './user';
+import { getUserInfo, UserInfo } from './ucache';
 
 let log = new TaggedLogger('unread');
-
-interface UserInfo {
-  uid: string;
-  name?: string;
-  photo?: string;
-}
 
 export async function init() {
   log.i('init()');
@@ -41,18 +35,10 @@ function makeUserCard(info: UserInfo) {
 
 async function getActiveChats(): Promise<UserInfo[]> {
   log.i('Getting the list of chats.');
-  let list = (await fs.dir('~/chats')) || [];
-  if (!list.length) return [];
+  let uids = await fs.dir('~/chats');
+  if (!uids || !uids.length) return [];
 
-  log.i('Getting user details:', list.length);
-  let infos = new Map<string, UserInfo>();
-  let ps = list.map(async id => {
-    let dir = `/srv/users/${id}/profile`;
-    let name = await fs.get(dir + '/name');
-    let photo = await fs.get(dir + '/img');
-    infos.set(id, { uid: id, name, photo });
-  });
-
-  await Promise.all(ps);
-  return [...infos.values()];
+  log.i('Getting user details:', uids.length);
+  let ps = uids.map(getUserInfo);
+  return Promise.all(ps);
 }

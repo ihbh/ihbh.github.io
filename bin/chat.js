@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "./react", "./fs", "./user"], function (require, exports, conf, dom, gp, log_1, qargs, react_1, fs_1, user) {
+define(["require", "exports", "./config", "./dom", "./fs", "./gp", "./log", "./qargs", "./react", "./ucache", "./user"], function (require, exports, conf, dom, fs_1, gp, log_1, qargs, react_1, ucache, user) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('chat');
@@ -77,35 +77,9 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
     async function getRemoteUserInfo() {
         dom.id.chatUserName.textContent = remoteUid;
         dom.id.chatUserIcon.src = conf.NULL_IMG;
-        let dir = `/srv/users/${remoteUid}/profile`;
-        let dirCached = `${conf.USERDATA_DIR}/users/${remoteUid}`;
-        let name, photo;
-        try {
-            log.i('Getting remote user details from cache.');
-            name = await fs_1.default.get(`${dirCached}/name`);
-            photo = await fs_1.default.get(`${dirCached}/img`);
-            if (!name || !photo) {
-                log.i('Getting remote user details from server.');
-                name = await fs_1.default.get(`${dir}/name`);
-                photo = await fs_1.default.get(`${dir}/img`);
-                log.i('Saving remote user details to cache.');
-                await fs_1.default.set(`${dirCached}/name`, name);
-                await fs_1.default.set(`${dirCached}/img`, photo);
-            }
-        }
-        catch (err) {
-            log.w('Failed to get user details:', err);
-            if (conf.DEBUG) {
-                let dbg = await new Promise((resolve_2, reject_2) => { require(['./dbg'], resolve_2, reject_2); });
-                let res = await dbg.getTestUserDetails(remoteUid);
-                name = res.name;
-                photo = res.photo;
-            }
-        }
-        if (name)
-            dom.id.chatUserName.textContent = name;
-        if (photo)
-            dom.id.chatUserIcon.src = photo;
+        let info = await ucache.getUserInfo(remoteUid);
+        dom.id.chatUserName.textContent = info.name || info.uid;
+        dom.id.chatUserIcon.src = info.photo || conf.NULL_IMG;
     }
     async function fetchAndRenderMessages() {
         log.i('Syncing chat messages.');
