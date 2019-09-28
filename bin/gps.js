@@ -2,24 +2,39 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('gps');
-    let options = { enableHighAccuracy: true };
-    function watch(listener) {
-        navigator.geolocation.getCurrentPosition(pos => listener(pos.coords), err => log.w('error:', err), options);
-        let wid = navigator.geolocation.watchPosition(pos => {
+    function watch(listener, timeout) {
+        let options = {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout,
+        };
+        let sendUpdate = (pos) => {
             let { latitude, longitude, altitude, accuracy } = pos.coords;
             log.i(`update: lat=${latitude.toFixed(4)} lon=${longitude.toFixed(4)} ` +
                 `acc=${accuracy.toFixed(0)}m alt=${altitude || 0}m`);
             listener(pos.coords);
-        }, err => {
+        };
+        let logError = (err) => {
             log.w('error:', err);
-        }, options);
-        log.i('Watch started:', wid);
-        return {
+        };
+        navigator.geolocation.getCurrentPosition(sendUpdate, logError, options);
+        let wid = navigator.geolocation.watchPosition(sendUpdate, logError, options);
+        let tid = setTimeout(() => {
+            log.i('Stopped watching as the timeout expired:', timeout);
+            watcher.stop();
+        }, timeout);
+        log.i('Watcher started:', wid, 'timeout:', timeout);
+        let watcher = {
             stop() {
+                if (!wid)
+                    return;
+                clearTimeout(tid);
                 navigator.geolocation.clearWatch(wid);
-                log.i('Watch stopped:', wid);
+                log.i('Watcher stopped:', wid);
+                wid = null;
             }
         };
+        return watcher;
     }
     exports.watch = watch;
     function dist(p, q) {

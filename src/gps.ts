@@ -1,36 +1,57 @@
 import { TaggedLogger } from './log';
 
 let log = new TaggedLogger('gps');
-let options = { enableHighAccuracy: true };
 
 export interface Watcher {
   stop(): void;
 }
 
-export function watch(listener: (pos: Coordinates) => void): Watcher {
+export function watch(listener: (pos: Coordinates) => void, timeout: number): Watcher {
+  let options: PositionOptions = {
+    enableHighAccuracy: true,
+    maximumAge: 0,
+    timeout,
+  };
+
+  let sendUpdate = (pos: Position) => {
+    let { latitude, longitude, altitude, accuracy } = pos.coords;
+    log.i(`update: lat=${latitude.toFixed(4)} lon=${longitude.toFixed(4)} ` +
+      `acc=${accuracy.toFixed(0)}m alt=${altitude || 0}m`);
+    listener(pos.coords);
+  };
+
+  let logError = (err) => {
+    log.w('error:', err);
+  };
+
   navigator.geolocation.getCurrentPosition(
-    pos => listener(pos.coords),
-    err => log.w('error:', err),
+    sendUpdate,
+    logError,
     options);
 
   let wid = navigator.geolocation.watchPosition(
-    pos => {
-      let { latitude, longitude, altitude, accuracy } = pos.coords;
-      log.i(`update: lat=${latitude.toFixed(4)} lon=${longitude.toFixed(4)} ` +
-        `acc=${accuracy.toFixed(0)}m alt=${altitude || 0}m`);
-      listener(pos.coords);
-    }, err => {
-      log.w('error:', err);
-    }, options);
+    sendUpdate,
+    logError,
+    options);
 
-  log.i('Watch started:', wid);
+  let tid = setTimeout(() => {
+    log.i('Stopped watching as the timeout expired:', timeout);
+    watcher.stop();
+  }, timeout);
 
-  return {
+  log.i('Watcher started:', wid, 'timeout:', timeout);
+
+  let watcher = {
     stop() {
+      if (!wid) return;
+      clearTimeout(tid);
       navigator.geolocation.clearWatch(wid);
-      log.i('Watch stopped:', wid);
+      log.i('Watcher stopped:', wid);
+      wid = null;
     }
   };
+
+  return watcher;
 }
 
 export function dist(p: Coordinates, q: Coordinates) {

@@ -70,7 +70,7 @@ async function loadMap() {
 function startWatchingGps() {
   log.i('Refreshing the GPS location.');
   watcher && watcher.stop()
-  watcher = gps.watch(onGpsUpdated);
+  watcher = gps.watch(onGpsUpdated, conf.GPS_TIMEOUT);
 }
 
 function onGpsUpdated(pos: Coordinates) {

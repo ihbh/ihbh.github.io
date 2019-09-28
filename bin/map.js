@@ -56,7 +56,7 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
     function startWatchingGps() {
         log.i('Refreshing the GPS location.');
         watcher && watcher.stop();
-        watcher = gps.watch(onGpsUpdated);
+        watcher = gps.watch(onGpsUpdated, conf.GPS_TIMEOUT);
     }
     function onGpsUpdated(pos) {
         if (bestPos && gps.dist(bestPos, pos) < conf.MIN_SIGNIFICANT_DIST) {
