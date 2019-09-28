@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./fs", "./log", "./qargs", "./react", "./rpc", "./user"], function (require, exports, conf, dom, fs_1, log_1, qargs, react_1, rpc, user) {
+define(["require", "exports", "./config", "./dom", "./log", "./qargs", "./react", "./rpc", "./ucache", "./user"], function (require, exports, conf, dom, log_1, qargs, react_1, rpc, ucache_1, user) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('nearby');
@@ -53,15 +53,8 @@ define(["require", "exports", "./config", "./dom", "./fs", "./log", "./qargs", "
         let uid = await user.uid.get();
         vuids = vuids.filter(vuid => vuid != uid);
         log.i('People nearby:', vuids);
-        let infos = new Map();
-        let ps = vuids.map(async (vuid) => {
-            let dir = `/srv/users/${vuid}/profile`;
-            let name = await fs_1.default.get(dir + '/name');
-            let photo = await fs_1.default.get(dir + '/img');
-            infos.set(vuid, { uid: vuid, name, photo });
-        });
-        await Promise.all(ps);
-        return [...infos.values()];
+        let ps = vuids.map(ucache_1.getUserInfo);
+        return Promise.all(ps);
     }
 });
 //# sourceMappingURL=nearby.js.map

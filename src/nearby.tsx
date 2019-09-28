@@ -1,10 +1,10 @@
 import * as conf from './config';
 import * as dom from './dom';
-import fs from './fs';
 import { TaggedLogger } from './log';
 import * as qargs from './qargs';
 import React from './react';
 import * as rpc from './rpc';
+import { getUserInfo } from './ucache';
 import * as user from './user';
 
 interface UserInfo {
@@ -77,14 +77,6 @@ async function getPeopleNearby({ lat, lon }): Promise<UserInfo[]> {
   vuids = vuids.filter(vuid => vuid != uid);
   log.i('People nearby:', vuids);
 
-  let infos = new Map<string, UserInfo>();
-  let ps = vuids.map(async vuid => {
-    let dir = `/srv/users/${vuid}/profile`;
-    let name = await fs.get(dir + '/name');
-    let photo = await fs.get(dir + '/img');
-    infos.set(vuid, { uid: vuid, name, photo });
-  });
-
-  await Promise.all(ps);
-  return [...infos.values()];
+  let ps = vuids.map(getUserInfo);
+  return Promise.all(ps);
 }
