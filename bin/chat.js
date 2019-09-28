@@ -100,6 +100,7 @@ define(["require", "exports", "./config", "./dom", "./fs", "./gp", "./log", "./q
         await cachedIncomingMessages(incoming);
         let diff = Date.now() - time;
         log.i('Rendered all messages in', diff, 'ms');
+        await clearUnreadMark();
     }
     function addMessagesToDOM(messages) {
         if (!messages.length)
@@ -153,6 +154,11 @@ define(["require", "exports", "./config", "./dom", "./fs", "./gp", "./log", "./q
         log.i('Getting outgoing messages.');
         let dir = `~/chats/${remoteUid}`;
         return await getMessageTexts(dir);
+    }
+    async function clearUnreadMark() {
+        log.i('Marking all messages as read.');
+        let uid = await user.uid.get();
+        await fs_1.default.set(`/srv/users/${uid}/unread/${remoteUid}`, null);
     }
     async function getMessageTexts(dir, tsids) {
         try {

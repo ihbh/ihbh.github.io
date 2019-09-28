@@ -273,6 +273,10 @@ body .page .ol-attribution * {
   word-break: break-word;
 }
 
+.user-cards .unread {
+  font-weight: bold;
+}
+
 #nearby-status {
   word-wrap: break-word;
   word-break: break-all;

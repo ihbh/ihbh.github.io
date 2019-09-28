@@ -4,8 +4,10 @@ import fs from './fs';
 import { TaggedLogger } from './log';
 import React from './react';
 import { getUserInfo, UserInfo } from './ucache';
+import * as user from './user';
 
-let log = new TaggedLogger('unread');
+const log = new TaggedLogger('unread');
+const cards = new Map<string, HTMLElement>();
 
 export async function init() {
   log.i('init()');
@@ -20,12 +22,33 @@ export async function init() {
     infos = await dbg.getDebugPeopleNearby();
   }
 
-  if (!infos.length) return;
+  log.i('Existing chats:', infos.length);
   let container = dom.id.activeChats;
-  container.append(...infos.map(makeUserCard));
+
+  for (let info of infos) {
+    let card = renderUserCard(info);
+    cards.set(info.uid, card);
+    container.append(card);
+  }
+
+  log.i('Checking if there are new unread messages.');
+  let uids = await getUnreadChats();
+  if (!uids.length) log.i('No new unread messages.');
+
+  for (let uid of uids) {
+    let card = cards.get(uid);
+    if (!card) {
+      log.i('Unread chat from a new user:', uid);
+      let info = await getUserInfo(uid);
+      card = renderUserCard(info);
+      cards.set(uid, card);
+      container.prepend(card);
+    }
+    card.classList.add('unread');
+  }
 }
 
-function makeUserCard(info: UserInfo) {
+function renderUserCard(info: UserInfo) {
   let href = '?page=chat&uid=' + info.uid;
   return <a href={href}>
     <img src={info.photo || conf.NULL_IMG} />
@@ -41,4 +64,10 @@ async function getActiveChats(): Promise<UserInfo[]> {
   log.i('Getting user details:', uids.length);
   let ps = uids.map(getUserInfo);
   return Promise.all(ps);
+}
+
+async function getUnreadChats(): Promise<string[]> {  
+  let uid = await user.uid.get();
+  let uids = await fs.dir(`/srv/users/${uid}/unread`);
+  return uids || [];
 }

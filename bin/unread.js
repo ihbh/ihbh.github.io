@@ -1,7 +1,8 @@
-define(["require", "exports", "./config", "./dom", "./fs", "./log", "./react", "./ucache"], function (require, exports, conf, dom, fs_1, log_1, react_1, ucache_1) {
+define(["require", "exports", "./config", "./dom", "./fs", "./log", "./react", "./ucache", "./user"], function (require, exports, conf, dom, fs_1, log_1, react_1, ucache_1, user) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    let log = new log_1.TaggedLogger('unread');
+    const log = new log_1.TaggedLogger('unread');
+    const cards = new Map();
     async function init() {
         log.i('init()');
         let infos;
@@ -15,13 +16,31 @@ define(["require", "exports", "./config", "./dom", "./fs", "./log", "./react", "
             let dbg = await new Promise((resolve_1, reject_1) => { require(['./dbg'], resolve_1, reject_1); });
             infos = await dbg.getDebugPeopleNearby();
         }
-        if (!infos.length)
-            return;
+        log.i('Existing chats:', infos.length);
         let container = dom.id.activeChats;
-        container.append(...infos.map(makeUserCard));
+        for (let info of infos) {
+            let card = renderUserCard(info);
+            cards.set(info.uid, card);
+            container.append(card);
+        }
+        log.i('Checking if there are new unread messages.');
+        let uids = await getUnreadChats();
+        if (!uids.length)
+            log.i('No new unread messages.');
+        for (let uid of uids) {
+            let card = cards.get(uid);
+            if (!card) {
+                log.i('Unread chat from a new user:', uid);
+                let info = await ucache_1.getUserInfo(uid);
+                card = renderUserCard(info);
+                cards.set(uid, card);
+                container.prepend(card);
+            }
+            card.classList.add('unread');
+        }
     }
     exports.init = init;
-    function makeUserCard(info) {
+    function renderUserCard(info) {
         let href = '?page=chat&uid=' + info.uid;
         return react_1.default.createElement("a", { href: href },
             react_1.default.createElement("img", { src: info.photo || conf.NULL_IMG }),
@@ -35,6 +54,11 @@ define(["require", "exports", "./config", "./dom", "./fs", "./log", "./react", "
         log.i('Getting user details:', uids.length);
         let ps = uids.map(ucache_1.getUserInfo);
         return Promise.all(ps);
+    }
+    async function getUnreadChats() {
+        let uid = await user.uid.get();
+        let uids = await fs_1.default.dir(`/srv/users/${uid}/unread`);
+        return uids || [];
     }
 });
 //# sourceMappingURL=unread.js.map
