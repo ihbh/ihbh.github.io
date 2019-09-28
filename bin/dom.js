@@ -7,7 +7,7 @@ define(["require", "exports"], function (require, exports) {
         get mapAll() { return $('#all-places'); },
         get sendLocation() { return $('#send'); },
         get logs() { return $('#logs'); },
-        get gotoLondon() { return $('#gps-london'); },
+        get gotoCommon() { return $('#gps-london'); },
         get showLogs() { return $('#show-logs'); },
         get exportDB() { return $('#export-db'); },
         get importDB() { return $('#import-db'); },

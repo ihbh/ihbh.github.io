@@ -7,9 +7,11 @@ define(["require", "exports", "./config", "./dom", "./idb", "./log", "./logdb", 
         if (!conf.DEBUG)
             return;
         document.body.classList.add(dom.CSS_DEBUG);
-        dom.id.gotoLondon.onclick = async () => {
-            let lat = 51.5073509;
-            let lon = -0.1277583;
+        dom.id.gotoCommon.onclick = async () => {
+            let d = 1e-4; // 10 meters
+            let x = (2 * Math.random() - 1) * d; // +/- 10 meters
+            let lat = 49.246292 + x;
+            let lon = -123.116226 + x;
             let loc = await new Promise((resolve_1, reject_1) => { require(['./loc'], resolve_1, reject_1); });
             await loc.shareLocation({ lat, lon });
             let page = await new Promise((resolve_2, reject_2) => { require(['./page'], resolve_2, reject_2); });
