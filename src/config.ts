@@ -13,6 +13,7 @@ export const MIN_SIGNIFICANT_DIST = 10 * MAP_1M;
 export const GPS_DIGITS = 7;
 export const GPS_TIMEOUT = 15000; // ms
 export const MAP_BOX_SIZE = 250 * MAP_1M;
+export const PLACE_CLICK_TIMEOUT = 1000; // ms
 export const OSM_URL = 'https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0';
 export const OSM_LIB = `${OSM_URL}/build/ol.js`;
 export const OSM_CSS = `${OSM_URL}/css/ol.css`;

@@ -1,7 +1,9 @@
-define(["require", "exports", "./dom", "./log", "./loc", "./osm", "./config", "./qargs"], function (require, exports, dom, log_1, loc, osm_1, config_1, qargs) {
+define(["require", "exports", "./dom", "./log", "./loc", "./osm", "./config", "./qargs"], function (require, exports, dom, log_1, loc, osm_1, conf, qargs) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('places');
+    let timer = 0;
+    let lastClickedTskey = '';
     async function init() {
         try {
             await loadMap();
@@ -37,8 +39,19 @@ define(["require", "exports", "./dom", "./log", "./loc", "./osm", "./config", ".
             let diff = tmax - +time;
             let opacity = Math.exp(-diff / (tmax - tmin));
             let marker = osm.addMarker({ id, lat, lon, opacity });
-            marker.onclick = () => log.i(`place ${id} clicked`);
+            marker.onclick = () => handleClick(id);
         }
+    }
+    function handleClick(id) {
+        log.i(`place ${id} clicked`);
+        if (id > lastClickedTskey)
+            lastClickedTskey = id;
+        timer = timer || setTimeout(async () => {
+            log.i('Opening place:', lastClickedTskey);
+            let { lat, lon } = await loc.getPlace(lastClickedTskey);
+            let page = await new Promise((resolve_1, reject_1) => { require(['./page'], resolve_1, reject_1); });
+            page.set('nearby', { lat, lon });
+        }, conf.PLACE_CLICK_TIMEOUT);
     }
     function getBBox(places) {
         let bbox = {
@@ -51,10 +64,10 @@ define(["require", "exports", "./dom", "./log", "./loc", "./osm", "./config", ".
             bbox.max.lat = Math.max(bbox.max.lat, lat);
             bbox.max.lon = Math.max(bbox.max.lon, lon);
         }
-        bbox.min.lat -= config_1.MAP_BOX_SIZE;
-        bbox.min.lon -= config_1.MAP_BOX_SIZE;
-        bbox.max.lat += config_1.MAP_BOX_SIZE;
-        bbox.max.lon += config_1.MAP_BOX_SIZE;
+        bbox.min.lat -= conf.MAP_BOX_SIZE;
+        bbox.min.lon -= conf.MAP_BOX_SIZE;
+        bbox.max.lat += conf.MAP_BOX_SIZE;
+        bbox.max.lon += conf.MAP_BOX_SIZE;
         return bbox;
     }
 });

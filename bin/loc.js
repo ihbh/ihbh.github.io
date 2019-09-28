@@ -10,6 +10,7 @@ define(["require", "exports", "./config", "./fs"], function (require, exports, c
         ]);
         return { lat, lon, time };
     }
+    exports.getPlace = getPlace;
     async function setPlace(tskey, { lat, lon, time }) {
         let dir = conf.VPLACES_DIR + '/' + tskey;
         await Promise.all([

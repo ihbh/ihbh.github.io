@@ -23,7 +23,7 @@ export interface VisitorNote {
   pos: GpsCoords;
 }
 
-async function getPlace(tskey: string): Promise<Place> {
+export async function getPlace(tskey: string): Promise<Place> {
   let dir = conf.VPLACES_DIR + '/' + tskey;
   let [lat, lon, time] = await Promise.all([
     fs.get(dir + '/lat'),
