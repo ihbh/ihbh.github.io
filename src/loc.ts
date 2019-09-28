@@ -1,6 +1,5 @@
 import * as conf from './config';
 import fs from './fs';
-import * as gp from './gp';
 
 export interface Place {
   time: number; // Date.now()/1000
@@ -44,7 +43,7 @@ async function setPlace(tskey: string, { lat, lon, time }: Place) {
   ]);
 }
 
-function deriveTsKey(time: number) {
+export function deriveTsKey(time: number) {
   let tskey = (time / 60 | 0).toString(16);
   while (tskey.length < 8) tskey = '0' + tskey;
   return tskey;

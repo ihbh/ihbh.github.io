@@ -1,6 +1,7 @@
 import * as dom from './dom';
 import { TaggedLogger } from "./log";
 import * as config from './config';
+import * as ol from 'ol';
 
 const log = new TaggedLogger('osm');
 
@@ -14,11 +15,25 @@ export interface LonLat {
   lat: number; // lat = y-axis, south-to-north
 }
 
+export interface Marker {
+  id: string;
+  lat: number;
+  lon: number;
+  onclick?: () => any;
+  remove(): void;
+}
+
+async function importOpenLayersLib() {
+  let ol = await import(config.OSM_LIB);
+  window['ol'] = ol;
+  return ol;
+}
+
 export class OSM {
   private mapid: string = null;
-  private map = null; // ol.Map
+  private map: ol.Map = null;
   private ol = null;
-  private layers = [];
+  private markers = new Map<string, Marker>();
 
   constructor(mapid: string) {
     this.mapid = mapid.replace('#', '');
@@ -28,7 +43,7 @@ export class OSM {
     log.i('Rendering OSM in #' + this.mapid,
       JSON.stringify(bbox));
 
-    this.ol = await import(config.OSM_LIB);
+    this.ol = await importOpenLayersLib();
     let ol = this.ol;
 
     dom.loadStyles(config.OSM_CSS);
@@ -42,7 +57,35 @@ export class OSM {
       ],
     });
 
+    this.addClickHandler();
     bbox && await this.setBBox(bbox);
+  }
+
+  private addClickHandler() {
+    this.map.on('singleclick', e => {
+      let [lon, lat] = this.ol.proj.toLonLat(e.coordinate);
+      log.d('map:singleclick', lat, lon, e);
+      this.map.forEachLayerAtPixel(e.pixel, (layer) => {
+        let key = layer.get('myKey');
+        log.d('layer:', key, layer);
+        key && this.fireMarkerClickEvent(key);
+      });
+    });
+  }
+
+  private fireMarkerClickEvent(key: string) {
+    let marker = this.markers.get(key);
+    if (!marker) return;
+
+    let onclick = marker.onclick;
+    if (!onclick) return;
+
+    try {
+      log.i(`Marker ${key}.onclick`);
+      onclick();
+    } catch (err) {
+      log.w(`Marker ${marker.id}.onclick failed:`, err);
+    }
   }
 
   setBBox({ min, max }: BBox) {
@@ -62,11 +105,13 @@ export class OSM {
     this.map.getView().fit(extent);
   }
 
-  addMarker({ lat, lon, opacity = 1 }) {
+  addMarker({ id = '', lat, lon, opacity = 1 }): Marker {
     let ol = this.ol;
-    log.i(`marker: ${lat}, ${lon}`);
+    id = id || Math.random().toString(16).slice(2);
+    log.i(`marker: id=${id}, lat=${lat}, lon=${lon}`);
 
     let layer = new ol.layer.Vector({
+      myKey: id,
       source: new ol.source.Vector({
         features: [
           new ol.Feature({
@@ -86,12 +131,22 @@ export class OSM {
     });
 
     this.map.addLayer(layer);
-    this.layers.push(layer);
+    this.markers.set(id, {
+      id, lat, lon,
+      remove: () => {
+        if (!this.markers.has(id))
+          throw new Error('Marker already deleted: ' + id);
+        this.map.removeLayer(layer);
+        this.markers.delete(id);
+      },
+    });
+
+    return this.markers.get(id);
   }
 
   clearMarkers() {
-    for (let layer of this.layers)
-      this.map.removeLayer(layer);
-    this.layers = [];
+    let markers = [...this.markers.values()];
+    for (let marker of markers)
+      marker.remove();
   }
 }

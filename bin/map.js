@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", "./page", "./config"], function (require, exports, config_1, dom, gps, log_1, osm_1, page, conf) {
+define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", "./page"], function (require, exports, conf, dom, gps, log_1, osm_1, page) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('map');
@@ -69,7 +69,7 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
             log.i('Refreshing the GPS location.');
             let { latitude: lat, longitude: lon } = pos;
             log.i('Updating OSM view box:', pos);
-            let s = config_1.MAP_BOX_SIZE;
+            let s = conf.MAP_BOX_SIZE;
             osm.setBBox({
                 min: { lat: lat - s, lon: lon - s },
                 max: { lat: lat + s, lon: lon + s },

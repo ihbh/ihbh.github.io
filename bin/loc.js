@@ -24,6 +24,7 @@ define(["require", "exports", "./config", "./fs"], function (require, exports, c
             tskey = '0' + tskey;
         return tskey;
     }
+    exports.deriveTsKey = deriveTsKey;
     async function shareLocation({ lat, lon }) {
         let time = Date.now() / 1000 | 0;
         let tskey = deriveTsKey(time);

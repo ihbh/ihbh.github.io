@@ -8,6 +8,7 @@
     "webfsd": "killall -q webfsd; webfsd -F -l - -p 8080 -r . -f index.html"
   },
   "devDependencies": {
+    "@types/ol": "5.3.5",
     "js-sha1": "0.6.0",
     "typescript": "3.5.3"
   },

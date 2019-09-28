@@ -1,10 +1,9 @@
-import { MAP_BOX_SIZE } from './config';
+import * as conf from './config';
 import * as dom from './dom';
 import * as gps from './gps';
 import { TaggedLogger } from './log';
 import { OSM } from './osm';
 import * as page from './page';
-import * as conf from './config';
 
 declare const PositionError;
 
@@ -87,7 +86,7 @@ function onGpsUpdated(pos: Coordinates) {
     let { latitude: lat, longitude: lon } = pos;
 
     log.i('Updating OSM view box:', pos);
-    let s = MAP_BOX_SIZE;
+    let s = conf.MAP_BOX_SIZE;
     osm.setBBox({
       min: { lat: lat - s, lon: lon - s },
       max: { lat: lat + s, lon: lon + s },

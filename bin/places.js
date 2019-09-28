@@ -32,10 +32,12 @@ define(["require", "exports", "./dom", "./log", "./loc", "./osm", "./config", ".
         let tmin = +psorted[0].time;
         let tmax = +psorted[psorted.length - 1].time;
         for (let { lon, lat, time } of psorted) {
+            let id = loc.deriveTsKey(time);
             // tmax -> 1, tmin -> 1/e = 0.37
             let diff = tmax - +time;
             let opacity = Math.exp(-diff / (tmax - tmin));
-            osm.addMarker({ lat, lon, opacity });
+            let marker = osm.addMarker({ id, lat, lon, opacity });
+            marker.onclick = () => log.i(`place ${id} clicked`);
         }
     }
     function getBBox(places) {
