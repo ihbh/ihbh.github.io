@@ -9,22 +9,25 @@ const matches = (prefix: string, key: string) =>
 
 const lsfs: VFS = {
   async find(path: string): Promise<string[]> {
+    if (path.endsWith('/'))
+      path = path.slice(0, -1);
+    log.d('find()', path);
     let prefix = parsePath(path);
-    log.d('find()', prefix);
     return Object.keys(localStorage)
       .filter(key => matches(prefix, key))
       .map(key => '/' + key.split('.').join('/'));
   },
 
   async dir(path: string): Promise<string[]> {
+    if (!path.endsWith('/'))
+      path += '/';
     log.d('dir()', path);
-    let keys = await lsfs.find(path);
+    let subpaths = await lsfs.find(path);
     let names = new Set<string>();
-    for (let key of keys) {
-      let suffix = path == '/' ?
-        key : key.slice(path.length);
+    for (let subpath of subpaths) {
+      let suffix = subpath.slice(path.length);
       if (!suffix) continue;
-      let name = suffix.split('.')[0];
+      let name = suffix.split('/')[0];
       names.add(name);
     }
     return [...names];
@@ -44,6 +47,25 @@ const lsfs: VFS = {
     let text = JSON.stringify(json);
     log.d('set', path, text);
     localStorage.setItem(path, text);
+  },
+
+  async rm(path: string): Promise<void> {
+    log.d('rm', path);
+    if (!path || path == '/') {
+      log.d('clear()');
+      localStorage.clear();
+    } else if (!path.endsWith('/')) {
+      let key = parsePath(path);
+      log.d('removeItem()', key);
+      localStorage.removeItem(key);
+    } else {
+      let prefix = parsePath(path);
+      let keys = Object.keys(localStorage)
+        .filter(key => key.startsWith(prefix));
+      log.d('removeItem()', keys);
+      for (let key of keys)
+        localStorage.removeItem(key);
+    }
   }
 };
 

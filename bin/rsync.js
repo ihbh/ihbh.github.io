@@ -3,8 +3,11 @@ define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"],
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('rsync');
     let syncing = false;
+    const encodePath = encodeURIComponent;
+    const decodePath = decodeURIComponent;
     async function reset() {
-        await vfs_1.default.set(conf.RSYNC_SYNCED, null);
+        await vfs_1.default.rm(conf.RSYNC_SYNCED);
+        await vfs_1.default.rm(conf.RSYNC_FAILED);
     }
     exports.reset = reset;
     async function start() {
@@ -25,7 +28,7 @@ define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"],
             log.i('Building RPCs.');
             let rpcargs = [];
             for (let path of upaths) {
-                let relpath = path.slice(conf.RSYNC_DIR_DATA.length);
+                let relpath = path.slice(conf.RSYNC_SHARED.length);
                 if (relpath[0] != '/')
                     throw new Error('Bad rel path: ' + relpath);
                 rpcargs.push({
@@ -55,7 +58,7 @@ define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"],
                 let updates = new Map();
                 for (let i = 0; i < rpcres.length; i++) {
                     let path = batch[i].args.path
-                        .replace(/^~/, conf.RSYNC_DIR_DATA);
+                        .replace(/^~/, conf.RSYNC_SHARED);
                     let { err, res } = rpcres[i];
                     if (!err) {
                         log.d('File synced:', path, res);
@@ -88,10 +91,11 @@ define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"],
     // Full paths that can be used with fs.get().
     async function getUnsyncedPaths() {
         try {
-            let synced = await vfs_1.default.get(conf.RSYNC_SYNCED);
-            let paths = new Set(await vfs_1.default.find(conf.RSYNC_DIR_DATA));
-            for (let path in synced)
-                paths.delete(path);
+            let synced = await vfs_1.default.dir(conf.RSYNC_SYNCED);
+            let failed = await vfs_1.default.dir(conf.RSYNC_FAILED);
+            let paths = new Set(await vfs_1.default.find(conf.RSYNC_SHARED));
+            for (let key of [...synced, ...failed])
+                paths.delete(decodePath(key));
             return [...paths];
         }
         catch (err) {
@@ -99,10 +103,14 @@ define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"],
         }
     }
     async function addSyncedPaths(updates) {
-        let synced = await vfs_1.default.get(conf.RSYNC_SYNCED) || {};
-        for (let [path, status] of updates)
-            synced[path] = status;
-        await vfs_1.default.set(conf.RSYNC_SYNCED, synced);
+        let ps = [];
+        for (let [path, { res, err }] of updates) {
+            let key = encodePath(path);
+            ps.push(err ?
+                vfs_1.default.set(conf.RSYNC_FAILED + '/' + key, err) :
+                vfs_1.default.set(conf.RSYNC_SYNCED + '/' + key, res));
+        }
+        await Promise.all(ps);
     }
     function isPermanentError(status) {
         return status >= 400 && status < 500;

@@ -69,9 +69,26 @@ define(["require", "exports", "./idb", "./log"], function (require, exports, idb
             let t = db.open(table);
             return t.set(key, json);
         },
+        async rm(path) {
+            let { dbname, table, key } = parsePath(path);
+            log.d('rm', dbname + '.' + table + ':' + key);
+            let db = idb_1.DB.open(dbname);
+            let t = db.open(table);
+            if (!path.endsWith('/')) {
+                await t.remove(key);
+            }
+            else {
+                let names = await t.keys();
+                let ps = [];
+                for (let name of names)
+                    if (name.startsWith(key))
+                        ps.push(t.remove(name));
+                await Promise.all(ps);
+            }
+        },
     };
     function parsePath(path) {
-        if (path[0] != '/')
+        if (path[0] != '/' || path.includes('.'))
             throw new TypeError('Bad path: ' + path);
         let [dbname, table, ...props] = path.slice(1).split('/');
         if (!dbname || !table || !props.length)

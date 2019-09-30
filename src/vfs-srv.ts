@@ -3,10 +3,6 @@ import { VFS } from './vfs-api';
 import * as rpc from './rpc';
 
 class SrvFS implements VFS {
-  async find(path: string): Promise<string[]> {
-    throw new NotImplementedError;
-  }
-
   async dir(path: string): Promise<string[]> {
     return rpc.invoke('RSync.Dir', path);
   }
