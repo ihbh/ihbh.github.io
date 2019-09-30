@@ -69,8 +69,8 @@ function initUnvisitLink() {
       log.i('Unvisiting:', tskey);
       let uid = await user.uid.get();
       let { root: vfs } = await import('./vfs');
-      await vfs.rm(`/srv/users/${uid}/places/${tskey}/`);
       await vfs.rm(`${conf.VPLACES_DIR}/${tskey}/`);
+      await vfs.rm(`/srv/users/${uid}/places/${tskey}/`);
     } catch (err) {
       log.e('Failed to unvisit:', err);
     }

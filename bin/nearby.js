@@ -49,8 +49,8 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
                 log.i('Unvisiting:', tskey);
                 let uid = await user.uid.get();
                 let { root: vfs } = await new Promise((resolve_2, reject_2) => { require(['./vfs'], resolve_2, reject_2); });
-                await vfs.rm(`/srv/users/${uid}/places/${tskey}/`);
                 await vfs.rm(`${conf.VPLACES_DIR}/${tskey}/`);
+                await vfs.rm(`/srv/users/${uid}/places/${tskey}/`);
             }
             catch (err) {
                 log.e('Failed to unvisit:', err);
