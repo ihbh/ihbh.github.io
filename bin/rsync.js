@@ -88,15 +88,23 @@ define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"],
         }
     }
     exports.start = start;
-    // Full paths that can be used with fs.get().
+    // Full paths that can be used with vfs.get().
     async function getUnsyncedPaths() {
         try {
             let synced = await vfs_1.default.dir(conf.RSYNC_SYNCED);
             let failed = await vfs_1.default.dir(conf.RSYNC_FAILED);
-            let paths = new Set(await vfs_1.default.find(conf.RSYNC_SHARED));
+            let local = await vfs_1.default.find(conf.RSYNC_SHARED);
+            // newPaths = local - (synced + failed)
+            let newPaths = new Set(local);
             for (let key of [...synced, ...failed])
-                paths.delete(decodePath(key));
-            return [...paths];
+                newPaths.delete(decodePath(key));
+            log.d('Files to add:', newPaths.size);
+            // delPaths = synced - local
+            let delPaths = new Set(synced.map(decodePath));
+            for (let path of local)
+                delPaths.delete(path);
+            log.d('Files to delete:', delPaths.size);
+            return [...newPaths];
         }
         catch (err) {
             throw new error_1.DerivedError('Failed to get unsynced paths.', err);

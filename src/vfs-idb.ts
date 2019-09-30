@@ -74,7 +74,8 @@ const idbfs: VFS = {
     log.d('get', dbname + '.' + table + ':' + key);
     let db = DB.open(dbname);
     let t = db.open(table);
-    return t.get(key);
+    let json = await t.get(key);
+    return json === undefined ? null : json;
   },
 
   async set(path: string, json): Promise<void> {

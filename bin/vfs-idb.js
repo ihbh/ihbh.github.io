@@ -60,7 +60,8 @@ define(["require", "exports", "./idb", "./log"], function (require, exports, idb
             log.d('get', dbname + '.' + table + ':' + key);
             let db = idb_1.DB.open(dbname);
             let t = db.open(table);
-            return t.get(key);
+            let json = await t.get(key);
+            return json === undefined ? null : json;
         },
         async set(path, json) {
             let { dbname, table, key } = parsePath(path);
