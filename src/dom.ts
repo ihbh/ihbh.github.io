@@ -10,6 +10,7 @@ export const id = {
   get exportDB() { return $('#export-db'); },
   get importDB() { return $('#import-db'); },
   get unsync() { return $('#unsync'); },
+  get unvisit() { return $<HTMLButtonElement>('#unvisit'); },
   get noGPS() { return $('#no-gps'); },
   get regPhoto() { return $<HTMLImageElement>('#photo-frame > img'); },
   get regName() { return $<HTMLInputElement>('#reg-name'); },

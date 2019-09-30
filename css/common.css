@@ -277,6 +277,10 @@ body .page .ol-attribution * {
   font-weight: bold;
 }
 
+#unvisit {
+  
+}
+
 #nearby-status {
   word-wrap: break-word;
   word-break: break-all;

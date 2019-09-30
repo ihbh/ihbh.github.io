@@ -12,6 +12,7 @@ define(["require", "exports"], function (require, exports) {
         get exportDB() { return $('#export-db'); },
         get importDB() { return $('#import-db'); },
         get unsync() { return $('#unsync'); },
+        get unvisit() { return $('#unvisit'); },
         get noGPS() { return $('#no-gps'); },
         get regPhoto() { return $('#photo-frame > img'); },
         get regName() { return $('#reg-name'); },

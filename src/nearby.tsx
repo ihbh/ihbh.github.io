@@ -16,13 +16,17 @@ interface UserInfo {
   photo?: string;
 }
 
+let tskey = '';
+
 export async function init() {
   log.i('init()');
 
   try {
-    let tskey = qargs.get('tskey');
+    tskey = qargs.get('tskey');
     if (!tskey)
       throw new Error('Missing ?tskey= URL param.');
+
+    initUnvisitLink();
 
     let { lat, lon } = await loc.getPlace(tskey);
     if (!lat || !lon)
@@ -57,6 +61,20 @@ export async function init() {
 function setStatus(text: string) {
   let div = dom.id.nearbyStatus;
   div.textContent = text;
+}
+
+function initUnvisitLink() {
+  dom.id.unvisit.onclick = async () => {
+    try {
+      log.i('Unvisiting:', tskey);
+      let uid = await user.uid.get();
+      let { root: vfs } = await import('./vfs');
+      await vfs.rm(`/srv/users/${uid}/places/${tskey}/`);
+      await vfs.rm(`${conf.VPLACES_DIR}/${tskey}/`);
+    } catch (err) {
+      log.e('Failed to unvisit:', err);
+    }
+  };
 }
 
 function makeUserCard(info: UserInfo) {
