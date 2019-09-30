@@ -1,16 +1,16 @@
-define(["require", "exports", "./config", "./dom", "./log", "./qargs", "./react", "./rpc", "./ucache", "./user"], function (require, exports, conf, dom, log_1, qargs, react_1, rpc, ucache_1, user) {
+define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", "./react", "./rpc", "./ucache", "./user"], function (require, exports, conf, dom, loc, log_1, qargs, react_1, rpc, ucache_1, user) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    let log = new log_1.TaggedLogger('nearby');
-    let isValidLat = lat => lat >= -90 && lat <= +90;
-    let isValidLon = lon => lon >= -180 && lon <= +180;
+    const log = new log_1.TaggedLogger('page.visitors');
     async function init() {
         log.i('init()');
         try {
-            let lat = +qargs.get('lat');
-            let lon = +qargs.get('lon');
-            if (!isValidLat(lat) || !isValidLon(lon))
-                throw new Error(`Invalid GPS coords: lat=${lat} lon=${lon}`);
+            let tskey = qargs.get('tskey');
+            if (!tskey)
+                throw new Error('Missing ?tskey= URL param.');
+            let { lat, lon } = await loc.getPlace(tskey);
+            if (!lat || !lon)
+                throw new Error(`No such visited place: ?tskey=` + tskey);
             setStatus('Checking who has been here too...');
             let infos;
             try {
@@ -27,7 +27,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./qargs", "./react"
                 setStatus('Looks like you are the first.');
                 return;
             }
-            setStatus('');
+            setStatus(`lat=${lat.toFixed(3)} lon=${lon.toFixed(3)}`);
             let container = dom.id.visitors;
             container.append(...infos.map(makeUserCard));
         }
@@ -49,11 +49,11 @@ define(["require", "exports", "./config", "./dom", "./log", "./qargs", "./react"
     }
     async function getPeopleNearby({ lat, lon }) {
         let visitors = await rpc.invoke('Map.GetVisitors', { lat, lon });
-        let vuids = Object.keys(visitors);
+        let ids = Object.keys(visitors);
         let uid = await user.uid.get();
-        vuids = vuids.filter(vuid => vuid != uid);
-        log.i('People nearby:', vuids);
-        let ps = vuids.map(ucache_1.getUserInfo);
+        ids = ids.filter(vuid => vuid != uid);
+        log.i('People nearby:', ids);
+        let ps = ids.map(ucache_1.getUserInfo);
         return Promise.all(ps);
     }
 });

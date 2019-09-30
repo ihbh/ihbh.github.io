@@ -4,8 +4,7 @@ type ArgId =
   'page' |
   'rpc' | 
   'uid' |
-  'lat' | 
-  'lon' | 
+  'tskey' | 
   'vpt' | 
   'pnt';
 

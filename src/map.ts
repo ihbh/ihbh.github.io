@@ -110,19 +110,17 @@ async function initSendButton() {
     let pwa = await import('./pwa');
     pwa.showInstallPrompt();
     button.disabled = true;
+    let tskey = null;
 
     try {
-      await shareDisplayedLocation();
+      tskey = await shareDisplayedLocation();
     } catch (err) {
       log.e(err);
     } finally {
       button.disabled = false;
     }
 
-    page.set('nearby', {
-      lat: bestPos.latitude,
-      lon: bestPos.longitude,
-    });
+    page.set('nearby', { tskey });
   };
 }
 
@@ -134,5 +132,5 @@ async function shareDisplayedLocation() {
   if (!bestPos) throw new Error('GPS not ready.');
   let loc = await import('./loc');
   let { latitude: lat, longitude: lng } = bestPos;
-  await loc.shareLocation({ lat, lon: lng });
+  return loc.shareLocation({ lat, lon: lng });
 }

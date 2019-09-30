@@ -91,8 +91,9 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
             let pwa = await new Promise((resolve_2, reject_2) => { require(['./pwa'], resolve_2, reject_2); });
             pwa.showInstallPrompt();
             button.disabled = true;
+            let tskey = null;
             try {
-                await shareDisplayedLocation();
+                tskey = await shareDisplayedLocation();
             }
             catch (err) {
                 log.e(err);
@@ -100,10 +101,7 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
             finally {
                 button.disabled = false;
             }
-            page.set('nearby', {
-                lat: bestPos.latitude,
-                lon: bestPos.longitude,
-            });
+            page.set('nearby', { tskey });
         };
     }
     async function initRefreshGps() {
@@ -114,7 +112,7 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
             throw new Error('GPS not ready.');
         let loc = await new Promise((resolve_3, reject_3) => { require(['./loc'], resolve_3, reject_3); });
         let { latitude: lat, longitude: lng } = bestPos;
-        await loc.shareLocation({ lat, lon: lng });
+        return loc.shareLocation({ lat, lon: lng });
     }
 });
 //# sourceMappingURL=map.js.map

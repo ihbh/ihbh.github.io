@@ -30,6 +30,7 @@ define(["require", "exports", "./config", "./fs"], function (require, exports, c
         let time = Date.now() / 1000 | 0;
         let tskey = deriveTsKey(time);
         await setPlace(tskey, { lat, lon, time });
+        return tskey;
     }
     exports.shareLocation = shareLocation;
     async function getVisitedPlaces() {
