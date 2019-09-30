@@ -1,5 +1,5 @@
 import * as conf from './config';
-import fs from './fs';
+import vfs from './vfs';
 
 export interface Place {
   time: number; // Date.now()/1000
@@ -26,9 +26,9 @@ export interface VisitorNote {
 export async function getPlace(tskey: string): Promise<Place> {
   let dir = conf.VPLACES_DIR + '/' + tskey;
   let [lat, lon, time] = await Promise.all([
-    fs.get(dir + '/lat'),
-    fs.get(dir + '/lon'),
-    fs.get(dir + '/time'),
+    vfs.get(dir + '/lat'),
+    vfs.get(dir + '/lon'),
+    vfs.get(dir + '/time'),
   ]);
 
   return { lat, lon, time };
@@ -37,9 +37,9 @@ export async function getPlace(tskey: string): Promise<Place> {
 async function setPlace(tskey: string, { lat, lon, time }: Place) {
   let dir = conf.VPLACES_DIR + '/' + tskey;
   await Promise.all([
-    fs.set(dir + '/lat', lat),
-    fs.set(dir + '/lon', lon),
-    fs.set(dir + '/time', time),
+    vfs.set(dir + '/lat', lat),
+    vfs.set(dir + '/lon', lon),
+    vfs.set(dir + '/time', time),
   ]);
 }
 
@@ -57,7 +57,7 @@ export async function shareLocation({ lat, lon }: GpsCoords) {
 }
 
 export async function getVisitedPlaces(): Promise<Place[]> {
-  let tskeys = await fs.dir(conf.VPLACES_DIR);
+  let tskeys = await vfs.dir(conf.VPLACES_DIR);
   let ps = tskeys.map(getPlace);
   return Promise.all(ps);
 }

@@ -1,6 +1,6 @@
 import * as conf from './config';
-import fsprop from './fsprop';
 import { TaggedLogger } from './log';
+import vfsprop from './vfs-prop';
 
 const log = new TaggedLogger('gp');
 
@@ -8,7 +8,7 @@ function prop<T>(path: string, defval: T = null) {
   let fspath = conf.USERDATA_DIR + '/' +
     path.split('.').join('/');
   log.d(path, '->', fspath, 'default:', defval);
-  return fsprop(fspath, defval);
+  return vfsprop(fspath, defval);
 }
 
 export interface RpcInfo {

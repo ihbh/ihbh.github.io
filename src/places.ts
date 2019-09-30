@@ -59,9 +59,8 @@ function handleClick(id) {
     lastClickedTskey = id;
   timer = timer || setTimeout(async () => {
     log.i('Opening place:', lastClickedTskey);
-    let { lat, lon } = await loc.getPlace(lastClickedTskey);
     let page = await import('./page');
-    page.set('nearby', { lat, lon });
+    page.set('nearby', { tskey: lastClickedTskey });
   }, conf.PLACE_CLICK_TIMEOUT);
 }
 

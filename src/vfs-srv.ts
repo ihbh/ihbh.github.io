@@ -1,8 +1,8 @@
 import { NotImplementedError } from './error';
-import { FS } from './fs-api';
+import { VFS } from './vfs-api';
 import * as rpc from './rpc';
 
-class SrvFS implements FS {
+class SrvFS implements VFS {
   async find(path: string): Promise<string[]> {
     throw new NotImplementedError;
   }

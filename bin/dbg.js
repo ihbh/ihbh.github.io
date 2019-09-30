@@ -13,9 +13,9 @@ define(["require", "exports", "./config", "./dom", "./idb", "./log", "./logdb", 
             let lat = 49.246292 + x;
             let lon = -123.116226 + x;
             let loc = await new Promise((resolve_1, reject_1) => { require(['./loc'], resolve_1, reject_1); });
-            await loc.shareLocation({ lat, lon });
+            let tskey = await loc.shareLocation({ lat, lon });
             let page = await new Promise((resolve_2, reject_2) => { require(['./page'], resolve_2, reject_2); });
-            page.set('nearby', { lat, lon });
+            page.set('nearby', { tskey });
         };
         dom.id.unsync.onclick = async () => {
             log.i('Resetting the rsync state.');

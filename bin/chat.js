@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./fs", "./gp", "./log", "./qargs", "./react", "./ucache", "./user"], function (require, exports, conf, dom, fs_1, gp, log_1, qargs, react_1, ucache, user) {
+define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "./react", "./ucache", "./user", "./vfs"], function (require, exports, conf, dom, gp, log_1, qargs, react_1, ucache, user, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('chat');
@@ -48,7 +48,7 @@ define(["require", "exports", "./config", "./dom", "./fs", "./gp", "./log", "./q
                 date: new Date,
             };
             let tsid = date2tsid(message.date);
-            await fs_1.default.set(`~/chats/${remoteUid}/${tsid}/text`, text);
+            await vfs_1.default.set(`~/chats/${remoteUid}/${tsid}/text`, text);
             log.i('Message saved.');
             let container = dom.id.chatMessages;
             let div = renderMessage(message);
@@ -144,9 +144,9 @@ define(["require", "exports", "./config", "./dom", "./fs", "./gp", "./log", "./q
         log.i('Getting new incoming messages.');
         let uid = await user.uid.get();
         let dir = `/srv/users/${remoteUid}/chats/${uid}`;
-        let tsids = (await fs_1.default.dir(dir)) || [];
+        let tsids = (await vfs_1.default.dir(dir)) || [];
         let dirCached = `${conf.USERDATA_DIR}/chats/${remoteUid}`;
-        let tsidsCached = (await fs_1.default.dir(dirCached)) || [];
+        let tsidsCached = (await vfs_1.default.dir(dirCached)) || [];
         let tsidsNew = diff(tsids, tsidsCached);
         return getMessageTexts(dir, tsidsNew);
     }
@@ -158,16 +158,16 @@ define(["require", "exports", "./config", "./dom", "./fs", "./gp", "./log", "./q
     async function clearUnreadMark() {
         log.i('Marking all messages as read.');
         let uid = await user.uid.get();
-        await fs_1.default.set(`/srv/users/${uid}/unread/${remoteUid}`, null);
+        await vfs_1.default.set(`/srv/users/${uid}/unread/${remoteUid}`, null);
     }
     async function getMessageTexts(dir, tsids) {
         try {
             let messages = {};
             if (!tsids)
-                tsids = (await fs_1.default.dir(dir)) || [];
+                tsids = (await vfs_1.default.dir(dir)) || [];
             log.i(`Getting ${tsids.length} messages from ${dir}/*/text`);
             let ps = tsids.map(async (tsid) => {
-                let text = await fs_1.default.get(`${dir}/${tsid}/text`);
+                let text = await vfs_1.default.get(`${dir}/${tsid}/text`);
                 messages[tsid] = { text };
             });
             await Promise.all(ps);
@@ -185,7 +185,7 @@ define(["require", "exports", "./config", "./dom", "./fs", "./gp", "./log", "./q
                 let text = messages[tsid].text;
                 if (!text)
                     throw new Error(`No text at ${tsid} for ${dir}.`);
-                await fs_1.default.set(`${dir}/${tsid}/text`, text);
+                await vfs_1.default.set(`${dir}/${tsid}/text`, text);
             });
             await Promise.all(ps);
             log.i('Added message texts:', dir, tsids.length);

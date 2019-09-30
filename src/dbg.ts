@@ -22,9 +22,9 @@ export async function init() {
     let lat = 49.246292 + x;
     let lon = -123.116226 + x;
     let loc = await import('./loc');
-    await loc.shareLocation({ lat, lon });
+    let tskey = await loc.shareLocation({ lat, lon });
     let page = await import('./page');
-    page.set('nearby', { lat, lon });
+    page.set('nearby', { tskey });
   };
 
   dom.id.unsync.onclick = async () => {

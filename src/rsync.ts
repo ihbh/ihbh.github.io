@@ -1,15 +1,15 @@
 import * as conf from './config';
 import { DerivedError } from "./error";
-import fs from './fs';
 import { TaggedLogger } from "./log";
 import * as rpc from './rpc';
+import vfs from './vfs';
 
 const log = new TaggedLogger('rsync');
 
 let syncing = false;
 
 export async function reset() {
-  await fs.set(conf.RSYNC_SYNCED, null);
+  await vfs.set(conf.RSYNC_SYNCED, null);
 }
 
 export async function start() {
@@ -29,7 +29,7 @@ export async function start() {
     let ufdata = new Map<string, any>();
     await Promise.all(
       upaths.map(
-        path => fs.get(path).then(
+        path => vfs.get(path).then(
           data => ufdata.set(path, data))));
 
     log.i('Building RPCs.');
@@ -104,8 +104,8 @@ export async function start() {
 // Full paths that can be used with fs.get().
 async function getUnsyncedPaths(): Promise<string[]> {
   try {
-    let synced = await fs.get(conf.RSYNC_SYNCED);
-    let paths = new Set(await fs.find(conf.RSYNC_DIR_DATA));
+    let synced = await vfs.get(conf.RSYNC_SYNCED);
+    let paths = new Set(await vfs.find(conf.RSYNC_DIR_DATA));
     for (let path in synced)
       paths.delete(path);
     return [...paths];
@@ -116,10 +116,10 @@ async function getUnsyncedPaths(): Promise<string[]> {
 }
 
 async function addSyncedPaths(updates: Map<string, { res } | { err }>) {
-  let synced = await fs.get(conf.RSYNC_SYNCED) || {};
+  let synced = await vfs.get(conf.RSYNC_SYNCED) || {};
   for (let [path, status] of updates)
     synced[path] = status;
-  await fs.set(conf.RSYNC_SYNCED, synced);
+  await vfs.set(conf.RSYNC_SYNCED, synced);
 }
 
 function isPermanentError(status: number) {

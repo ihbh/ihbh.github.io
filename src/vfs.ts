@@ -1,6 +1,6 @@
 import * as conf from './config';
 import { DerivedError } from './error';
-import { FS } from './fs-api';
+import { VFS } from './vfs-api';
 import { TaggedLogger } from './log';
 import { AsyncProp } from './prop';
 
@@ -8,20 +8,21 @@ const PATH_REGEX = /^(\/[\w-_]+)+$/;
 const ROOT_REGEX = /^\/\w+/;
 const log = new TaggedLogger('fs');
 
-const pfsmod = path => new AsyncProp<FS>(
-  () => import(path).then(
-    mod => mod.default));
+const pfsmod = (importfn: () => Promise<{ default: VFS }>) =>
+  new AsyncProp<VFS>(
+    () => importfn().then(
+      mod => mod.default));
 
 const handlers = {
-  '/ls': pfsmod('./lsfs'),
-  '/idb': pfsmod('./idbfs'),
-  '/srv': pfsmod('./srvfs'),
+  '/ls': pfsmod(() => import('./vfs-ls')),
+  '/idb': pfsmod(() => import('./vfs-idb')),
+  '/srv': pfsmod(() => import('./vfs-srv')),
 };
 
 const abspath = (path: string) =>
   path.replace('~', conf.SHARED_DIR);
 
-let fs: FS = {
+export const root: VFS = {
   async find(path: string): Promise<string[]> {
     if (path == '/') {
       // find() via recursive dir()
@@ -79,20 +80,21 @@ async function invokeHandler(method: string, path: string, ...args) {
   }
 }
 
-function parsePath(path: string): [AsyncProp<FS>, string] {
+function parsePath(path: string): [AsyncProp<VFS>, string] {
   path = abspath(path);
   if (!PATH_REGEX.test(path))
     throw new SyntaxError('Invalid fs path: ' + path);
   let i = path.indexOf('/', 1);
   if (i < 0) i = path.length;
   let rootdir = path.slice(0, i);
-  let handler: AsyncProp<FS> = handlers[rootdir];
+  let handler: AsyncProp<VFS> = handlers[rootdir];
   if (!handler)
     throw new TypeError('Invalid root dir: ' + path);
   let rempath = path.slice(i) || '/';
   return [handler, rempath];
 }
 
-export default fs;
+if (conf.DEBUG)
+  window['vfs'] = root;
 
-window['fs'] = fs;
+export default root;

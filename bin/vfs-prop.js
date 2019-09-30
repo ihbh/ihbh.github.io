@@ -17,4 +17,4 @@ define(["require", "exports", "./prop", "./vfs"], function (require, exports, pr
     }
     exports.default = prop;
 });
-//# sourceMappingURL=fsprop.js.map
+//# sourceMappingURL=vfs-prop.js.map

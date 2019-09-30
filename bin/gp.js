@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./fsprop", "./log"], function (require, exports, conf, fsprop_1, log_1) {
+define(["require", "exports", "./config", "./log", "./vfs-prop"], function (require, exports, conf, log_1, vfs_prop_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('gp');
@@ -6,7 +6,7 @@ define(["require", "exports", "./config", "./fsprop", "./log"], function (requir
         let fspath = conf.USERDATA_DIR + '/' +
             path.split('.').join('/');
         log.d(path, '->', fspath, 'default:', defval);
-        return fsprop_1.default(fspath, defval);
+        return vfs_prop_1.default(fspath, defval);
     }
     exports.uid = prop('shared.profile.id');
     exports.username = prop('shared.profile.name');

@@ -1,10 +1,10 @@
 import * as conf from './config';
 import * as dom from './dom';
-import fs from './fs';
 import { TaggedLogger } from './log';
 import React from './react';
 import { getUserInfo, UserInfo } from './ucache';
 import * as user from './user';
+import vfs from './vfs';
 
 const log = new TaggedLogger('unread');
 const cards = new Map<string, HTMLElement>();
@@ -58,7 +58,7 @@ function renderUserCard(info: UserInfo) {
 
 async function getActiveChats(): Promise<UserInfo[]> {
   log.i('Getting the list of chats.');
-  let uids = await fs.dir('~/chats');
+  let uids = await vfs.dir('~/chats');
   if (!uids || !uids.length) return [];
 
   log.i('Getting user details:', uids.length);
@@ -68,6 +68,6 @@ async function getActiveChats(): Promise<UserInfo[]> {
 
 async function getUnreadChats(): Promise<string[]> {  
   let uid = await user.uid.get();
-  let uids = await fs.dir(`/srv/users/${uid}/unread`);
+  let uids = await vfs.dir(`/srv/users/${uid}/unread`);
   return uids || [];
 }

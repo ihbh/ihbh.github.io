@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./fs", "./log", "./react", "./ucache", "./user"], function (require, exports, conf, dom, fs_1, log_1, react_1, ucache_1, user) {
+define(["require", "exports", "./config", "./dom", "./log", "./react", "./ucache", "./user", "./vfs"], function (require, exports, conf, dom, log_1, react_1, ucache_1, user, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('unread');
@@ -48,7 +48,7 @@ define(["require", "exports", "./config", "./dom", "./fs", "./log", "./react", "
     }
     async function getActiveChats() {
         log.i('Getting the list of chats.');
-        let uids = await fs_1.default.dir('~/chats');
+        let uids = await vfs_1.default.dir('~/chats');
         if (!uids || !uids.length)
             return [];
         log.i('Getting user details:', uids.length);
@@ -57,7 +57,7 @@ define(["require", "exports", "./config", "./dom", "./fs", "./log", "./react", "
     }
     async function getUnreadChats() {
         let uid = await user.uid.get();
-        let uids = await fs_1.default.dir(`/srv/users/${uid}/unread`);
+        let uids = await vfs_1.default.dir(`/srv/users/${uid}/unread`);
         return uids || [];
     }
 });

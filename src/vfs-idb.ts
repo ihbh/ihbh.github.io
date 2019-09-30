@@ -1,12 +1,12 @@
 // IDBFS path: /<db-name>/<table-name>/<record-key>
 
-import { FS } from './fs-api';
+import { VFS } from './vfs-api';
 import { DB } from './idb';
 import { TaggedLogger } from './log';
 
 const log = new TaggedLogger('idbfs');
 
-const idbfs: FS = {
+const idbfs: VFS = {
   async find(path: string): Promise<string[]> {
     checkPath(path);
     log.d('find()', path);

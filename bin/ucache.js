@@ -4,20 +4,20 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
     const log = new log_1.TaggedLogger('ucache');
     async function getUserInfo(uid) {
         log.i('Getting user info:', uid);
-        const { default: fs } = await new Promise((resolve_1, reject_1) => { require(['./fs'], resolve_1, reject_1); });
+        const { default: vfs } = await new Promise((resolve_1, reject_1) => { require(['./vfs'], resolve_1, reject_1); });
         let dir = `/srv/users/${uid}/profile`;
         let dirCached = `${conf.USERDATA_DIR}/users/${uid}`;
         let info = { uid };
         try {
-            info.name = await fs.get(`${dirCached}/name`);
-            info.photo = await fs.get(`${dirCached}/img`);
+            info.name = await vfs.get(`${dirCached}/name`);
+            info.photo = await vfs.get(`${dirCached}/img`);
             if (!info.name || !info.photo) {
-                info.name = await fs.get(`${dir}/name`);
-                info.photo = await fs.get(`${dir}/img`);
+                info.name = await vfs.get(`${dir}/name`);
+                info.photo = await vfs.get(`${dir}/img`);
                 try {
                     log.i('Saving user info to cache:', uid);
-                    await fs.set(`${dirCached}/name`, info.name);
-                    await fs.set(`${dirCached}/img`, info.photo);
+                    await vfs.set(`${dirCached}/name`, info.name);
+                    await vfs.set(`${dirCached}/img`, info.photo);
                 }
                 catch (err) {
                     log.w('Failed to save user info to cache:', uid, err);

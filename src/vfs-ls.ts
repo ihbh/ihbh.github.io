@@ -1,4 +1,4 @@
-import { FS } from './fs-api';
+import { VFS } from './vfs-api';
 import { TaggedLogger } from './log';
 
 const log = new TaggedLogger('lsfs');
@@ -7,7 +7,7 @@ const parsePath = (path: string) =>
 const matches = (prefix: string, key: string) =>
   !prefix || prefix == key || key.startsWith(prefix + '.');
 
-const lsfs: FS = {
+const lsfs: VFS = {
   async find(path: string): Promise<string[]> {
     let prefix = parsePath(path);
     log.d('find()', prefix);

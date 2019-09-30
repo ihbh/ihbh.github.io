@@ -1,4 +1,4 @@
-export declare interface FS {
+export declare interface VFS {
   find(path: string): Promise<string[]>;
   dir(path: string): Promise<string[]>;
   get(path: string): Promise<any>;

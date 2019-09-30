@@ -48,9 +48,8 @@ define(["require", "exports", "./dom", "./log", "./loc", "./osm", "./config", ".
             lastClickedTskey = id;
         timer = timer || setTimeout(async () => {
             log.i('Opening place:', lastClickedTskey);
-            let { lat, lon } = await loc.getPlace(lastClickedTskey);
             let page = await new Promise((resolve_1, reject_1) => { require(['./page'], resolve_1, reject_1); });
-            page.set('nearby', { lat, lon });
+            page.set('nearby', { tskey: lastClickedTskey });
         }, conf.PLACE_CLICK_TIMEOUT);
     }
     function getBBox(places) {

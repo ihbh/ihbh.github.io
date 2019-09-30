@@ -1,12 +1,12 @@
-define(["require", "exports", "./config", "./fs"], function (require, exports, conf, fs_1) {
+define(["require", "exports", "./config", "./vfs"], function (require, exports, conf, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     async function getPlace(tskey) {
         let dir = conf.VPLACES_DIR + '/' + tskey;
         let [lat, lon, time] = await Promise.all([
-            fs_1.default.get(dir + '/lat'),
-            fs_1.default.get(dir + '/lon'),
-            fs_1.default.get(dir + '/time'),
+            vfs_1.default.get(dir + '/lat'),
+            vfs_1.default.get(dir + '/lon'),
+            vfs_1.default.get(dir + '/time'),
         ]);
         return { lat, lon, time };
     }
@@ -14,9 +14,9 @@ define(["require", "exports", "./config", "./fs"], function (require, exports, c
     async function setPlace(tskey, { lat, lon, time }) {
         let dir = conf.VPLACES_DIR + '/' + tskey;
         await Promise.all([
-            fs_1.default.set(dir + '/lat', lat),
-            fs_1.default.set(dir + '/lon', lon),
-            fs_1.default.set(dir + '/time', time),
+            vfs_1.default.set(dir + '/lat', lat),
+            vfs_1.default.set(dir + '/lon', lon),
+            vfs_1.default.set(dir + '/time', time),
         ]);
     }
     function deriveTsKey(time) {
@@ -34,7 +34,7 @@ define(["require", "exports", "./config", "./fs"], function (require, exports, c
     }
     exports.shareLocation = shareLocation;
     async function getVisitedPlaces() {
-        let tskeys = await fs_1.default.dir(conf.VPLACES_DIR);
+        let tskeys = await vfs_1.default.dir(conf.VPLACES_DIR);
         let ps = tskeys.map(getPlace);
         return Promise.all(ps);
     }

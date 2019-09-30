@@ -1,10 +1,10 @@
-define(["require", "exports", "./config", "./error", "./fs", "./log", "./rpc"], function (require, exports, conf, error_1, fs_1, log_1, rpc) {
+define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"], function (require, exports, conf, error_1, log_1, rpc, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('rsync');
     let syncing = false;
     async function reset() {
-        await fs_1.default.set(conf.RSYNC_SYNCED, null);
+        await vfs_1.default.set(conf.RSYNC_SYNCED, null);
     }
     exports.reset = reset;
     async function start() {
@@ -21,7 +21,7 @@ define(["require", "exports", "./config", "./error", "./fs", "./log", "./rpc"], 
             }
             log.i('Files to be synced:', upaths.length);
             let ufdata = new Map();
-            await Promise.all(upaths.map(path => fs_1.default.get(path).then(data => ufdata.set(path, data))));
+            await Promise.all(upaths.map(path => vfs_1.default.get(path).then(data => ufdata.set(path, data))));
             log.i('Building RPCs.');
             let rpcargs = [];
             for (let path of upaths) {
@@ -88,8 +88,8 @@ define(["require", "exports", "./config", "./error", "./fs", "./log", "./rpc"], 
     // Full paths that can be used with fs.get().
     async function getUnsyncedPaths() {
         try {
-            let synced = await fs_1.default.get(conf.RSYNC_SYNCED);
-            let paths = new Set(await fs_1.default.find(conf.RSYNC_DIR_DATA));
+            let synced = await vfs_1.default.get(conf.RSYNC_SYNCED);
+            let paths = new Set(await vfs_1.default.find(conf.RSYNC_DIR_DATA));
             for (let path in synced)
                 paths.delete(path);
             return [...paths];
@@ -99,10 +99,10 @@ define(["require", "exports", "./config", "./error", "./fs", "./log", "./rpc"], 
         }
     }
     async function addSyncedPaths(updates) {
-        let synced = await fs_1.default.get(conf.RSYNC_SYNCED) || {};
+        let synced = await vfs_1.default.get(conf.RSYNC_SYNCED) || {};
         for (let [path, status] of updates)
             synced[path] = status;
-        await fs_1.default.set(conf.RSYNC_SYNCED, synced);
+        await vfs_1.default.set(conf.RSYNC_SYNCED, synced);
     }
     function isPermanentError(status) {
         return status >= 400 && status < 500;

@@ -1,12 +1,12 @@
 import * as conf from './config';
 import * as dom from './dom';
-import fs from './fs';
 import * as gp from './gp';
 import { TaggedLogger } from './log';
 import * as qargs from './qargs';
 import React from './react';
 import * as ucache from './ucache';
 import * as user from './user';
+import vfs from './vfs';
 
 let log = new TaggedLogger('chat');
 
@@ -77,7 +77,7 @@ async function setSendButtonHandler() {
     };
 
     let tsid = date2tsid(message.date);
-    await fs.set(`~/chats/${remoteUid}/${tsid}/text`, text);
+    await vfs.set(`~/chats/${remoteUid}/${tsid}/text`, text);
     log.i('Message saved.');
 
     let container = dom.id.chatMessages;
@@ -195,9 +195,9 @@ async function getNewIncomingMessages() {
   log.i('Getting new incoming messages.');
   let uid = await user.uid.get();
   let dir = `/srv/users/${remoteUid}/chats/${uid}`;
-  let tsids = (await fs.dir(dir)) || [];
+  let tsids = (await vfs.dir(dir)) || [];
   let dirCached = `${conf.USERDATA_DIR}/chats/${remoteUid}`;
-  let tsidsCached = (await fs.dir(dirCached)) || [];
+  let tsidsCached = (await vfs.dir(dirCached)) || [];
   let tsidsNew = diff(tsids, tsidsCached);
   return getMessageTexts(dir, tsidsNew);
 }
@@ -211,16 +211,16 @@ async function getOutgoingMessages() {
 async function clearUnreadMark() {
   log.i('Marking all messages as read.');
   let uid = await user.uid.get();
-  await fs.set(`/srv/users/${uid}/unread/${remoteUid}`, null);
+  await vfs.set(`/srv/users/${uid}/unread/${remoteUid}`, null);
 }
 
 async function getMessageTexts(dir: string, tsids?: string[]) {
   try {
     let messages: RemoteMessages = {};
-    if (!tsids) tsids = (await fs.dir(dir)) || [];
+    if (!tsids) tsids = (await vfs.dir(dir)) || [];
     log.i(`Getting ${tsids.length} messages from ${dir}/*/text`);
     let ps = tsids.map(async tsid => {
-      let text = await fs.get(`${dir}/${tsid}/text`);
+      let text = await vfs.get(`${dir}/${tsid}/text`);
       messages[tsid] = { text };
     });
     await Promise.all(ps);
@@ -237,7 +237,7 @@ async function addMessageTexts(dir: string, messages: RemoteMessages) {
     let ps = tsids.map(async tsid => {
       let text: string = messages[tsid].text;
       if (!text) throw new Error(`No text at ${tsid} for ${dir}.`);
-      await fs.set(`${dir}/${tsid}/text`, text);
+      await vfs.set(`${dir}/${tsid}/text`, text);
     });
     await Promise.all(ps);
     log.i('Added message texts:', dir, tsids.length);
