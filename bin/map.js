@@ -43,6 +43,8 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
             log.i('Loading OSM.');
             dom.id.noGPS.textContent = '';
             osm = new osm_1.OSM(dom.id.map.id);
+            if (conf.DEBUG)
+                osm.onaddmarker = pos => addMarkerAt(pos);
             await osm.render(null);
             await startWatchingGps();
         }
@@ -104,13 +106,19 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
             page.set('nearby', { tskey });
         };
     }
+    async function addMarkerAt({ lat, lon }) {
+        log.i(`Creating a marker at lat=${lat} lon=${lon}`);
+        let loc = await new Promise((resolve_3, reject_3) => { require(['./loc'], resolve_3, reject_3); });
+        let tskey = await loc.shareLocation({ lat, lon });
+        page.set('nearby', { tskey });
+    }
     async function initRefreshGps() {
         dom.id.refreshGps.onclick = () => startWatchingGps();
     }
     async function shareDisplayedLocation() {
         if (!bestPos)
             throw new Error('GPS not ready.');
-        let loc = await new Promise((resolve_3, reject_3) => { require(['./loc'], resolve_3, reject_3); });
+        let loc = await new Promise((resolve_4, reject_4) => { require(['./loc'], resolve_4, reject_4); });
         let { latitude: lat, longitude: lng } = bestPos;
         return loc.shareLocation({ lat, lon: lng });
     }

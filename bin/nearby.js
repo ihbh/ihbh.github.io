@@ -10,7 +10,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
             if (!tskey)
                 throw new Error('Missing ?tskey= URL param.');
             initUnvisitLink();
-            let { lat, lon } = await loc.getPlace(tskey);
+            let { lat, lon, time } = await loc.getPlace(tskey);
             if (!lat || !lon)
                 throw new Error(`No such visited place: ?tskey=` + tskey);
             setStatus('Checking who has been here too...');
@@ -25,11 +25,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
                 let dbg = await new Promise((resolve_1, reject_1) => { require(['./dbg'], resolve_1, reject_1); });
                 infos = await dbg.getDebugPeopleNearby();
             }
-            if (!infos.length) {
-                setStatus('Looks like you are the first.');
-                return;
-            }
-            setStatus(`lat=${lat.toFixed(3)} lon=${lon.toFixed(3)}`);
+            setStatus(`lat=${lat.toFixed(3)} lon=${lon.toFixed(3)} time=${new Date(time * 1000).toJSON()}`);
             let container = dom.id.visitors;
             container.append(...infos.map(makeUserCard));
         }
@@ -47,10 +43,8 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
         dom.id.unvisit.onclick = async () => {
             try {
                 log.i('Unvisiting:', tskey);
-                let uid = await user.uid.get();
                 let { root: vfs } = await new Promise((resolve_2, reject_2) => { require(['./vfs'], resolve_2, reject_2); });
                 await vfs.rm(`${conf.VPLACES_DIR}/${tskey}/`);
-                await vfs.rm(`/srv/users/${uid}/places/${tskey}/`);
             }
             catch (err) {
                 log.e('Failed to unvisit:', err);

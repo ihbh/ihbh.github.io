@@ -35,6 +35,8 @@ export class OSM {
   private ol = null;
   private markers = new Map<string, Marker>();
 
+  onaddmarker: (pos: LonLat) => any;
+
   constructor(mapid: string) {
     this.mapid = mapid.replace('#', '');
   }
@@ -64,11 +66,16 @@ export class OSM {
   private addClickHandler() {
     this.map.on('singleclick', e => {
       let [lon, lat] = this.ol.proj.toLonLat(e.coordinate);
-      log.d('map:singleclick', lat, lon, e);
+      log.d('map:singleclick', lat, lon);
       this.map.forEachLayerAtPixel(e.pixel, (layer) => {
         let key = layer.get('myKey');
-        log.d('layer:', key, layer);
-        key && this.fireMarkerClickEvent(key);
+        if (key) {
+          log.d('layer:', key);
+          this.fireMarkerClickEvent(key);
+        } else if (this.onaddmarker) {
+          log.d('Firing the addmarker event.');
+          this.onaddmarker({ lon, lat });
+        }
       });
     });
   }

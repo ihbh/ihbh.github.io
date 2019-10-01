@@ -15,43 +15,53 @@ define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"],
             return;
         syncing = true;
         let time = Date.now();
-        log.i('Started syncing.');
         try {
             let upaths = await getUnsyncedPaths();
-            if (!upaths.length) {
+            log.d('Files to add:', upaths.add.size);
+            log.d('Files to delete:', upaths.del.size);
+            if (!upaths.add.size && !upaths.del.size) {
                 log.i('Nothing to sync.');
                 return;
             }
-            log.i('Files to be synced:', upaths.length);
             let ufdata = new Map();
-            await Promise.all(upaths.map(path => vfs_1.default.get(path).then(data => ufdata.set(path, data))));
-            log.i('Building RPCs.');
-            let rpcargs = [];
-            for (let path of upaths) {
+            await Promise.all([...upaths.add].map(path => vfs_1.default.get(path).then(data => ufdata.set(path, data))));
+            log.d('Building RPCs.');
+            let rpcreq = [];
+            for (let path of [...upaths.add, ...upaths.del]) {
                 let relpath = path.slice(conf.RSYNC_SHARED.length);
                 if (relpath[0] != '/')
                     throw new Error('Bad rel path: ' + relpath);
-                rpcargs.push({
-                    name: 'RSync.AddFile',
-                    args: {
-                        path: '~' + relpath,
-                        data: ufdata.get(path),
-                    }
-                });
+                if (upaths.add.has(path)) {
+                    rpcreq.push({
+                        name: 'RSync.AddFile',
+                        args: {
+                            path: '~' + relpath,
+                            data: ufdata.get(path),
+                        }
+                    });
+                }
+                else {
+                    rpcreq.push({
+                        name: 'RSync.DeleteFile',
+                        args: {
+                            path: '~' + relpath,
+                        },
+                    });
+                }
             }
-            log.i('Building RPC batches.');
-            rpcargs.sort((p, q) => jsonlen(p) - jsonlen(q));
-            while (rpcargs.length > 0) {
+            // Smaller RPCs first.
+            rpcreq.sort((p, q) => jsonlen(p) - jsonlen(q));
+            while (rpcreq.length > 0) {
                 let batchsize = 0;
                 let batch = [];
                 do {
-                    let entry = rpcargs[0];
+                    let entry = rpcreq[0];
                     batchsize += jsonlen(entry);
                     batch.push(entry);
-                    rpcargs.splice(0, 1);
-                } while (rpcargs.length > 0 &&
+                    rpcreq.splice(0, 1);
+                } while (rpcreq.length > 0 &&
                     batchsize < conf.RPC_MAX_BATCH_SIZE);
-                log.i('RPC batch:', batch.length, 'rpcs', (batchsize / 1024).toFixed(1), 'KB');
+                log.d('RPC batch:', batch.length, 'rpcs', (batchsize / 1024).toFixed(1), 'KB');
                 let rpcres = await rpc.invoke('Batch.Run', batch);
                 if (rpcres.length != batch.length)
                     throw new Error('Wrong number of results: ' + rpcres.length);
@@ -62,7 +72,7 @@ define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"],
                     let { err, res } = rpcres[i];
                     if (!err) {
                         log.d('File synced:', path, res);
-                        updates.set(path, { res });
+                        updates.set(path, { res: Object.assign({}, res) });
                     }
                     else if (isPermanentError(err.code)) {
                         log.i('Permanently rejected:', path, err);
@@ -73,50 +83,60 @@ define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"],
                     }
                 }
                 if (updates.size > 0) {
-                    log.i('Finalizing the sync status updates.');
-                    await addSyncedPaths(updates);
+                    log.d('Finalizing the sync status updates.');
+                    await updatedSyncState(updates, upaths.del);
                 }
             }
+            let diff = (Date.now() - time) / 1000;
+            log.i('Done syncing in', diff.toFixed(1), 's');
         }
         catch (err) {
             log.w('Failed to sync:', err);
         }
         finally {
             syncing = false;
-            let diff = (Date.now() - time) / 1000;
-            log.i('Done syncing in', diff.toFixed(1), 's');
         }
     }
     exports.start = start;
     // Full paths that can be used with vfs.get().
     async function getUnsyncedPaths() {
         try {
-            let synced = await vfs_1.default.dir(conf.RSYNC_SYNCED);
-            let failed = await vfs_1.default.dir(conf.RSYNC_FAILED);
-            let local = await vfs_1.default.find(conf.RSYNC_SHARED);
+            let [synced, failed, local] = await Promise.all([
+                vfs_1.default.dir(conf.RSYNC_SYNCED),
+                vfs_1.default.dir(conf.RSYNC_FAILED),
+                vfs_1.default.find(conf.RSYNC_SHARED),
+            ]);
             // newPaths = local - (synced + failed)
             let newPaths = new Set(local);
             for (let key of [...synced, ...failed])
                 newPaths.delete(decodePath(key));
-            log.d('Files to add:', newPaths.size);
-            // delPaths = synced - local
+            // delPaths = synced - (local + failed)
             let delPaths = new Set(synced.map(decodePath));
             for (let path of local)
                 delPaths.delete(path);
-            log.d('Files to delete:', delPaths.size);
-            return [...newPaths];
+            for (let key of failed)
+                delPaths.delete(decodePath(key));
+            return { add: newPaths, del: delPaths };
         }
         catch (err) {
             throw new error_1.DerivedError('Failed to get unsynced paths.', err);
         }
     }
-    async function addSyncedPaths(updates) {
+    async function updatedSyncState(updates, removed) {
         let ps = [];
         for (let [path, { res, err }] of updates) {
             let key = encodePath(path);
-            ps.push(err ?
-                vfs_1.default.set(conf.RSYNC_FAILED + '/' + key, err) :
-                vfs_1.default.set(conf.RSYNC_SYNCED + '/' + key, res));
+            if (!removed.has(path)) {
+                ps.push(err ?
+                    vfs_1.default.set(conf.RSYNC_FAILED + '/' + key, err) :
+                    vfs_1.default.set(conf.RSYNC_SYNCED + '/' + key, res));
+            }
+            else if (!err) {
+                ps.push(vfs_1.default.rm(conf.RSYNC_SYNCED + '/' + key), vfs_1.default.rm(conf.RSYNC_FAILED + '/' + key));
+            }
+            else {
+                ps.push(vfs_1.default.set(conf.RSYNC_FAILED + '/' + key, err));
+            }
         }
         await Promise.all(ps);
     }
