@@ -5,7 +5,7 @@ import * as startup from './startup';
 
 const log = new TaggedLogger('page');
 
-type PageId = 'map' | 'reg' | 'places' | 'nearby';
+type PageId = 'map' | 'reg' | 'places' | 'nearby' | 'explorer';
 
 export async function init() {
   let id = get();

@@ -3,6 +3,7 @@ define(["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CSS_DEBUG = 'debug';
     exports.id = {
+        get pageExplorer() { return $('#p-explorer'); },
         get map() { return $('#map'); },
         get mapAll() { return $('#all-places'); },
         get sendLocation() { return $('#send'); },

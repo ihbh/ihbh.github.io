@@ -3,6 +3,7 @@ import { TaggedLogger } from "./log";
 type ArgId = 
   'page' |
   'rpc' | 
+  'path' |
   'uid' |
   'tskey' | 
   'vpt' | 

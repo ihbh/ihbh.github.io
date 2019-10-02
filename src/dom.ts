@@ -1,6 +1,7 @@
 export const CSS_DEBUG = 'debug';
 
 export const id = {
+  get pageExplorer() { return $('#p-explorer'); },
   get map() { return $('#map'); },
   get mapAll() { return $('#all-places'); },
   get sendLocation() { return $<HTMLButtonElement>('#send'); },
