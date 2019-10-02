@@ -386,22 +386,22 @@ body .page .ol-attribution * {
   background: #000;
   color: #fff;
   padding: 1em;
+  word-break: break-all;
 }
 
 #p-explorer .links {
-  padding: 1em;
-  display: flex;
-  flex-flow: row wrap;
+  padding: 0.25em;
+  display: grid;
+  grid-gap: 0.25em;
+  grid-template-columns: repeat(4, 1fr);
 }
 
 #p-explorer .links a {
   background: #004;
   color: #fff;
-  padding: 1em;
-  margin: 0.1em;
-  width: 6em;
   word-break: break-all;
   text-decoration: none;
+  padding: 0.5em;
 }
 
 #p-explorer .data {
