@@ -59,6 +59,8 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
         };
     }
     async function renderAsFile(root, path) {
+        if (path.endsWith('/'))
+            return;
         log.i('Checking if this is a file.');
         let data = await vfs_1.default.get(path);
         if (data === null)
@@ -68,6 +70,8 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
         root.appendChild(react_1.default.createElement("div", { class: "data" }, json));
     }
     async function renderAsDir(root, path) {
+        if (path.endsWith('/'))
+            path = path.slice(0, -1);
         log.i('Checking if this is a dir.');
         let names = await vfs_1.default.dir(path);
         let links = react_1.default.createElement("div", { class: TAG_LINKS });

@@ -73,6 +73,8 @@ function addRmDirButton(controls: HTMLElement) {
 }
 
 async function renderAsFile(root: HTMLElement, path: string) {
+  if (path.endsWith('/'))
+    return;
   log.i('Checking if this is a file.');
   let data = await vfs.get(path);
   if (data === null) return;
@@ -82,6 +84,8 @@ async function renderAsFile(root: HTMLElement, path: string) {
 }
 
 async function renderAsDir(root: HTMLElement, path: string) {
+  if (path.endsWith('/'))
+    path = path.slice(0, -1);
   log.i('Checking if this is a dir.');
   let names = await vfs.dir(path);
   let links = <div class={TAG_LINKS}></div>;
