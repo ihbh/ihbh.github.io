@@ -72,10 +72,18 @@ export class OSM {
         if (key) {
           log.d('layer:', key);
           this.fireMarkerClickEvent(key);
-        } else if (this.onaddmarker) {
-          log.d('Firing the addmarker event.');
-          this.onaddmarker({ lon, lat });
         }
+      });
+    });
+
+    this.map.on('dblclick', e => {
+      let [lon, lat] = this.ol.proj.toLonLat(e.coordinate);
+      log.d('map:dblclick', lat, lon);
+      if (!this.onaddmarker) return;
+
+      this.map.forEachLayerAtPixel(e.pixel, (layer) => {
+        log.d('Firing the addmarker event.');
+        this.onaddmarker({ lon, lat });
       });
     });
   }
