@@ -50,6 +50,12 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
         async rm(path) {
             return invokeHandler('rm', path);
         },
+        async rmdir(path) {
+            log.i('rmdir', path);
+            let paths = await this.find(path);
+            let ps = paths.map(filepath => this.rm(filepath));
+            await Promise.all(ps);
+        }
     };
     async function invokeHandler(method, path, ...args) {
         log.d(method + '()', path);

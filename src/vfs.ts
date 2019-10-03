@@ -67,6 +67,13 @@ export const root: VFS = {
   async rm(path: string): Promise<void> {
     return invokeHandler('rm', path);
   },
+
+  async rmdir(path: string) {
+    log.i('rmdir', path);
+    let paths = await this.find(path);
+    let ps = paths.map(filepath => this.rm(filepath));
+    await Promise.all(ps);
+  }
 };
 
 async function invokeHandler(method: keyof VFS, path: string, ...args) {

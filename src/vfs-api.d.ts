@@ -4,4 +4,5 @@ export declare interface VFS {
   get?(path: string): Promise<any>;
   set?(path: string, data: any): Promise<void>;
   rm?(path: string): Promise<void>;
+  rmdir?(path: string): Promise<void>;
 }
