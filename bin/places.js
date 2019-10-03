@@ -1,4 +1,4 @@
-define(["require", "exports", "./dom", "./log", "./loc", "./osm", "./config", "./qargs"], function (require, exports, dom, log_1, loc, osm_1, conf, qargs) {
+define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", "./qargs"], function (require, exports, conf, dom, loc, log_1, osm_1, qargs) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('places');
@@ -29,6 +29,8 @@ define(["require", "exports", "./dom", "./log", "./loc", "./osm", "./config", ".
             throw new Error('Nothing to render: no places visited.');
         let bbox = getBBox(places);
         let osm = new osm_1.OSM(dom.id.mapAll.id);
+        if (conf.DEBUG)
+            osm.onaddmarker = pos => addMarkerAt(pos);
         await osm.render(bbox);
         let psorted = places.sort((p1, p2) => +p1.time - +p2.time);
         let tmin = +psorted[0].time;
@@ -68,6 +70,13 @@ define(["require", "exports", "./dom", "./log", "./loc", "./osm", "./config", ".
         bbox.max.lat += conf.MAP_BOX_SIZE;
         bbox.max.lon += conf.MAP_BOX_SIZE;
         return bbox;
+    }
+    async function addMarkerAt({ lat, lon }) {
+        log.i(`Creating a marker at lat=${lat} lon=${lon}`);
+        let loc = await new Promise((resolve_2, reject_2) => { require(['./loc'], resolve_2, reject_2); });
+        let tskey = await loc.shareLocation({ lat, lon });
+        let page = await new Promise((resolve_3, reject_3) => { require(['./page'], resolve_3, reject_3); });
+        page.set('nearby', { tskey });
     }
 });
 //# sourceMappingURL=places.js.map

@@ -56,8 +56,6 @@ async function loadMap() {
     log.i('Loading OSM.');
     dom.id.noGPS.textContent = '';
     osm = new OSM(dom.id.map.id);
-    if (conf.DEBUG)
-      osm.onaddmarker = pos => addMarkerAt(pos);    
     await osm.render(null);
     await startWatchingGps();
   } catch (err) {
@@ -124,13 +122,6 @@ async function initSendButton() {
 
     page.set('nearby', { tskey });
   };
-}
-
-async function addMarkerAt({ lat, lon }) {
-  log.i(`Creating a marker at lat=${lat} lon=${lon}`);
-  let loc = await import('./loc');
-  let tskey = await loc.shareLocation({ lat, lon });
-  page.set('nearby', { tskey });
 }
 
 async function initRefreshGps() {

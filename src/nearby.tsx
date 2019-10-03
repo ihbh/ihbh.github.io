@@ -68,6 +68,9 @@ function initUnvisitLink() {
     } catch (err) {
       log.e('Failed to unvisit:', err);
     }
+
+    let page = await import('./page');
+    await page.set('places');
   };
 }
 

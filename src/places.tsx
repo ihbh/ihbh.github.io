@@ -1,8 +1,8 @@
-import * as dom from './dom';
-import { TaggedLogger } from './log';
-import * as loc from './loc';
-import { OSM, BBox } from './osm';
 import * as conf from './config';
+import * as dom from './dom';
+import * as loc from './loc';
+import { TaggedLogger } from './log';
+import { BBox, OSM } from './osm';
 import * as qargs from './qargs';
 
 const log = new TaggedLogger('places');
@@ -37,6 +37,8 @@ async function loadMap() {
 
   let bbox = getBBox(places);
   let osm = new OSM(dom.id.mapAll.id);
+  if (conf.DEBUG)
+    osm.onaddmarker = pos => addMarkerAt(pos);
   await osm.render(bbox);
 
   let psorted = places.sort((p1, p2) => +p1.time - +p2.time);
@@ -85,3 +87,10 @@ function getBBox(places: loc.Place[]): BBox {
   return bbox;
 }
 
+async function addMarkerAt({ lat, lon }) {
+  log.i(`Creating a marker at lat=${lat} lon=${lon}`);
+  let loc = await import('./loc');
+  let tskey = await loc.shareLocation({ lat, lon });
+  let page = await import('./page');
+  page.set('nearby', { tskey });
+}

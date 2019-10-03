@@ -49,6 +49,8 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
             catch (err) {
                 log.e('Failed to unvisit:', err);
             }
+            let page = await new Promise((resolve_3, reject_3) => { require(['./page'], resolve_3, reject_3); });
+            await page.set('places');
         };
     }
     function makeUserCard(info) {
