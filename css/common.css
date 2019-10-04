@@ -50,6 +50,8 @@ body {
   cursor: pointer;
   width: 2rem;
   height: 2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn-sq:focus {
