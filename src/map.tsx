@@ -19,6 +19,7 @@ export async function init() {
   await initMap();
   await initSendButton();
   await initChatButton();
+  await showLastSeenPos();
 }
 
 function initChatButton() {
@@ -83,13 +84,15 @@ function onGpsUpdated(pos: Coordinates) {
 
   bestPos = pos;
   dom.id.sendLocation.disabled = false;
+  let { latitude: lat, longitude: lon } = pos;
+  setLastGps({ lat, lon });
+  updateMap({ lat, lon });
+}
 
+async function updateMap({ lat, lon }) {
   try {
-    log.i('Refreshing the GPS location.');
-    let { latitude: lat, longitude: lon } = pos;
-
-    log.i('Updating OSM view box:', pos);
     let s = conf.MAP_BOX_SIZE;
+    log.i('Updating OSM view box:', s, { lat, lon });
     osm.setBBox({
       min: { lat: lat - s, lon: lon - s },
       max: { lat: lat + s, lon: lon + s },
@@ -100,8 +103,24 @@ function onGpsUpdated(pos: Coordinates) {
     osm.addMarker({ lat, lon });
   } catch (err) {
     log.e('Failed to refresh GPS coords:', err);
-    throw err;
   }
+}
+
+async function showLastSeenPos() {
+  let pos = await getLastGps();
+  if (!pos) return;
+  log.i('Last seen pos:', pos);
+  await updateMap(pos);
+}
+
+async function setLastGps({ lat, lon }) {
+  let gp = await import('./gp');
+  await gp.lastgps.set({ lat, lon });
+}
+
+async function getLastGps() {
+  let gp = await import('./gp');
+  return gp.lastgps.get();
 }
 
 async function initSendButton() {

@@ -34,11 +34,13 @@ define(["require", "exports"], function (require, exports) {
     exports.LOG_IDB_INTERVAL = 5; // ms
     exports.FS_SLOW_THRS = 10; // ms
     exports.USERDATA_DIR = '/idb/user';
+    exports.LOCAL_DIR = `${exports.USERDATA_DIR}/local`;
     exports.SHARED_DIR = `${exports.USERDATA_DIR}/shared`;
     exports.VPLACES_DIR = `${exports.SHARED_DIR}/places`;
     exports.RSYNC_SHARED = exports.SHARED_DIR;
     exports.RSYNC_SYNCED = `${exports.USERDATA_DIR}/rsync/synced`;
     exports.RSYNC_FAILED = `${exports.USERDATA_DIR}/rsync/failed`;
+    exports.LASTGPS_DIR = `${exports.LOCAL_DIR}/lastgps`;
     exports.NULL_IMG = 'data:image/jpeg;base64,';
 });
 //# sourceMappingURL=config.js.map

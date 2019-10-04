@@ -5,7 +5,7 @@ define(["require", "exports", "./config", "./log", "./vfs-prop"], function (requ
     function prop(path, defval = null) {
         let fspath = conf.USERDATA_DIR + '/' +
             path.split('.').join('/');
-        log.d(path, '->', fspath, 'default:', defval);
+        log.d(path, '->', fspath);
         return vfs_prop_1.default(fspath, defval);
     }
     exports.uid = prop('shared.profile.id');
@@ -15,5 +15,6 @@ define(["require", "exports", "./config", "./log", "./vfs-prop"], function (requ
     exports.keyseed = prop('local.keys.keyseed');
     exports.privkey = prop('local.keys.privkey');
     exports.chats = prop('local.chat.drafts', {});
+    exports.lastgps = prop('local.lastgps');
 });
 //# sourceMappingURL=gp.js.map

@@ -7,7 +7,7 @@ const log = new TaggedLogger('gp');
 function prop<T>(path: string, defval: T = null) {
   let fspath = conf.USERDATA_DIR + '/' +
     path.split('.').join('/');
-  log.d(path, '->', fspath, 'default:', defval);
+  log.d(path, '->', fspath);
   return vfsprop(fspath, defval);
 }
 
@@ -24,3 +24,4 @@ export const pubkey = prop<string>('shared.profile.pubkey');
 export const keyseed = prop<string>('local.keys.keyseed');
 export const privkey = prop<string>('local.keys.privkey');
 export const chats = prop<any>('local.chat.drafts', {});
+export const lastgps = prop<{ lat: number, lon: number }>('local.lastgps');

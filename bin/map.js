@@ -11,6 +11,7 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
         await initMap();
         await initSendButton();
         await initChatButton();
+        await showLastSeenPos();
     }
     exports.init = init;
     function initChatButton() {
@@ -69,11 +70,14 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
         }
         bestPos = pos;
         dom.id.sendLocation.disabled = false;
+        let { latitude: lat, longitude: lon } = pos;
+        setLastGps({ lat, lon });
+        updateMap({ lat, lon });
+    }
+    async function updateMap({ lat, lon }) {
         try {
-            log.i('Refreshing the GPS location.');
-            let { latitude: lat, longitude: lon } = pos;
-            log.i('Updating OSM view box:', pos);
             let s = conf.MAP_BOX_SIZE;
+            log.i('Updating OSM view box:', s, { lat, lon });
             osm.setBBox({
                 min: { lat: lat - s, lon: lon - s },
                 max: { lat: lat + s, lon: lon + s },
@@ -84,15 +88,29 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
         }
         catch (err) {
             log.e('Failed to refresh GPS coords:', err);
-            throw err;
         }
+    }
+    async function showLastSeenPos() {
+        let pos = await getLastGps();
+        if (!pos)
+            return;
+        log.i('Last seen pos:', pos);
+        await updateMap(pos);
+    }
+    async function setLastGps({ lat, lon }) {
+        let gp = await new Promise((resolve_2, reject_2) => { require(['./gp'], resolve_2, reject_2); });
+        await gp.lastgps.set({ lat, lon });
+    }
+    async function getLastGps() {
+        let gp = await new Promise((resolve_3, reject_3) => { require(['./gp'], resolve_3, reject_3); });
+        return gp.lastgps.get();
     }
     async function initSendButton() {
         let button = dom.id.sendLocation;
         button.disabled = true;
         button.onclick = async () => {
             log.i('#send:click');
-            let pwa = await new Promise((resolve_2, reject_2) => { require(['./pwa'], resolve_2, reject_2); });
+            let pwa = await new Promise((resolve_4, reject_4) => { require(['./pwa'], resolve_4, reject_4); });
             pwa.showInstallPrompt();
             button.disabled = true;
             let tskey = null;
@@ -111,7 +129,7 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
     async function shareDisplayedLocation() {
         if (!bestPos)
             throw new Error('GPS not ready.');
-        let loc = await new Promise((resolve_3, reject_3) => { require(['./loc'], resolve_3, reject_3); });
+        let loc = await new Promise((resolve_5, reject_5) => { require(['./loc'], resolve_5, reject_5); });
         let { latitude: lat, longitude: lng } = bestPos;
         return loc.shareLocation({ lat, lon: lng });
     }
