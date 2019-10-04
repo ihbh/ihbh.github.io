@@ -16,6 +16,12 @@ export async function init() {
 
   document.body.classList.add(dom.CSS_DEBUG);
 
+  dom.id.btnDebugToggle.onclick = () => {
+    const style = dom.id.debugMenu.style;
+    style.visibility = style.visibility != 'collapse' ?
+      'collapse' : 'visible';
+  };
+
   dom.id.gotoCommon.onclick = async () => {
     let d = 1e-4; // 10 meters
     let x = (2 * Math.random() - 1) * d; // +/- 10 meters
@@ -25,12 +31,6 @@ export async function init() {
     let tskey = await loc.shareLocation({ lat, lon });
     let page = await import('./page');
     page.set('nearby', { tskey });
-  };
-
-  dom.id.unsync.onclick = async () => {
-    log.i('Resetting the rsync state.');
-    let rsync = await import('./rsync');
-    await rsync.reset();
   };
 
   dom.id.exportDB.addEventListener('click', async () => {

@@ -1,6 +1,9 @@
 export const CSS_DEBUG = 'debug';
 
 export const id = {
+  get btnSeeChats() { return $('#see-chats') as HTMLButtonElement; },
+  get debugMenu() { return $('#debug'); },
+  get btnDebugToggle() { return $('#debug-toggle') as HTMLButtonElement; },
   get pageExplorer() { return $('#p-explorer'); },
   get map() { return $('#map'); },
   get mapAll() { return $('#all-places'); },
@@ -10,7 +13,6 @@ export const id = {
   get showLogs() { return $('#show-logs'); },
   get exportDB() { return $('#export-db'); },
   get importDB() { return $('#import-db'); },
-  get unsync() { return $('#unsync'); },
   get unvisit() { return $<HTMLButtonElement>('#unvisit'); },
   get noGPS() { return $('#no-gps'); },
   get regPhoto() { return $<HTMLImageElement>('#photo-frame > img'); },
@@ -20,7 +22,6 @@ export const id = {
   get uploadPhotoInput() { return $<HTMLInputElement>('#upload-input'); },
   get userPic() { return $<HTMLImageElement>('#userpic'); },
   get showPlaces() { return $('#show-places'); },
-  get refreshGps() { return $<HTMLButtonElement>('#refresh-gps'); },
   get visitors() { return $('#visitors'); },
   get activeChats() { return $('#p-unread > .user-cards'); },
   get nearbyStatus() { return $('#nearby-status'); },

@@ -3,6 +3,9 @@ define(["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CSS_DEBUG = 'debug';
     exports.id = {
+        get btnSeeChats() { return $('#see-chats'); },
+        get debugMenu() { return $('#debug'); },
+        get btnDebugToggle() { return $('#debug-toggle'); },
         get pageExplorer() { return $('#p-explorer'); },
         get map() { return $('#map'); },
         get mapAll() { return $('#all-places'); },
@@ -12,7 +15,6 @@ define(["require", "exports"], function (require, exports) {
         get showLogs() { return $('#show-logs'); },
         get exportDB() { return $('#export-db'); },
         get importDB() { return $('#import-db'); },
-        get unsync() { return $('#unsync'); },
         get unvisit() { return $('#unvisit'); },
         get noGPS() { return $('#no-gps'); },
         get regPhoto() { return $('#photo-frame > img'); },
@@ -22,7 +24,6 @@ define(["require", "exports"], function (require, exports) {
         get uploadPhotoInput() { return $('#upload-input'); },
         get userPic() { return $('#userpic'); },
         get showPlaces() { return $('#show-places'); },
-        get refreshGps() { return $('#refresh-gps'); },
         get visitors() { return $('#visitors'); },
         get activeChats() { return $('#p-unread > .user-cards'); },
         get nearbyStatus() { return $('#nearby-status'); },

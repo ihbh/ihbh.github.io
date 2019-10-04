@@ -7,6 +7,11 @@ define(["require", "exports", "./config", "./dom", "./idb", "./log", "./logdb", 
         if (!conf.DEBUG)
             return;
         document.body.classList.add(dom.CSS_DEBUG);
+        dom.id.btnDebugToggle.onclick = () => {
+            const style = dom.id.debugMenu.style;
+            style.visibility = style.visibility != 'collapse' ?
+                'collapse' : 'visible';
+        };
         dom.id.gotoCommon.onclick = async () => {
             let d = 1e-4; // 10 meters
             let x = (2 * Math.random() - 1) * d; // +/- 10 meters
@@ -16,11 +21,6 @@ define(["require", "exports", "./config", "./dom", "./idb", "./log", "./logdb", 
             let tskey = await loc.shareLocation({ lat, lon });
             let page = await new Promise((resolve_2, reject_2) => { require(['./page'], resolve_2, reject_2); });
             page.set('nearby', { tskey });
-        };
-        dom.id.unsync.onclick = async () => {
-            log.i('Resetting the rsync state.');
-            let rsync = await new Promise((resolve_3, reject_3) => { require(['./rsync'], resolve_3, reject_3); });
-            await rsync.reset();
         };
         dom.id.exportDB.addEventListener('click', async () => {
             log.i('Exporting data...');
@@ -119,7 +119,7 @@ define(["require", "exports", "./config", "./dom", "./idb", "./log", "./logdb", 
     }
     exports.getDebugPeopleNearby = getDebugPeopleNearby;
     async function getTestUserDetails(uid) {
-        let { default: text } = await new Promise((resolve_4, reject_4) => { require(['./lorem'], resolve_4, reject_4); });
+        let { default: text } = await new Promise((resolve_3, reject_3) => { require(['./lorem'], resolve_3, reject_3); });
         return {
             photo: conf.DBG_TEST_USER_PHOTO,
             name: uid.slice(0, 8),

@@ -18,7 +18,11 @@ export async function init() {
   await initShowPlaces();
   await initMap();
   await initSendButton();
-  await initRefreshGps();
+  await initChatButton();
+}
+
+function initChatButton() {
+  dom.id.btnSeeChats.onclick = () => page.set('unread');
 }
 
 function initShowPlaces() {
@@ -27,14 +31,13 @@ function initShowPlaces() {
 
 async function initUserPic() {
   try {
-    let img = dom.id.userPic;
-    img.onerror = () => log.e('Failed to load user pic.');
-    img.onload = () => log.i('user pic loaded:',
-      img.width, 'x', img.height);
-
+    let button = dom.id.userPic;
+    button.onclick = () => page.set('reg');
     let usr = await import('./usr');
-    img.src = await usr.getPhotoUri();
-    img.title = await usr.getDisplayName();
+    let name = await usr.getDisplayName();
+    button.textContent = name;
+    let photo = await usr.getPhotoUri();
+    button.style.backgroundImage = 'url(' + photo + ')';
   } catch (err) {
     log.e(err);
   }
@@ -122,10 +125,6 @@ async function initSendButton() {
 
     page.set('nearby', { tskey });
   };
-}
-
-async function initRefreshGps() {
-  dom.id.refreshGps.onclick = () => startWatchingGps();
 }
 
 async function shareDisplayedLocation() {

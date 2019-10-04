@@ -29,14 +29,18 @@
 
 <body>
   <div id="logs" style="display:none"></div>
-  <div id="debug">
+
+  <button id="debug-toggle" title="Show debug menu" class="btn-sq" style="background-image: url(/icons/debug.svg)">
+    Debug
+  </button>
+
+  <div id="debug" style="visibility: collapse">
     <a class="btn" href="/">Home</a>
     <a class="btn" href="/?page=explorer">VFS</a>
     <button class="btn" id="gps-london">Common</button>
     <button class="btn" id="show-logs">Logs</button>
     <button class="btn" id="export-db">Export</button>
     <button class="btn" id="import-db">Import</button>
-    <button class="btn" id="unsync">Unsync</button>
   </div>
 
   <!-- The registration page. -->
@@ -84,14 +88,16 @@
     <div id="map"></div>
     <span id="no-gps"></span>
     <div id="controls">
-      <a href="?page=reg">
-        <img id="userpic">
-      </a>
-      <img id="show-places" src="icons/globe.png">
-      <a href="?page=unread">
-        <img src="icons/chat.png">
-      </a>
-      <img id="refresh-gps" src="icons/gps.png" alt="+">
+      <button id="userpic" class="btn-sq" title="Show profile" style="background-image: url()">
+        Profile
+      </button>
+      <button id="show-places" class="btn-sq" title="Show visited places"
+        style="background-image: url(/icons/globe.png)">
+        Places
+      </button>
+      <button id="see-chats" class="btn-sq" title="Show unread messages" style="background-image: url(/icons/chat.png)">
+        Chat
+      </button>
     </div>
     <button class="btn" id="send">I've Been Here!</button>
   </div>

@@ -10,20 +10,24 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
         await initShowPlaces();
         await initMap();
         await initSendButton();
-        await initRefreshGps();
+        await initChatButton();
     }
     exports.init = init;
+    function initChatButton() {
+        dom.id.btnSeeChats.onclick = () => page.set('unread');
+    }
     function initShowPlaces() {
         dom.id.showPlaces.onclick = () => page.set('places');
     }
     async function initUserPic() {
         try {
-            let img = dom.id.userPic;
-            img.onerror = () => log.e('Failed to load user pic.');
-            img.onload = () => log.i('user pic loaded:', img.width, 'x', img.height);
+            let button = dom.id.userPic;
+            button.onclick = () => page.set('reg');
             let usr = await new Promise((resolve_1, reject_1) => { require(['./usr'], resolve_1, reject_1); });
-            img.src = await usr.getPhotoUri();
-            img.title = await usr.getDisplayName();
+            let name = await usr.getDisplayName();
+            button.textContent = name;
+            let photo = await usr.getPhotoUri();
+            button.style.backgroundImage = 'url(' + photo + ')';
         }
         catch (err) {
             log.e(err);
@@ -103,9 +107,6 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
             }
             page.set('nearby', { tskey });
         };
-    }
-    async function initRefreshGps() {
-        dom.id.refreshGps.onclick = () => startWatchingGps();
     }
     async function shareDisplayedLocation() {
         if (!bestPos)

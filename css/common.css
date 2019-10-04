@@ -34,6 +34,28 @@ body {
   outline: none;
 }
 
+.btn-sq {
+  font-size: 0.45rem;
+  padding-top: 1.15rem;
+  border: none;
+  color: #444;
+  background-color: #fff;
+  background-size: 40%;
+  background-repeat: no-repeat;
+  background-position: center 35%;
+  box-shadow: 0 0 1pt 1pt #0004;
+  user-select: none;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+}
+
+.btn-sq:focus {
+  outline: none;
+}
+
 .page {
   display: flex;
   flex-direction: column;
@@ -43,29 +65,35 @@ body {
 
 /* debug menu */
 
-#debug {
+#debug-toggle {
+  visibility: collapse;
   position: fixed;
-  bottom: 0;
-  left: 0;
-  z-index: 1;
-  display: none;
-  flex-direction: column;
+  left: 1em;
+  bottom: 1em;
   z-index: 3;
 }
 
-body.debug #debug {
+body.debug #debug-toggle {
+  visibility: visible;
+}
+
+#debug {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 3;
   display: flex;
+  flex-direction: column;
 }
 
 #debug .btn {
   color: #fff;
-  font-size: 12pt;
+  font-size: 0.5rem;
   box-shadow: 0 0 3pt 1pt #000;
   background: #000;
+  word-break: break-all;
+  margin: 0.2rem;
   padding: 0.5em;
-  margin: 0.5em;
-  margin-top: 0;
-  opacity: 0.5;
 }
 
 #logs {
@@ -201,12 +229,12 @@ body .page .ol-attribution * {
   flex-direction: column;
   z-index: 1;
   position: fixed;
-  right: 0.5em;
-  top: 0.5em;
+  right: 0.5rem;
+  top: 0.5rem;
 }
 
 #controls>* {
-  margin-bottom: 0.5em;
+  margin-bottom: 0.5rem;
 }
 
 #controls img {
