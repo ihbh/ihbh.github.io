@@ -91,7 +91,7 @@ body.debug #debug-toggle {
 #debug .btn {
   color: #fff;
   font-size: 0.5rem;
-  box-shadow: 0 0 3pt 1pt #000;
+  box-shadow: 0 0 3pt 1pt #800;
   background: #000;
   word-break: break-all;
   margin: 0.2rem;
@@ -435,7 +435,6 @@ body .page .ol-attribution * {
   color: #fff;
   padding: 1em;
   word-break: break-all;
-  height: 1em;
   border-bottom: 0.5em solid #800;
 }
 
