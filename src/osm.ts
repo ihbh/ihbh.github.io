@@ -41,7 +41,7 @@ export class OSM {
     this.mapid = mapid.replace('#', '');
   }
 
-  async render(bbox: BBox) {
+  async render(bbox?: BBox) {
     log.i('Rendering OSM in #' + this.mapid,
       JSON.stringify(bbox));
 

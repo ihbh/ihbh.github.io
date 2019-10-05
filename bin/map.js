@@ -48,7 +48,7 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
             log.i('Loading OSM.');
             dom.id.noGPS.textContent = '';
             osm = new osm_1.OSM(dom.id.map.id);
-            await osm.render(null);
+            await osm.render();
             await startWatchingGps();
         }
         catch (err) {

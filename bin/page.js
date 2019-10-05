@@ -27,15 +27,10 @@ define(["require", "exports", "./log", "./qargs", "./dom", "./startup"], functio
     }
     exports.set = set;
     function select(id) {
-        let pages = dom_1.$$('body > *');
-        pages.forEach((p) => {
-            if (/^p-/.test(p.id))
-                p.style.display = 'none';
-        });
         let page = dom_1.$('body > #p-' + id);
         if (!page)
             throw new Error('No such page: #' + id);
-        page.style.display = '';
+        page.style.display = 'flex';
     }
 });
 //# sourceMappingURL=page.js.map

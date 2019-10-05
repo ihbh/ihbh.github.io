@@ -59,7 +59,7 @@ body {
 }
 
 .page {
-  display: flex;
+  display: none;
   flex-direction: column;
   width: 100%;
   height: 100%;
@@ -274,6 +274,30 @@ body .page .ol-attribution * {
 
 /* ?page=nearby */
 
+#vplace-map {
+  height: 25%;
+}
+
+#vtime-bar {
+  background: #800;
+  color: #fff;
+  padding: 1em;
+  font-size: 0.5rem;
+}
+
+#vtime-bar * {
+  font-size: 0.5rem;
+}
+
+#unvisit {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#nearby-status {
+  font-size: 0.5rem;
+}
+
 /* ?page=unread */
 
 .user-cards {
@@ -307,19 +331,12 @@ body .page .ol-attribution * {
   font-weight: bold;
 }
 
-#unvisit {}
-
 #nearby-status {
   word-wrap: break-word;
   word-break: break-all;
 }
 
 /* ?page=chat */
-
-#p-chat {
-  display: flex;
-  flex-direction: column;
-}
 
 #u-header {
   display: flex;

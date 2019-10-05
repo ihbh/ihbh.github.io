@@ -60,7 +60,7 @@ async function loadMap() {
     log.i('Loading OSM.');
     dom.id.noGPS.textContent = '';
     osm = new OSM(dom.id.map.id);
-    await osm.render(null);
+    await osm.render();
     await startWatchingGps();
   } catch (err) {
     log.e('Failed to render OSM:', err);

@@ -13,7 +13,6 @@ export const id = {
   get showLogs() { return $('#show-logs'); },
   get exportDB() { return $('#export-db'); },
   get importDB() { return $('#import-db'); },
-  get unvisit() { return $<HTMLButtonElement>('#unvisit'); },
   get noGPS() { return $('#no-gps'); },
   get regPhoto() { return $<HTMLImageElement>('#photo-frame > img'); },
   get regName() { return $<HTMLInputElement>('#reg-name'); },
@@ -24,7 +23,13 @@ export const id = {
   get showPlaces() { return $('#show-places'); },
   get visitors() { return $('#visitors'); },
   get activeChats() { return $('#p-unread > .user-cards'); },
+
   get nearbyStatus() { return $('#nearby-status'); },
+  get vplaceMap() { return $('#vplace-map'); },
+  get vtimeBar() { return $('#vtime-bar'); },
+  get vtimeLabel() { return $('#vtime-label'); },
+  get unvisit() { return $('#unvisit'); },
+
   get chatUserIcon() { return $<HTMLImageElement>('#chat-u-icon'); },
   get chatUserName() { return $('#chat-u-name'); },
   get chatMessages() { return $('#messages'); },

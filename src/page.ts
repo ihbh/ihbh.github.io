@@ -31,12 +31,7 @@ export function set(id: PageId, args?) {
 }
 
 function select(id: PageId) {
-  let pages = $$('body > *');
-  pages.forEach((p: HTMLElement) => {
-    if (/^p-/.test(p.id))
-      p.style.display = 'none';
-  });
   let page = $<HTMLElement>('body > #p-' + id);
   if (!page) throw new Error('No such page: #' + id);
-  page.style.display = '';
+  page.style.display = 'flex';
 }
