@@ -52,8 +52,8 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
                     update();
                     if (remaining)
                         return;
-                    reset();
                     await vfs_1.default.rmdir(path);
+                    reset();
                 }, 1000);
             }
         };

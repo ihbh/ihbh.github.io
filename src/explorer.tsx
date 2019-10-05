@@ -65,8 +65,8 @@ function addRmDirButton(controls: HTMLElement) {
         update();
         if (remaining)
           return;
-        reset();
         await vfs.rmdir(path);
+        reset();
       }, 1000);
     }
   };
