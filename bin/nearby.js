@@ -16,7 +16,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
             initVMap({ lat, lon });
             dom.id.vtimeLabel.textContent =
                 tts.recentTimeToStr(new Date(time * 1000));
-            setStatus('Checking who has been here too...');
+            setStatus('Checking who has been here before...');
             let infos;
             try {
                 infos = await getPeopleNearby({ lat, lon });
@@ -28,12 +28,14 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
                 let dbg = await new Promise((resolve_1, reject_1) => { require(['./dbg'], resolve_1, reject_1); });
                 infos = await dbg.getDebugPeopleNearby();
             }
-            setStatus(`${infos.length} people have been here before:`);
-            let container = dom.id.visitors;
-            if (infos.length > 0)
+            if (infos.length > 0) {
+                setStatus(`Others who have been here before:`);
+                let container = dom.id.visitors;
                 container.append(...infos.map(makeUserCard));
-            else
-                container.textContent = 'Nobody has been here before.';
+            }
+            else {
+                setStatus(`Nobody has been here before.`);
+            }
         }
         catch (err) {
             setStatus(err + '');

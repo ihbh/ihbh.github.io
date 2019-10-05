@@ -37,7 +37,7 @@ export async function init() {
     dom.id.vtimeLabel.textContent =
       tts.recentTimeToStr(new Date(time * 1000));
 
-    setStatus('Checking who has been here too...');
+    setStatus('Checking who has been here before...');
     let infos: UserInfo[];
 
     try {
@@ -49,13 +49,13 @@ export async function init() {
       infos = await dbg.getDebugPeopleNearby();
     }
 
-    setStatus(`${infos.length} people have been here before:`);
-    let container = dom.id.visitors;
-
-    if (infos.length > 0)
+    if (infos.length > 0) {
+      setStatus(`Others who have been here before:`);
+      let container = dom.id.visitors;
       container.append(...infos.map(makeUserCard));
-    else
-      container.textContent = 'Nobody has been here before.';
+    } else {
+      setStatus(`Nobody has been here before.`);
+    }
   } catch (err) {
     setStatus(err + '');
     throw err;
