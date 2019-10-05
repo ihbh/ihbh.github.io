@@ -274,8 +274,12 @@ body .page .ol-attribution * {
 
 /* ?page=nearby */
 
+#p-nearby {
+  height: auto;
+}
+
 #vplace-map {
-  height: 25%;
+  height: 25vh;
 }
 
 #vtime-bar {
@@ -296,6 +300,7 @@ body .page .ol-attribution * {
 
 #nearby-status {
   font-size: 0.5rem;
+  padding: 1em;
 }
 
 /* ?page=unread */
@@ -304,7 +309,6 @@ body .page .ol-attribution * {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-gap: 1em;
-  padding: 1em;
 }
 
 .user-cards a {
