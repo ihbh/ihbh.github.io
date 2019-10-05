@@ -76,7 +76,7 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
         let names = await vfs_1.default.dir(path);
         let links = react_1.default.createElement("div", { class: TAG_LINKS });
         log.i('This is a dir.');
-        for (let name of names) {
+        for (let name of names.sort()) {
             let href = `/?page=explorer&path=${path}/${name}`;
             let link = react_1.default.createElement("a", { href: href }, name);
             links.appendChild(link);

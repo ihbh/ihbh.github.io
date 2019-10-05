@@ -91,7 +91,7 @@ async function renderAsDir(root: HTMLElement, path: string) {
   let links = <div class={TAG_LINKS}></div>;
   log.i('This is a dir.');
 
-  for (let name of names) {
+  for (let name of names.sort()) {
     let href = `/?page=explorer&path=${path}/${name}`;
     let link = <a href={href}>{name}</a>;
     links.appendChild(link);
