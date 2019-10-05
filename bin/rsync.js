@@ -63,11 +63,13 @@ define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"],
                 let batch = [];
                 do {
                     let entry = rpcreq[0];
-                    batchsize += jsonlen(entry);
+                    let size = jsonlen(entry);
+                    if (batch.length > 0 && batchsize + size > conf.RPC_MAX_BATCH_SIZE)
+                        break;
+                    batchsize += size;
                     batch.push(entry);
                     rpcreq.splice(0, 1);
-                } while (rpcreq.length > 0 &&
-                    batchsize < conf.RPC_MAX_BATCH_SIZE);
+                } while (rpcreq.length > 0);
                 log.d('RPC batch:', batch.length, 'rpcs', (batchsize / 1024).toFixed(1), 'KB');
                 let rpcres = await rpc.invoke('Batch.Run', batch);
                 if (rpcres.length != batch.length)
@@ -98,7 +100,7 @@ define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"],
             log.i('Done syncing in', diff.toFixed(1), 's');
         }
         catch (err) {
-            log.w('Failed to sync:', err);
+            log.e('Failed to sync:', err);
         }
         finally {
             syncing = false;
