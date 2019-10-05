@@ -14,6 +14,8 @@ function prop<T>(path: string, defval: T = null) {
 
     async set(value: T) {
       await vfs.set(path, value);
+      let rsync = await import('./rsync');
+      await rsync.reset(path);
     },
   });
 }

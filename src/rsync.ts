@@ -16,9 +16,15 @@ let syncing = false;
 const encodePath = encodeURIComponent;
 const decodePath = decodeURIComponent;
 
-export async function reset() {
-  await vfs.rm(conf.RSYNC_SYNCED);
-  await vfs.rm(conf.RSYNC_FAILED);
+export async function reset(path?: string) {
+  if (!path) {
+    await vfs.rm(conf.RSYNC_SYNCED);
+    await vfs.rm(conf.RSYNC_FAILED);
+  } else {
+    let key = encodePath(path);
+    await vfs.rm(conf.RSYNC_SYNCED + '/' + key);
+    await vfs.rm(conf.RSYNC_FAILED + '/' + key);
+  }
 }
 
 export async function start() {
@@ -96,7 +102,7 @@ export async function start() {
         let { err, res } = rpcres[i];
 
         if (!err) {
-          log.d('File synced:', path, res);
+          log.d('File synced:', path);
           updates.set(path, { res: { ...res } });
         } else if (isPermanentError(err.code)) {
           log.i('Permanently rejected:', path, err);

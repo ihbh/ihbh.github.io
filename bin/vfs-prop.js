@@ -12,6 +12,8 @@ define(["require", "exports", "./prop", "./vfs"], function (require, exports, pr
             },
             async set(value) {
                 await vfs_1.default.set(path, value);
+                let rsync = await new Promise((resolve_1, reject_1) => { require(['./rsync'], resolve_1, reject_1); });
+                await rsync.reset(path);
             },
         });
     }

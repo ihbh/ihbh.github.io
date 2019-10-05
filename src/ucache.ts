@@ -14,11 +14,14 @@ export async function getUserInfo(uid: string) {
   const { default: vfs } = await import('./vfs');
   let dir = `/srv/users/${uid}/profile`;
   let dirCached = `${conf.USERDATA_DIR}/users/${uid}`;
+  let useCache = Math.random() > 1 / conf.UCACHE_REFRESH_RATE;
   let info: UserInfo = { uid };
 
   try {
-    info.name = await vfs.get(`${dirCached}/name`);
-    info.photo = await vfs.get(`${dirCached}/img`);
+    if (useCache) {
+      info.name = await vfs.get(`${dirCached}/name`);
+      info.photo = await vfs.get(`${dirCached}/img`);
+    }
 
     if (!info.name || !info.photo) {
       info.name = await vfs.get(`${dir}/name`);

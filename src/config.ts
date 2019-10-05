@@ -39,3 +39,6 @@ export const RSYNC_SYNCED = `${USERDATA_DIR}/rsync/synced`;
 export const RSYNC_FAILED = `${USERDATA_DIR}/rsync/failed`;
 export const LASTGPS_DIR = `${LOCAL_DIR}/lastgps`;
 export const NULL_IMG = 'data:image/jpeg;base64,';
+// /srv/users/<uid>/profile details are cached and
+// refreshed every N times
+export const UCACHE_REFRESH_RATE = 10;

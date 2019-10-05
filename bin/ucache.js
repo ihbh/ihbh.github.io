@@ -7,10 +7,13 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
         const { default: vfs } = await new Promise((resolve_1, reject_1) => { require(['./vfs'], resolve_1, reject_1); });
         let dir = `/srv/users/${uid}/profile`;
         let dirCached = `${conf.USERDATA_DIR}/users/${uid}`;
+        let useCache = Math.random() > 1 / conf.UCACHE_REFRESH_RATE;
         let info = { uid };
         try {
-            info.name = await vfs.get(`${dirCached}/name`);
-            info.photo = await vfs.get(`${dirCached}/img`);
+            if (useCache) {
+                info.name = await vfs.get(`${dirCached}/name`);
+                info.photo = await vfs.get(`${dirCached}/img`);
+            }
             if (!info.name || !info.photo) {
                 info.name = await vfs.get(`${dir}/name`);
                 info.photo = await vfs.get(`${dir}/img`);

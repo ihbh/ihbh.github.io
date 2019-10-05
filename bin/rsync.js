@@ -5,9 +5,16 @@ define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"],
     let syncing = false;
     const encodePath = encodeURIComponent;
     const decodePath = decodeURIComponent;
-    async function reset() {
-        await vfs_1.default.rm(conf.RSYNC_SYNCED);
-        await vfs_1.default.rm(conf.RSYNC_FAILED);
+    async function reset(path) {
+        if (!path) {
+            await vfs_1.default.rm(conf.RSYNC_SYNCED);
+            await vfs_1.default.rm(conf.RSYNC_FAILED);
+        }
+        else {
+            let key = encodePath(path);
+            await vfs_1.default.rm(conf.RSYNC_SYNCED + '/' + key);
+            await vfs_1.default.rm(conf.RSYNC_FAILED + '/' + key);
+        }
     }
     exports.reset = reset;
     async function start() {
@@ -71,7 +78,7 @@ define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"],
                         .replace(/^~/, conf.RSYNC_SHARED);
                     let { err, res } = rpcres[i];
                     if (!err) {
-                        log.d('File synced:', path, res);
+                        log.d('File synced:', path);
                         updates.set(path, { res: Object.assign({}, res) });
                     }
                     else if (isPermanentError(err.code)) {
