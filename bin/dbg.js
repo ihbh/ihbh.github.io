@@ -72,16 +72,12 @@ define(["require", "exports", "./config", "./dom", "./idb", "./log", "./logdb", 
             }
         });
         dom.id.showLogs.addEventListener('click', async () => {
-            log.i('#show-logs:click');
             let div = dom.id.logs;
             if (!div.style.display) {
-                log.i('Hiding the logs.');
                 div.style.display = 'none';
                 return;
             }
-            log.i('Getting a copy of the logs.');
             let logs = await logdb.getLogs();
-            log.i('Got logs:', logs.length);
             let text = logs.map(args => args.map(serializeLogArg).join(' '))
                 .join('\n');
             div.textContent = text;
