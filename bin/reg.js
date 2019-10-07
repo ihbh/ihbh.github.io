@@ -1,10 +1,11 @@
-define(["require", "exports", "./config", "./dom", "./log", "./gp", "./page", "./usr"], function (require, exports, config_1, dom, log_1, gp, page, usr) {
+define(["require", "exports", "./config", "./dom", "./log", "./gp", "./page", "./usr"], function (require, exports, conf, dom, log_1, gp, page, usr) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const IMG_MAXSIZE = 4096;
     const IMG_MIME = 'image/jpeg';
     const log = new log_1.TaggedLogger('reg');
-    const strDataUrl = url => url.slice(0, 30) + '...' + url.slice(-10);
+    const strDataUrl = url => url.slice(0, 30) + '...' +
+        url.slice(-10) + ` (${url.length} bytes)`;
     async function init() {
         dom.id.regPhoto.onclick =
             () => selectPhoto();
@@ -44,10 +45,11 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./page", ".
             let dy = (h - wh) / 2;
             log.i('cropped size:', wh, 'x', wh);
             context.drawImage(bitmap, dx, dy, wh, wh);
-            let dataUrl = canvas.toDataURL();
-            log.i('Data URL:', strDataUrl(dataUrl));
+            let blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg'));
+            let imgurl = URL.createObjectURL(blob);
+            log.i('jpeg blob url:', imgurl);
             let img = dom.id.regPhoto;
-            img.src = dataUrl;
+            img.src = imgurl;
         }
         catch (err) {
             log.e('Failed to save photo:', err);
@@ -59,14 +61,15 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./page", ".
             return null;
         let w = img.naturalWidth;
         let h = img.naturalHeight;
-        let s = config_1.PHOTO_SIZE;
+        let s = conf.PHOTO_SIZE;
         log.i('resizing image:', w, 'x', h, '->', s, 'x', s);
         let canvas = document.createElement('canvas');
         canvas.width = s;
         canvas.height = s;
         let context = canvas.getContext('2d');
+        context.filter = 'grayscale(100%)';
         context.drawImage(img, 0, 0, w, h, 0, 0, s, s);
-        let newDataUrl = canvas.toDataURL(IMG_MIME);
+        let newDataUrl = canvas.toDataURL(IMG_MIME, conf.PHOTO_QIALITY);
         log.i('resized photo:', strDataUrl(newDataUrl));
         return newDataUrl;
     }
@@ -76,8 +79,8 @@ define(["require", "exports", "./config", "./dom", "./log", "./gp", "./page", ".
             let username = dom.id.regName.value || '';
             if (!username)
                 throw new Error('Need to set user name.');
-            if (!config_1.VALID_USERNAME_REGEX.test(username))
-                throw new Error(`Username "${username}" doesn't match ${config_1.VALID_USERNAME_REGEX} regex.`);
+            if (!conf.VALID_USERNAME_REGEX.test(username))
+                throw new Error(`Invalid username.`);
             let imgurl = getResizedPhoto();
             if (!imgurl)
                 throw new Error('Need to set user photo.');

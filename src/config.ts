@@ -19,6 +19,7 @@ export const OSM_LIB = `${OSM_URL}/build/ol.js`;
 export const OSM_CSS = `${OSM_URL}/css/ol.css`;
 export const VALID_USERNAME_REGEX = /^[a-z]{3,15}$/i;
 export const PHOTO_SIZE = 64;
+export const PHOTO_QIALITY = 0.75;
 export const MARKER_ICON_URL = '/icons/marker.png';
 export const MARKER_ICON_SIZE = 64;
 export const MARKER_ICON_SCALE = 0.5;

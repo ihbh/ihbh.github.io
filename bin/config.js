@@ -22,6 +22,7 @@ define(["require", "exports"], function (require, exports) {
     exports.OSM_CSS = `${exports.OSM_URL}/css/ol.css`;
     exports.VALID_USERNAME_REGEX = /^[a-z]{3,15}$/i;
     exports.PHOTO_SIZE = 64;
+    exports.PHOTO_QIALITY = 0.75;
     exports.MARKER_ICON_URL = '/icons/marker.png';
     exports.MARKER_ICON_SIZE = 64;
     exports.MARKER_ICON_SCALE = 0.5;

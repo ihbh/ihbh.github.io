@@ -1,4 +1,4 @@
-import { VALID_USERNAME_REGEX, PHOTO_SIZE } from "./config";
+import * as conf from "./config";
 import * as dom from './dom';
 import { TaggedLogger } from "./log";
 import * as gp from './gp';
@@ -9,7 +9,8 @@ const IMG_MAXSIZE = 4096;
 const IMG_MIME = 'image/jpeg';
 
 const log = new TaggedLogger('reg');
-const strDataUrl = url => url.slice(0, 30) + '...' + url.slice(-10);
+const strDataUrl = url => url.slice(0, 30) + '...' +
+  url.slice(-10) + ` (${url.length} bytes)`;
 
 export async function init() {
   dom.id.regPhoto.onclick =
@@ -50,10 +51,12 @@ async function savePhotoFromFile(file: File) {
     let dy = (h - wh) / 2;
     log.i('cropped size:', wh, 'x', wh);
     context.drawImage(bitmap, dx, dy, wh, wh);
-    let dataUrl = canvas.toDataURL();
-    log.i('Data URL:', strDataUrl(dataUrl));
+    let blob = await new Promise((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg'));
+    let imgurl = URL.createObjectURL(blob);
+    log.i('jpeg blob url:', imgurl);
     let img = dom.id.regPhoto;
-    img.src = dataUrl;
+    img.src = imgurl;
   } catch (err) {
     log.e('Failed to save photo:', err);
   }
@@ -64,16 +67,17 @@ function getResizedPhoto() {
   if (!img.src) return null;
   let w = img.naturalWidth;
   let h = img.naturalHeight;
-  let s = PHOTO_SIZE;
+  let s = conf.PHOTO_SIZE;
   log.i('resizing image:', w, 'x', h, '->', s, 'x', s);
   let canvas = document.createElement('canvas');
   canvas.width = s;
   canvas.height = s;
   let context = canvas.getContext('2d');
+  context.filter = 'grayscale(100%)';
   context.drawImage(img,
     0, 0, w, h,
     0, 0, s, s);
-  let newDataUrl = canvas.toDataURL(IMG_MIME);
+  let newDataUrl = canvas.toDataURL(IMG_MIME, conf.PHOTO_QIALITY);
   log.i('resized photo:', strDataUrl(newDataUrl));
   return newDataUrl;
 }
@@ -83,8 +87,8 @@ async function registerProfile() {
     log.i('updating profile');
     let username = dom.id.regName.value || '';
     if (!username) throw new Error('Need to set user name.');
-    if (!VALID_USERNAME_REGEX.test(username))
-      throw new Error(`Username "${username}" doesn't match ${VALID_USERNAME_REGEX} regex.`);
+    if (!conf.VALID_USERNAME_REGEX.test(username))
+      throw new Error(`Invalid username.`);
 
     let imgurl = getResizedPhoto();
     if (!imgurl) throw new Error('Need to set user photo.');
