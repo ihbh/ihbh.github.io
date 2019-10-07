@@ -11,33 +11,62 @@ export interface UserInfo {
 
 export async function getUserInfo(uid: string) {
   log.i('Getting user info:', uid);
-  const { default: vfs } = await import('./vfs');
-  let dir = `/srv/users/${uid}/profile`;
+  let { default: vfs } = await import('./vfs');
+  let dirRemote = `/users/${uid}/profile`;
   let dirCached = `${conf.USERDATA_DIR}/users/${uid}`;
   let useCache = Math.random() > 1 / conf.UCACHE_REFRESH_RATE;
   let info: UserInfo = { uid };
 
   try {
-    if (useCache) {
-      info.name = await vfs.get(`${dirCached}/name`);
-      info.photo = await vfs.get(`${dirCached}/img`);
-    }
-
-    if (!info.name || !info.photo) {
-      info.name = await vfs.get(`${dir}/name`);
-      info.photo = await vfs.get(`${dir}/img`);
-
+    if (!useCache) {
       try {
-        log.i('Saving user info to cache:', uid);
-        await vfs.set(`${dirCached}/name`, info.name);
-        await vfs.set(`${dirCached}/img`, info.photo);
+        await syncFiles(dirCached, dirRemote, ['name', 'img']);
+        log.d('Synced user info:', uid);
       } catch (err) {
-        log.w('Failed to save user info to cache:', uid, err);
+        log.e('Failed to sync user info:', uid, err);
       }
     }
+
+    info.name = await vfs.get(`${dirCached}/name`);
+    info.photo = await vfs.get(`${dirCached}/img`);
   } catch (err) {
     log.w('Failed to get user info:', uid, err);
   }
 
   return info;
+}
+
+async function syncFiles(dirCached: string, dirRemote: string, fnames: string[]) {
+  let ps = fnames.map(
+    fname => syncFile(
+      dirCached + '/' + fname,
+      dirRemote + '/' + fname));
+  await Promise.all(ps);
+}
+
+async function syncFile(fpathCached: string, fpathRemote: string) {
+  let rpc = await import('./rpc');
+  let { default: vfs } = await import('./vfs');
+
+  let data = await vfs.get(fpathCached);
+  let hash = null;
+
+  if (data) {
+    let rsync = await import('./rsync');
+    let { default: Buffer } = await import('./buffer');    
+    let json = JSON.stringify(data);
+    let bytes = Buffer.from(json, 'utf8').toArray(Uint8Array).buffer;
+    hash = await rsync.rhash(bytes);
+    log.d('Data hash:', hash, fpathCached);
+  }
+
+  let newData = await rpc.invoke('RSync.GetFile', {
+    path: fpathRemote,
+    hash,
+  });
+
+  if (newData) {
+    log.d('Got new data:', fpathCached);
+    await vfs.set(fpathCached, newData);
+  }
 }

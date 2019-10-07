@@ -1,10 +1,16 @@
-define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs"], function (require, exports, conf, error_1, log_1, rpc, vfs_1) {
+define(["require", "exports", "./config", "./error", "./log", "./rpc", "./vfs", "./buffer"], function (require, exports, conf, error_1, log_1, rpc, vfs_1, buffer_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('rsync');
     let syncing = false;
     const encodePath = encodeURIComponent;
     const decodePath = decodeURIComponent;
+    async function rhash(bytes) {
+        let h = await crypto.subtle.digest(conf.RSYNC_HASH, bytes);
+        let p = h.slice(0, conf.RSYNC_HASHLEN);
+        return new buffer_1.default(p).toString('hex');
+    }
+    exports.rhash = rhash;
     async function reset(path) {
         if (!path) {
             await vfs_1.default.rm(conf.RSYNC_SYNCED);

@@ -40,10 +40,12 @@ define(["require", "exports"], function (require, exports) {
     exports.RSYNC_SHARED = exports.SHARED_DIR;
     exports.RSYNC_SYNCED = `${exports.USERDATA_DIR}/rsync/synced`;
     exports.RSYNC_FAILED = `${exports.USERDATA_DIR}/rsync/failed`;
+    exports.RSYNC_HASH = 'SHA-256';
+    exports.RSYNC_HASHLEN = 4; // bytes
     exports.LASTGPS_DIR = `${exports.LOCAL_DIR}/lastgps`;
     exports.NULL_IMG = 'data:image/jpeg;base64,';
     // /srv/users/<uid>/profile details are cached and
     // refreshed every N times
-    exports.UCACHE_REFRESH_RATE = 10;
+    exports.UCACHE_REFRESH_RATE = 5;
 });
 //# sourceMappingURL=config.js.map

@@ -2,14 +2,15 @@ define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function recentTimeToStr(time) {
-        let diff = (Date.now() - time.getTime()) / 86400 / 1000 | 0;
-        if (diff < 1)
-            return `today`;
-        if (diff < 30)
-            return `${diff} days ago`;
-        if (diff < 365)
-            return `${diff / 30 | 0} months ago`;
-        return `${diff / 365 | 0} years ago`;
+        let hours = (Date.now() - time.getTime()) / 1000 / 3600;
+        let days = hours / 24 | 0;
+        if (days < 2)
+            return `${hours | 0} hours ago`;
+        if (days < 60)
+            return `${days} days ago`;
+        if (days < 365 * 2)
+            return `${days / 30 | 0} months ago`;
+        return `${days / 365 | 0} years ago`;
     }
     exports.recentTimeToStr = recentTimeToStr;
 });

@@ -60,6 +60,11 @@ export interface RSyncFile {
   data: any;
 }
 
+export interface RSyncGet {
+  path: string;
+  hash?: string;
+}
+
 export interface BatchEntry {
   name: string;
   args: any;
@@ -86,7 +91,7 @@ export function invoke(
 
 export function invoke(
   method: 'RSync.GetFile',
-  path: string)
+  args: RSyncGet)
   : Promise<any>;
 
 export function invoke(

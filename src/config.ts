@@ -37,8 +37,10 @@ export const VPLACES_DIR = `${SHARED_DIR}/places`;
 export const RSYNC_SHARED = SHARED_DIR;
 export const RSYNC_SYNCED = `${USERDATA_DIR}/rsync/synced`;
 export const RSYNC_FAILED = `${USERDATA_DIR}/rsync/failed`;
+export const RSYNC_HASH = 'SHA-256';
+export const RSYNC_HASHLEN = 4; // bytes
 export const LASTGPS_DIR = `${LOCAL_DIR}/lastgps`;
 export const NULL_IMG = 'data:image/jpeg;base64,';
 // /srv/users/<uid>/profile details are cached and
 // refreshed every N times
-export const UCACHE_REFRESH_RATE = 10;
+export const UCACHE_REFRESH_RATE = 5;

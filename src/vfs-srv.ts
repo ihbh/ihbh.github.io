@@ -8,7 +8,7 @@ class SrvFS implements VFS {
   }
 
   async get(path: string): Promise<any> {
-    return rpc.invoke('RSync.GetFile', path);
+    return rpc.invoke('RSync.GetFile', { path });
   }
 
   async set(path: string, data): Promise<void> {

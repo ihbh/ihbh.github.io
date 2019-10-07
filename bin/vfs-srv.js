@@ -6,7 +6,7 @@ define(["require", "exports", "./rpc"], function (require, exports, rpc) {
             return rpc.invoke('RSync.Dir', path);
         }
         async get(path) {
-            return rpc.invoke('RSync.GetFile', path);
+            return rpc.invoke('RSync.GetFile', { path });
         }
         async set(path, data) {
             return rpc.invoke('RSync.AddFile', { path, data });

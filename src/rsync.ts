@@ -3,6 +3,7 @@ import { DerivedError } from "./error";
 import { TaggedLogger } from "./log";
 import * as rpc from './rpc';
 import vfs from './vfs';
+import Buffer from './buffer';
 
 const log = new TaggedLogger('rsync');
 
@@ -15,6 +16,12 @@ let syncing = false;
 
 const encodePath = encodeURIComponent;
 const decodePath = decodeURIComponent;
+
+export async function rhash(bytes: ArrayBuffer) {
+  let h = await crypto.subtle.digest(conf.RSYNC_HASH, bytes);
+  let p = h.slice(0, conf.RSYNC_HASHLEN);
+  return new Buffer(p).toString('hex');
+}
 
 export async function reset(path?: string) {
   if (!path) {
