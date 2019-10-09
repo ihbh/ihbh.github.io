@@ -50,7 +50,7 @@ export async function init() {
     }
 
     if (infos.length > 0) {
-      setStatus(`Others who have been here before:`);
+      setStatus(null);
       let container = dom.id.visitors;
       container.append(...infos.map(makeUserCard));
     } else {
@@ -64,7 +64,7 @@ export async function init() {
 
 function setStatus(text: string) {
   let div = dom.id.nearbyStatus;
-  div.textContent = text;
+  div.textContent = text || '';
 }
 
 async function initVMap({ lat, lon }) {

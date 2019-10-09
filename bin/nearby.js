@@ -29,7 +29,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
                 infos = await dbg.getDebugPeopleNearby();
             }
             if (infos.length > 0) {
-                setStatus(`Others who have been here before:`);
+                setStatus(null);
                 let container = dom.id.visitors;
                 container.append(...infos.map(makeUserCard));
             }
@@ -45,7 +45,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
     exports.init = init;
     function setStatus(text) {
         let div = dom.id.nearbyStatus;
-        div.textContent = text;
+        div.textContent = text || '';
     }
     async function initVMap({ lat, lon }) {
         log.i('Rendering map.');
