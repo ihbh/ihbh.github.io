@@ -34,9 +34,9 @@ define(["require", "exports", "./config", "./dom", "./log", "./react", "./ucache
                 let info = await ucache_1.getUserInfo(uid);
                 card = renderUserCard(info);
                 cards.set(uid, card);
-                container.prepend(card);
             }
             card.classList.add('unread');
+            container.prepend(card);
         }
     }
     exports.init = init;

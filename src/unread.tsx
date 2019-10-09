@@ -42,9 +42,9 @@ export async function init() {
       let info = await getUserInfo(uid);
       card = renderUserCard(info);
       cards.set(uid, card);
-      container.prepend(card);
     }
     card.classList.add('unread');
+    container.prepend(card);
   }
 }
 
