@@ -44,7 +44,8 @@ export async function init() {
       cards.set(uid, card);
     }
     card.classList.add('unread');
-    container.prepend(card);
+    container.removeChild(card);
+    container.insertBefore(card, container.firstChild);
   }
 }
 

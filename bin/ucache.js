@@ -50,7 +50,7 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
         try {
             newData = await rpc.invoke('RSync.GetFile', {
                 path: fpathRemote,
-                hash,
+                hash: hash || undefined,
             });
         }
         catch (err) {

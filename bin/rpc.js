@@ -93,7 +93,7 @@ define(["require", "exports", "./config", "./log", "./qargs", "./prop"], functio
             log.d('Parsing batch results:', batch.length);
             for (let i = 0; i < batch.length; i++) {
                 let { res, err } = results[i];
-                let { name, reqid, resolve, reject } = batch[i];
+                let { name, resolve, reject } = batch[i];
                 if (!err) {
                     resolve(res);
                     continue;

@@ -185,10 +185,10 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             let t = texists && db.transaction(this.name, modes.has('readwrite') ? 'readwrite' : 'readonly');
             let s = t && t.objectStore(this.name);
             let ptss = this.pending;
+            this.log('exec:', ...ptss.map(t => t.name));
             this.pending = [];
             for (let { name, fn, defval, resolve, reject } of ptss) {
                 if (s) {
-                    this.log('exec:', name);
                     let r = fn(s);
                     r.onerror = () => reject(new Error(`Transaction ${name} failed: ${r.error}`));
                     r.onsuccess = () => resolve(r.result);

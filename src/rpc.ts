@@ -195,7 +195,7 @@ async function sendPendingBatch() {
 
     for (let i = 0; i < batch.length; i++) {
       let { res, err } = results[i];
-      let { name, reqid, resolve, reject } = batch[i];
+      let { name, resolve, reject } = batch[i];
 
       if (!err) {
         resolve(res);

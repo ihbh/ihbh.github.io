@@ -68,7 +68,7 @@ async function syncFile(fpathCached: string, fpathRemote: string) {
   try {
     newData = await rpc.invoke('RSync.GetFile', {
       path: fpathRemote,
-      hash,
+      hash: hash || undefined,
     });
   } catch (err) {
     log.w(`Failed to get ${fpathRemote}:`, err);
