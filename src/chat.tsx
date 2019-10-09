@@ -112,6 +112,7 @@ async function setSendButtonHandler() {
 }
 
 async function getRemoteUserInfo() {
+  dom.id.chatUserHref.href = '?page=profile&uid=' + remoteUid;
   dom.id.chatUserName.textContent = remoteUid;
   dom.id.chatUserIcon.src = conf.NULL_IMG;
 

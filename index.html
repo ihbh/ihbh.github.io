@@ -43,22 +43,30 @@
     <button class="btn" id="import-db">Import</button>
   </div>
 
-  <!-- The registration page. -->
+  <!-- The user profile page. -->
 
-  <div id="p-reg" class="page">
-    <div id="photo-frame">
-      <button class="btn">Upload Photo</button>
+  <div id="p-profile" class="page">
+    <div class="header">
       <img id="photo">
-      <!-- This hidden <input> is used to upload a file. -->
-      <input id="upload-input" type="file" accept="image/*">
+      <span id="reg-name">[?]</span>
+      <button class="self-tag">You</button>
     </div>
-    <div id="reg-name-group">
-      <div id="name-tag">Your name:</div>
-      <input id="reg-name" type="text">
+
+    <div class="details">
+      <table>
+        <tr><td>Age<td>None
+        <tr><td>Sex<td>None
+      </table>
     </div>
-    <div id="reg-err"></div>
-    <div id="reg-nav">
-      <button class="btn" id="reg-done">Done</button>
+
+    <div class="about"></div>
+    <div class="reason" contenteditable></div>
+
+    <div class="footer">
+      <span class="status"></span>
+      <button id="reg-done">Done</button>
+      <button class="report" title="Report abuse">Report</button>
+      <button class="send-report" title="Send Report">Send Report</button>
     </div>
   </div>
 
@@ -110,7 +118,9 @@
 
   <div id="p-chat" class="page">
     <div id="u-header">
-      <img id="chat-u-icon" />
+      <a class="user-href">
+        <img id="chat-u-icon" />
+      </a>
       <span id="chat-u-name">[?]</span>
     </div>
     <div id="messages"></div>

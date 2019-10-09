@@ -12,13 +12,14 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
         try {
             if (!useCache) {
                 try {
-                    await syncFiles(dirCached, dirRemote, ['name', 'img']);
+                    await syncFiles(dirCached, dirRemote, ['info', 'name', 'img']);
                     log.d('Synced user info:', uid);
                 }
                 catch (err) {
                     log.e('Failed to sync user info:', uid, err);
                 }
             }
+            info.about = await vfs.get(`${dirCached}/info`);
             info.name = await vfs.get(`${dirCached}/name`);
             info.photo = await vfs.get(`${dirCached}/img`);
         }
@@ -45,10 +46,16 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
             hash = await rsync.rhash(bytes);
             log.d('Data hash:', hash, fpathCached);
         }
-        let newData = await rpc.invoke('RSync.GetFile', {
-            path: fpathRemote,
-            hash,
-        });
+        let newData = null;
+        try {
+            newData = await rpc.invoke('RSync.GetFile', {
+                path: fpathRemote,
+                hash,
+            });
+        }
+        catch (err) {
+            log.w(`Failed to get ${fpathRemote}:`, err);
+        }
         if (newData) {
             log.d('Got new data:', fpathCached);
             await vfs.set(fpathCached, newData);

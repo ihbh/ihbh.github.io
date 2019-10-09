@@ -70,6 +70,7 @@ body {
 #debug-toggle {
   visibility: collapse;
   position: fixed;
+  opacity: 0.75;
   left: 1em;
   bottom: 1em;
   z-index: 3;
@@ -125,86 +126,171 @@ body .page .ol-attribution * {
   font-size: 10pt;
 }
 
-/* ?page=reg */
+/* ?page=profile */
 
-#p-reg {
-  justify-content: space-evenly;
+#p-profile {
+  flex-direction: column;
+  height: 100vh;
 }
 
-#photo-frame {
-  position: relative;
-  align-self: center;
-  width: 200pt;
-  height: 200pt;
+#p-profile .header {
+  display: flex;
+  align-items: center;
+  padding: 0.5em;
+  background: #800;
+  color: #fff;
 }
 
-#photo-frame>button {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  color: #888;
-  background: none;
-  box-shadow: none;
-  text-decoration: underline;
-  font-size: 0.5em;
-  font-weight: bold;
-}
-
-#photo-frame>img {
-  position: absolute;
-  top: 0;
-  left: 0;
+#p-profile #photo {
   border-radius: 50%;
-  object-fit: cover;
-  background: #0004;
-  width: 100%;
-  height: 100%;
+  width: 64px;
+  height: 64px;
+}
+
+#p-profile.self #photo {
   cursor: pointer;
 }
 
-#upload-input {
-  display: none;
+#p-profile #reg-name {
+  flex: 1;
+  margin: 0 0.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-#reg-name-group {
-  display: flex;
-  flex-direction: column;
-}
-
-#name-tag {
-  display: flex;
-  justify-content: space-evenly;
-  color: #444;
-  font-size: 0.75em;
-}
-
-#reg-name {
+#p-profile button {
+  user-select: none;
+  font-size: 0.5em;
+  padding: 0.5em 1em;
   border: none;
-  border-bottom: 1px solid #444;
-  width: 50%;
-  margin: 0 auto;
+  border-radius: 0.5em;
+  color: #fff;
+  box-shadow: 0 0 1pt 1pt #0004;
 }
 
-#reg-name:focus {
+#p-profile .self-tag {
+  display: none;
+  background: #060;
+}
+
+#p-profile .report {
+  display: none;
+  background: #a00;
+  cursor: pointer;
+}
+
+#p-profile .send-report {
+  display: none;
+  background: #840;
+  cursor: pointer;
+}
+
+#p-profile.report:not(.reported) .send-report {
+  display: inherit;
+}
+
+#p-profile:not(.self):not(.report) .report {
+  display: inherit;
+}
+
+#p-profile.self .self-tag {
+  display: inherit;
+}
+
+#p-profile #reg-name:empty::before {
+  font-style: italic;
+  color: #ccc;
+}
+
+#p-profile .details {
+  display: flex;
+}
+
+#p-profile .reason {
+  display: none;
+  font-size: 0.5em;
+  padding: 1em;
+  overflow-y: scroll;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+#p-profile .about {
+  flex: 1;
+  font-size: 0.5em;
+  padding: 1em;
+  overflow-y: scroll;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+#p-profile .about:focus {
   outline: none;
 }
 
-#reg-nav {
+#p-profile.self .about:empty::before {
+  font-style: italic;
+  color: #888;
+  content: 'Write something about yourself. You can add a link to your website here.';
+}
+
+#p-profile.report .reason {
+  display: inherit;
+  flex: 1;
+}
+
+#p-profile.report .reason:empty::before {
+  font-style: italic;
+  color: #f008;
+  content: 'Care to explain why?';
+}
+
+#p-profile .footer {
   display: flex;
+  flex-direction: row;
+  background: #800;
+  padding: 0.5em;
+  align-items: center;
 }
 
-#reg-err {
+#p-profile .status {
+  flex: 1;
+  color: #fff;
   font-size: 0.5em;
-  padding: 1em;
-  color: #800;
-  text-align: center;
-  word-wrap: break-word;
+  padding-right: 0.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-#reg-done {
-  margin: 0 auto;
+#p-profile #reg-done {
+  background: #008;
+  cursor: pointer;
+}
+
+#p-profile:not(.self) #reg-done {
+  display: none;
+}
+
+#p-profile .details table {
+  padding: 0.5em;
+  width: 100%;
+}
+
+#p-profile .details td {
+  padding: 0.3em;
+  font-size: 0.5em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#p-profile .details td:first-child {
+  font-weight: bold;
+  text-align: right;
+  width: 20%;
+  color: #000;
 }
 
 /* ?page=map */
@@ -361,6 +447,7 @@ body .page .ol-attribution * {
 #messages {
   overflow-x: hidden;
   overflow-y: scroll;
+  overflow: auto;
   flex: auto;
 }
 

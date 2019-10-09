@@ -17,6 +17,7 @@ export interface RpcInfo {
 }
 
 export const uid = prop<string>('shared.profile.id');
+export const userinfo = prop<string>('shared.profile.info');
 export const username = prop<string>('shared.profile.name');
 export const userimg = prop<string>('shared.profile.img'); // data:image/jpeg;base64,...
 export const pubkey = prop<string>('shared.profile.pubkey');

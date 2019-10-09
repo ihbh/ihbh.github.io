@@ -1,69 +1,63 @@
 import * as conf from "./config";
-import * as dom from './dom';
-import { TaggedLogger } from "./log";
 import * as gp from './gp';
-import * as page from './page';
-import * as usr from './usr';
+import { TaggedLogger } from "./log";
 
 const IMG_MAXSIZE = 4096;
 const IMG_MIME = 'image/jpeg';
+const IMG_FILTER = 'grayscale(100%)';
 
 const log = new TaggedLogger('reg');
-const strDataUrl = url => url.slice(0, 30) + '...' +
-  url.slice(-10) + ` (${url.length} bytes)`;
 
-export async function init() {
-  dom.id.regPhoto.onclick =
-    () => selectPhoto();
-  dom.id.regDone.onclick =
-    () => registerProfile();
-  dom.id.regName.value = await usr.getDisplayName();
-  let imguri = await usr.getPhotoUri();
-  if (imguri) dom.id.regPhoto.src = imguri;
+interface SaveInfoArgs {
+  img: HTMLImageElement;
+  name: HTMLSpanElement;
+  about: HTMLDivElement;
 }
 
-function selectPhoto() {
-  log.i('Asking the user to select a profile pic.');
-  let input = dom.id.uploadPhotoInput;
-  input.click();
-  input.onchange = () => {
-    let file = input.files[0];
-    if (file)
-      savePhotoFromFile(file);
-    else
-      log.e('No file selected.');
-  };
+export async function selectPhoto(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    log.i('Asking the user to select a profile pic.');
+    let input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.click();
+    input.onchange = async () => {
+      try {
+        log.i('Selected files:', input.files.length);
+        let file = input.files[0];
+        if (!file) throw new Error('No file selected.');
+        let url = await getJpegFromFile(file);
+        resolve(url);
+      } catch (err) {
+        reject(err);
+      }
+    };
+  });
 }
 
-async function savePhotoFromFile(file: File) {
-  try {
-    log.i('selected file:', file.type, file.size, 'bytes');
-    let bitmap = await createImageBitmap(file);
-    log.i('bitmap:', bitmap);
-    let w = bitmap.width;
-    let h = bitmap.height;
-    let canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    let context = canvas.getContext('2d');
-    let wh = Math.min(w, h, IMG_MAXSIZE);
-    let dx = (w - wh) / 2;
-    let dy = (h - wh) / 2;
-    log.i('cropped size:', wh, 'x', wh);
-    context.drawImage(bitmap, dx, dy, wh, wh);
-    let blob = await new Promise((resolve) =>
-      canvas.toBlob(resolve, 'image/jpeg'));
-    let imgurl = URL.createObjectURL(blob);
-    log.i('jpeg blob url:', imgurl);
-    let img = dom.id.regPhoto;
-    img.src = imgurl;
-  } catch (err) {
-    log.e('Failed to save photo:', err);
-  }
+export async function getJpegFromFile(file: File) {
+  log.i('selected file:', file.type, file.size, 'bytes');
+  let bitmap = await createImageBitmap(file);
+  log.i('bitmap:', bitmap);
+  let w = bitmap.width;
+  let h = bitmap.height;
+  let canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  let context = canvas.getContext('2d');
+  let wh = Math.min(w, h, IMG_MAXSIZE);
+  let dx = (w - wh) / 2;
+  let dy = (h - wh) / 2;
+  log.i('cropped size:', wh, 'x', wh);
+  context.drawImage(bitmap, dx, dy, wh, wh);
+  let blob = await new Promise((resolve) =>
+    canvas.toBlob(resolve, 'image/jpeg'));
+  let blobUrl = URL.createObjectURL(blob);
+  log.i('jpeg blob url:', blobUrl);
+  return blobUrl;
 }
 
-function getResizedPhoto() {
-  let img = dom.id.regPhoto;
+export function getResizedPhoto(img: HTMLImageElement) {
   if (!img.src) return null;
   let w = img.naturalWidth;
   let h = img.naturalHeight;
@@ -73,32 +67,29 @@ function getResizedPhoto() {
   canvas.width = s;
   canvas.height = s;
   let context = canvas.getContext('2d');
-  context.filter = 'grayscale(100%)';
+  context.filter = IMG_FILTER;
   context.drawImage(img,
     0, 0, w, h,
     0, 0, s, s);
   let newDataUrl = canvas.toDataURL(IMG_MIME, conf.PHOTO_QIALITY);
-  log.i('resized photo:', strDataUrl(newDataUrl));
+  log.i('resized photo:', newDataUrl);
   return newDataUrl;
 }
 
-async function registerProfile() {
-  try {
-    log.i('updating profile');
-    let username = dom.id.regName.value || '';
-    if (!username) throw new Error('Need to set user name.');
-    if (!conf.VALID_USERNAME_REGEX.test(username))
-      throw new Error(`Invalid username.`);
+export async function saveUserInfo(
+  { img, name, about }: SaveInfoArgs) {
 
-    let imgurl = getResizedPhoto();
-    if (!imgurl) throw new Error('Need to set user photo.');
+  log.i('updating profile');
+  let userinfo = (about.textContent || '').trim();
+  let username = name.textContent || '';
+  if (!username) throw new Error('Need to set user name.');
+  if (!conf.RX_USERNAME.test(username))
+    throw new Error(`Invalid username.`);
 
-    await gp.userimg.set(imgurl);
-    await gp.username.set(username);
+  let imgurl = getResizedPhoto(img);
+  if (!imgurl) throw new Error('Need to set user photo.');
 
-    page.set('map');
-  } catch (err) {
-    log.e('Failed to register profile:', err);
-    dom.id.regError.textContent = err.message;
-  }
+  await gp.userimg.set(imgurl);
+  await gp.username.set(username);
+  await gp.userinfo.set(userinfo);
 }

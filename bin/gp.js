@@ -9,6 +9,7 @@ define(["require", "exports", "./config", "./log", "./vfs-prop"], function (requ
         return vfs_prop_1.default(fspath, defval);
     }
     exports.uid = prop('shared.profile.id');
+    exports.userinfo = prop('shared.profile.info');
     exports.username = prop('shared.profile.name');
     exports.userimg = prop('shared.profile.img'); // data:image/jpeg;base64,...
     exports.pubkey = prop('shared.profile.pubkey');

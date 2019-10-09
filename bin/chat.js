@@ -78,6 +78,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
         input.textContent = autoSavedText;
     }
     async function getRemoteUserInfo() {
+        dom.id.chatUserHref.href = '?page=profile&uid=' + remoteUid;
         dom.id.chatUserName.textContent = remoteUid;
         dom.id.chatUserIcon.src = conf.NULL_IMG;
         let info = await ucache.getUserInfo(remoteUid);

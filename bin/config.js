@@ -20,7 +20,8 @@ define(["require", "exports"], function (require, exports) {
     exports.OSM_URL = 'https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0';
     exports.OSM_LIB = `${exports.OSM_URL}/build/ol.js`;
     exports.OSM_CSS = `${exports.OSM_URL}/css/ol.css`;
-    exports.VALID_USERNAME_REGEX = /^[a-z]{3,15}$/i;
+    exports.RX_USERNAME = /^[a-z]{3,15}$/i;
+    exports.RX_USERID = /^[a-f\d]{16}$/i;
     exports.PHOTO_SIZE = 64;
     exports.PHOTO_QIALITY = 0.75;
     exports.MARKER_ICON_URL = '/icons/marker.png';
@@ -38,6 +39,7 @@ define(["require", "exports"], function (require, exports) {
     exports.LOCAL_DIR = `${exports.USERDATA_DIR}/local`;
     exports.SHARED_DIR = `${exports.USERDATA_DIR}/shared`;
     exports.VPLACES_DIR = `${exports.SHARED_DIR}/places`;
+    exports.REPORTS_DIR = `${exports.SHARED_DIR}/reports`;
     exports.RSYNC_SHARED = exports.SHARED_DIR;
     exports.RSYNC_SYNCED = `${exports.USERDATA_DIR}/rsync/synced`;
     exports.RSYNC_FAILED = `${exports.USERDATA_DIR}/rsync/failed`;

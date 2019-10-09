@@ -7,6 +7,7 @@ export interface UserInfo {
   uid: string;
   name?: string;
   photo?: string;
+  about?: string;
 }
 
 export async function getUserInfo(uid: string) {
@@ -20,13 +21,15 @@ export async function getUserInfo(uid: string) {
   try {
     if (!useCache) {
       try {
-        await syncFiles(dirCached, dirRemote, ['name', 'img']);
+        await syncFiles(dirCached, dirRemote,
+          ['info', 'name', 'img']);
         log.d('Synced user info:', uid);
       } catch (err) {
         log.e('Failed to sync user info:', uid, err);
       }
     }
 
+    info.about = await vfs.get(`${dirCached}/info`);
     info.name = await vfs.get(`${dirCached}/name`);
     info.photo = await vfs.get(`${dirCached}/img`);
   } catch (err) {
@@ -53,17 +56,23 @@ async function syncFile(fpathCached: string, fpathRemote: string) {
 
   if (data) {
     let rsync = await import('./rsync');
-    let { default: Buffer } = await import('./buffer');    
+    let { default: Buffer } = await import('./buffer');
     let json = JSON.stringify(data);
     let bytes = Buffer.from(json, 'utf8').toArray(Uint8Array).buffer;
     hash = await rsync.rhash(bytes);
     log.d('Data hash:', hash, fpathCached);
   }
 
-  let newData = await rpc.invoke('RSync.GetFile', {
-    path: fpathRemote,
-    hash,
-  });
+  let newData = null;
+
+  try {
+    newData = await rpc.invoke('RSync.GetFile', {
+      path: fpathRemote,
+      hash,
+    });
+  } catch (err) {
+    log.w(`Failed to get ${fpathRemote}:`, err);
+  }
 
   if (newData) {
     log.d('Got new data:', fpathCached);

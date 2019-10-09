@@ -33,7 +33,7 @@ function initShowPlaces() {
 async function initUserPic() {
   try {
     let button = dom.id.userPic;
-    button.onclick = () => page.set('reg');
+    button.onclick = () => page.set('profile');
     let usr = await import('./usr');
     let name = await usr.getDisplayName();
     button.textContent = name;

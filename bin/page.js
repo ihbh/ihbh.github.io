@@ -27,10 +27,14 @@ define(["require", "exports", "./log", "./qargs", "./dom", "./startup"], functio
     }
     exports.set = set;
     function select(id) {
-        let page = dom_1.$('body > #p-' + id);
+        let page = getPageElement(id);
         if (!page)
             throw new Error('No such page: #' + id);
         page.style.display = 'flex';
     }
+    function getPageElement(id = get()) {
+        return dom_1.$('body > #p-' + id);
+    }
+    exports.getPageElement = getPageElement;
 });
 //# sourceMappingURL=page.js.map

@@ -5,7 +5,7 @@ import * as startup from './startup';
 
 const log = new TaggedLogger('page');
 
-type PageId = 'map' | 'reg' | 'unread' | 'places' | 'nearby' | 'explorer';
+type PageId = 'map' | 'profile' | 'unread' | 'places' | 'nearby' | 'explorer';
 
 export async function init() {
   let id = get();
@@ -31,7 +31,11 @@ export function set(id: PageId, args?) {
 }
 
 function select(id: PageId) {
-  let page = $<HTMLElement>('body > #p-' + id);
+  let page = getPageElement(id);
   if (!page) throw new Error('No such page: #' + id);
   page.style.display = 'flex';
+}
+
+export function getPageElement(id = get()) {
+  return $<HTMLElement>('body > #p-' + id);
 }
