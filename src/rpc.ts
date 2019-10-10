@@ -1,7 +1,7 @@
-import * as config from './config';
+import * as conf from './config';
 import { TaggedLogger } from './log';
-import * as qargs from './qargs';
 import { AsyncProp } from './prop';
+import * as qargs from './qargs';
 
 const log = new TaggedLogger('rpc');
 
@@ -9,8 +9,7 @@ let pending: PendingRpc[] = [];
 let pbtimer = 0;
 
 interface PendingRpc {
-  name: string;
-  args: any;
+  json: string;
   reqid: string;
   resolve(res): any;
   reject(err): any;
@@ -65,6 +64,10 @@ export interface RSyncGet {
   hash?: string;
 }
 
+export interface RSyncDel {
+  path: string;
+}
+
 export interface BatchEntry {
   name: string;
   args: any;
@@ -95,6 +98,11 @@ export function invoke(
   : Promise<any>;
 
 export function invoke(
+  method: 'RSync.DeleteFile',
+  args: RSyncDel)
+  : Promise<void>;
+
+export function invoke(
   method: 'RSync.Dir',
   path: string)
   : Promise<string[]>;
@@ -104,17 +112,17 @@ export function invoke(
   args: { lat: number, lon: number })
   : Promise<Visitors>;
 
-export async function invoke(method: string, args) {
-  let reqid = genRequestId();
-  if (method != 'Batch.Run')
-    return schedule(method, args, reqid);
-  return invokeInternal(method, args, reqid);
+export async function invoke(name: string, args) {
+  let reqid = generateRequestId();
+  if (name != 'Batch.Run')
+    return schedule(name, args, reqid);
+  return invokeInternal(name, args, reqid);
 }
 
-async function invokeInternal(method: string, args, reqid: string) {
-  log.i(reqid, method, args);
+async function invokeInternal(name: string, args, reqid: string) {
+  log.i(reqid, name, args);
   let user = await import('./user');
-  let path = '/rpc/' + method;
+  let path = '/rpc/' + name;
   let url = (await rpcurl.get()) + path;
   let body = JSON.stringify(args);
   let uid = await user.uid.get();
@@ -138,7 +146,7 @@ async function invokeInternal(method: string, args, reqid: string) {
     });
 
     if (!res.ok)
-      throw new RpcError(method, res);
+      throw new RpcError(name, res);
 
     let text = await res.text();
     let json = text ? JSON.parse(text) : null;
@@ -148,60 +156,91 @@ async function invokeInternal(method: string, args, reqid: string) {
     log.w(reqid, 'error:', err);
     if (err instanceof RpcError)
       throw err;
-    throw new RpcError(method, null);
+    throw new RpcError(name, null);
   }
 }
 
 function schedule(name: string, args, reqid: string) {
   return new Promise((resolve, reject) => {
-    pending.push({
+    let json = JSON.stringify({
       name,
       args,
+    });
+    pending.push({
+      json,
       reqid,
       resolve,
-      reject
+      reject,
     });
-    pbtimer = pbtimer || setTimeout(
-      sendPendingBatch,
-      config.RPC_BATCH_DELAY);
+    startTimer();
   });
 }
 
-async function sendPendingBatch() {
-  pbtimer = 0;
-  if (!pending.length) return;
-  log.d('Prepairing to send a batch:', pending.length);
+function startTimer() {
+  pbtimer = pbtimer || setTimeout(async () => {
+    pbtimer = 0;
+    if (pending.length < 1)
+      return;
+    if (pending.length == 1)
+      return sendSinglePendingRequest();
 
-  let batch = pending.splice(0);
+    await sendBatch();
 
-  if (batch.length == 1) {
-    log.d('The batch has only 1 rpc.');
-    let { name, args, reqid, resolve, reject } = batch[0];
-    await invokeInternal(name, args, reqid)
-      .then(resolve, reject);
-    return;
-  }
+    if (pending.length > 0)
+      startTimer();
+  }, conf.RPC_BATCH_DELAY);
+}
 
-  let args = batch.map(b => {
-    return {
-      name: b.name,
-      args: b.args
-    };
-  });
+async function sendSinglePendingRequest() {
+  let [req] = pending.splice(0);
+  let { json, reqid, resolve, reject } = req;
+  let { name, args } = JSON.parse(json);
+  await invokeInternal(name, args, reqid)
+    .then(resolve, reject);
+}
+
+function getBatchWithinMaxSize() {
+  // Smaller RPCs first.
+  pending.sort((p, q) =>
+    p.json.length - q.json.length);
+
+  let batchSize = 0;
+  let batch: PendingRpc[] = [];
+
+  do {
+    let req = pending[0];
+    let size = req.json.length;
+    let canAppend = !batch.length ||
+      batchSize + size <= conf.RPC_MAX_BATCH_SIZE;
+    if (!canAppend) break;
+    batchSize += size;
+    batch.push(req);
+    pending.splice(0, 1);
+  } while (pending.length > 0);
+
+  log.d('RPC batch:', batch.length, 'RPCs',
+    (batchSize / 1024).toFixed(1), 'KB',
+    pending.length, 'left');
+  return batch;
+}
+
+async function sendBatch() {
+  let batch = getBatchWithinMaxSize();
 
   try {
-    let results = await invoke('Batch.Run', args);
-    log.d('Parsing batch results:', batch.length);
+    let results = await invoke('Batch.Run',
+      batch.map(b => JSON.parse(b.json)));
 
     for (let i = 0; i < batch.length; i++) {
       let { res, err } = results[i];
-      let { name, resolve, reject } = batch[i];
+      let { json, resolve, reject } = batch[i];
 
       if (!err) {
         resolve(res);
         continue;
       }
 
+      let { name } = JSON.parse(json);
       let rpcerr = new RpcError(name, {
         status: err.code,
         message: err.message,
@@ -219,7 +258,7 @@ async function sendPendingBatch() {
   }
 }
 
-function genRequestId() {
+function generateRequestId() {
   let id = '';
   while (id.length < 8)
     id += Math.random().toString(16).slice(2);
@@ -228,15 +267,15 @@ function genRequestId() {
 
 let rpcurl = new AsyncProp<string>(() => {
   let url = qargs.get('rpc')
-    || config.DEFAULT_RPC_URL;
+    || conf.DEFAULT_RPC_URL;
 
   if (url.indexOf('://') < 0) {
-    let scheme = config.DEBUG ? 'http' : 'https';
+    let scheme = conf.DEBUG ? 'http' : 'https';
     url = scheme + '://' + url;
   }
 
   if (!/:\d+$/.test(url))
-    url = url + ':' + config.DEFAULT_RPC_PORT;
+    url = url + ':' + conf.DEFAULT_RPC_PORT;
 
   log.i('Server:', url);
   return url;

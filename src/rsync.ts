@@ -1,16 +1,11 @@
+import Buffer from './buffer';
 import * as conf from './config';
 import { DerivedError } from "./error";
 import { TaggedLogger } from "./log";
 import * as rpc from './rpc';
 import vfs from './vfs';
-import Buffer from './buffer';
 
 const log = new TaggedLogger('rsync');
-
-interface RSyncStatus {
-  err?: any;
-  res?: any;
-}
 
 let syncing = false;
 
@@ -50,82 +45,18 @@ export async function start() {
     }
 
     let ufdata = new Map<string, any>();
+
+    log.d('Waiting for VFS');
     await Promise.all(
       [...upaths.add].map(
         path => vfs.get(path).then(
           data => ufdata.set(path, data))));
 
-    log.d('Building RPCs.');
-    let rpcreq: rpc.BatchEntry[] = [];
-    for (let path of [...upaths.add, ...upaths.del]) {
-      let relpath = path.slice(conf.RSYNC_SHARED.length);
-      if (relpath[0] != '/')
-        throw new Error('Bad rel path: ' + relpath);
-      if (upaths.add.has(path)) {
-        rpcreq.push({
-          name: 'RSync.AddFile',
-          args: {
-            path: '~' + relpath,
-            data: ufdata.get(path),
-          }
-        });
-      } else {
-        rpcreq.push({
-          name: 'RSync.DeleteFile',
-          args: {
-            path: '~' + relpath,
-          },
-        });
-      }
-    }
-
-    // Smaller RPCs first.
-    rpcreq.sort((p, q) => jsonlen(p) - jsonlen(q));
-
-    while (rpcreq.length > 0) {
-      let batchsize = 0;
-      let batch: rpc.BatchEntry[] = [];
-
-      do {
-        let entry = rpcreq[0];
-        let size = jsonlen(entry);
-        if (batch.length > 0 && batchsize + size > conf.RPC_MAX_BATCH_SIZE)
-          break;
-        batchsize += size;
-        batch.push(entry);
-        rpcreq.splice(0, 1);
-      } while (rpcreq.length > 0);
-
-      log.d('RPC batch:', batch.length, 'rpcs',
-        (batchsize / 1024).toFixed(1), 'KB');
-
-      let rpcres = await rpc.invoke('Batch.Run', batch);
-      if (rpcres.length != batch.length)
-        throw new Error('Wrong number of results: ' + rpcres.length);
-
-      let updates = new Map<string, RSyncStatus>();
-
-      for (let i = 0; i < rpcres.length; i++) {
-        let path = batch[i].args.path
-          .replace(/^~/, conf.RSYNC_SHARED);
-        let { err, res } = rpcres[i];
-
-        if (!err) {
-          log.d('File synced:', path);
-          updates.set(path, { res: { ...res } });
-        } else if (isPermanentError(err.code)) {
-          log.i('Permanently rejected:', path, err);
-          updates.set(path, { err });
-        } else {
-          log.w('Temporary error:', path, err);
-        }
-      }
-
-      if (updates.size > 0) {
-        log.d('Finalizing the sync status updates.');
-        await updatedSyncState(updates, upaths.del);
-      }
-    }
+    log.d('Waiting for RPCs');
+    await Promise.all(
+      [...upaths.add, ...upaths.del].map(
+        path => syncFile(
+          path, ufdata.get(path))));
 
     let diff = (Date.now() - time) / 1000;
     log.i('Done syncing in', diff.toFixed(1), 's');
@@ -133,6 +64,40 @@ export async function start() {
     log.e('Failed to sync:', err);
   } finally {
     syncing = false;
+  }
+}
+
+async function syncFile(path: string, data) {
+  let remove = data === null;
+  let relpath = path.slice(conf.RSYNC_SHARED.length);
+  if (relpath[0] != '/')
+    throw new Error('Bad rel path: ' + relpath);
+
+  let res, err;
+
+  try {
+    if (!remove) {
+      res = await rpc.invoke('RSync.AddFile', {
+        path: '~' + relpath,
+        data: data,
+      });
+    } else {
+      res = await rpc.invoke('RSync.DeleteFile', {
+        path: '~' + relpath,
+      });
+    }
+  } catch (e) {
+    err = e;
+  }
+
+  if (!err) {
+    log.d('File synced:', path);
+    await updatedSyncState(path, !remove, { res });
+  } else if (isPermanentError(err.code)) {
+    log.i('Permanently rejected:', path, err);
+    await updatedSyncState(path, !remove, { err });
+  } else {
+    log.w('Temporary error:', path, err);
   }
 }
 
@@ -164,27 +129,23 @@ async function getUnsyncedPaths() {
   }
 }
 
-async function updatedSyncState(
-  updates: Map<string, RSyncStatus>,
-  removed: Set<string>) {
+async function updatedSyncState(path: string, added: boolean,
+  { res = null, err = null }) {
 
   let ps: Promise<void>[] = [];
+  let key = encodePath(path);
 
-  for (let [path, { res, err }] of updates) {
-    let key = encodePath(path);
-
-    if (!removed.has(path)) {
-      ps.push(err ?
-        vfs.set(conf.RSYNC_FAILED + '/' + key, err) :
-        vfs.set(conf.RSYNC_SYNCED + '/' + key, res));
-    } else if (!err) {
-      ps.push(
-        vfs.rm(conf.RSYNC_SYNCED + '/' + key),
-        vfs.rm(conf.RSYNC_FAILED + '/' + key));
-    } else {
-      ps.push(
-        vfs.set(conf.RSYNC_FAILED + '/' + key, err));
-    }
+  if (added) {
+    ps.push(err ?
+      vfs.set(conf.RSYNC_FAILED + '/' + key, err || {}) :
+      vfs.set(conf.RSYNC_SYNCED + '/' + key, res || {}));
+  } else if (!err) {
+    ps.push(
+      vfs.rm(conf.RSYNC_SYNCED + '/' + key),
+      vfs.rm(conf.RSYNC_FAILED + '/' + key));
+  } else {
+    ps.push(
+      vfs.set(conf.RSYNC_FAILED + '/' + key, err || {}));
   }
 
   await Promise.all(ps);
@@ -192,8 +153,4 @@ async function updatedSyncState(
 
 function isPermanentError(status: number) {
   return status >= 400 && status < 500;
-}
-
-function jsonlen(x) {
-  return JSON.stringify(x).length;
 }

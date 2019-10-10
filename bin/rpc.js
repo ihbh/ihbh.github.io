@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./log", "./qargs", "./prop"], function (require, exports, config, log_1, qargs, prop_1) {
+define(["require", "exports", "./config", "./log", "./prop", "./qargs"], function (require, exports, conf, log_1, prop_1, qargs) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('rpc');
@@ -13,17 +13,17 @@ define(["require", "exports", "./config", "./log", "./qargs", "./prop"], functio
         }
     }
     exports.RpcError = RpcError;
-    async function invoke(method, args) {
-        let reqid = genRequestId();
-        if (method != 'Batch.Run')
-            return schedule(method, args, reqid);
-        return invokeInternal(method, args, reqid);
+    async function invoke(name, args) {
+        let reqid = generateRequestId();
+        if (name != 'Batch.Run')
+            return schedule(name, args, reqid);
+        return invokeInternal(name, args, reqid);
     }
     exports.invoke = invoke;
-    async function invokeInternal(method, args, reqid) {
-        log.i(reqid, method, args);
+    async function invokeInternal(name, args, reqid) {
+        log.i(reqid, name, args);
         let user = await new Promise((resolve_1, reject_1) => { require(['./user'], resolve_1, reject_1); });
-        let path = '/rpc/' + method;
+        let path = '/rpc/' + name;
         let url = (await rpcurl.get()) + path;
         let body = JSON.stringify(args);
         let uid = await user.uid.get();
@@ -44,7 +44,7 @@ define(["require", "exports", "./config", "./log", "./qargs", "./prop"], functio
                 body,
             });
             if (!res.ok)
-                throw new RpcError(method, res);
+                throw new RpcError(name, res);
             let text = await res.text();
             let json = text ? JSON.parse(text) : null;
             log.i(reqid, 'result:', json);
@@ -54,50 +54,74 @@ define(["require", "exports", "./config", "./log", "./qargs", "./prop"], functio
             log.w(reqid, 'error:', err);
             if (err instanceof RpcError)
                 throw err;
-            throw new RpcError(method, null);
+            throw new RpcError(name, null);
         }
     }
     function schedule(name, args, reqid) {
         return new Promise((resolve, reject) => {
-            pending.push({
+            let json = JSON.stringify({
                 name,
                 args,
+            });
+            pending.push({
+                json,
                 reqid,
                 resolve,
-                reject
+                reject,
             });
-            pbtimer = pbtimer || setTimeout(sendPendingBatch, config.RPC_BATCH_DELAY);
+            startTimer();
         });
     }
-    async function sendPendingBatch() {
-        pbtimer = 0;
-        if (!pending.length)
-            return;
-        log.d('Prepairing to send a batch:', pending.length);
-        let batch = pending.splice(0);
-        if (batch.length == 1) {
-            log.d('The batch has only 1 rpc.');
-            let { name, args, reqid, resolve, reject } = batch[0];
-            await invokeInternal(name, args, reqid)
-                .then(resolve, reject);
-            return;
-        }
-        let args = batch.map(b => {
-            return {
-                name: b.name,
-                args: b.args
-            };
-        });
+    function startTimer() {
+        pbtimer = pbtimer || setTimeout(async () => {
+            pbtimer = 0;
+            if (pending.length < 1)
+                return;
+            if (pending.length == 1)
+                return sendSinglePendingRequest();
+            await sendBatch();
+            if (pending.length > 0)
+                startTimer();
+        }, conf.RPC_BATCH_DELAY);
+    }
+    async function sendSinglePendingRequest() {
+        let [req] = pending.splice(0);
+        let { json, reqid, resolve, reject } = req;
+        let { name, args } = JSON.parse(json);
+        await invokeInternal(name, args, reqid)
+            .then(resolve, reject);
+    }
+    function getBatchWithinMaxSize() {
+        // Smaller RPCs first.
+        pending.sort((p, q) => p.json.length - q.json.length);
+        let batchSize = 0;
+        let batch = [];
+        do {
+            let req = pending[0];
+            let size = req.json.length;
+            let canAppend = !batch.length ||
+                batchSize + size <= conf.RPC_MAX_BATCH_SIZE;
+            if (!canAppend)
+                break;
+            batchSize += size;
+            batch.push(req);
+            pending.splice(0, 1);
+        } while (pending.length > 0);
+        log.d('RPC batch:', batch.length, 'RPCs', (batchSize / 1024).toFixed(1), 'KB', pending.length, 'left');
+        return batch;
+    }
+    async function sendBatch() {
+        let batch = getBatchWithinMaxSize();
         try {
-            let results = await invoke('Batch.Run', args);
-            log.d('Parsing batch results:', batch.length);
+            let results = await invoke('Batch.Run', batch.map(b => JSON.parse(b.json)));
             for (let i = 0; i < batch.length; i++) {
                 let { res, err } = results[i];
-                let { name, resolve, reject } = batch[i];
+                let { json, resolve, reject } = batch[i];
                 if (!err) {
                     resolve(res);
                     continue;
                 }
+                let { name } = JSON.parse(json);
                 let rpcerr = new RpcError(name, {
                     status: err.code,
                     message: err.message,
@@ -114,7 +138,7 @@ define(["require", "exports", "./config", "./log", "./qargs", "./prop"], functio
             }
         }
     }
-    function genRequestId() {
+    function generateRequestId() {
         let id = '';
         while (id.length < 8)
             id += Math.random().toString(16).slice(2);
@@ -122,13 +146,13 @@ define(["require", "exports", "./config", "./log", "./qargs", "./prop"], functio
     }
     let rpcurl = new prop_1.AsyncProp(() => {
         let url = qargs.get('rpc')
-            || config.DEFAULT_RPC_URL;
+            || conf.DEFAULT_RPC_URL;
         if (url.indexOf('://') < 0) {
-            let scheme = config.DEBUG ? 'http' : 'https';
+            let scheme = conf.DEBUG ? 'http' : 'https';
             url = scheme + '://' + url;
         }
         if (!/:\d+$/.test(url))
-            url = url + ':' + config.DEFAULT_RPC_PORT;
+            url = url + ':' + conf.DEFAULT_RPC_PORT;
         log.i('Server:', url);
         return url;
     });

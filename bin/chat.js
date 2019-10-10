@@ -68,7 +68,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
                 else
                     unsent[remoteUid] = newText;
                 autoSavedText = newText;
-                log.d('Text autosaved:', autoSavedText);
+                log.d('Text autosaved:', JSON.stringify(autoSavedText));
                 return unsent;
             });
         }, conf.CHAT_AUTOSAVE_INTERVAL * 1000);
