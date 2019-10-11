@@ -2,12 +2,17 @@
 <html>
 
 <head>
-  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-  <meta http-equiv="Encoding" content="utf-8">
-  <meta name="theme-color" content="#800">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Type"
+        content="text/html;charset=utf-8">
+  <meta http-equiv="Encoding"
+        content="utf-8">
+  <meta name="theme-color"
+        content="#800">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
 
-  <meta http-equiv="Content-Security-Policy" content="
+  <meta http-equiv="Content-Security-Policy"
+        content="
       default-src 'self';
       connect-src 'self' blob: localhost:3921 https://ihbh.org:3921;
       img-src 'self' data: blob: *.tile.openstreetmap.org;
@@ -20,32 +25,44 @@
 
   <title>I've Been Here</title>
 
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" sizes="192x192" href="icons/192.png">
-  <link rel="stylesheet" href="css/common.css">
+  <link rel="manifest"
+        href="manifest.webmanifest">
+  <link rel="apple-touch-icon"
+        sizes="192x192"
+        href="icons/192.png">
+  <link rel="stylesheet"
+        href="css/common.css">
 
-  <script data-main="bin/index.js" src="bin/amd.js" async></script>
+  <script data-main="bin/index.js"
+          src="bin/amd.js"
+          async></script>
 </head>
 
 <body>
-  <div id="logs" style="display:none"></div>
+  <div id="logs"
+       style="display:none"></div>
 
-  <button id="debug-toggle" title="Show debug menu" class="btn-sq" style="background-image: url(/icons/debug.svg)">
+  <button id="debug-toggle"
+          title="Show debug menu"
+          class="btn-sq"
+          style="background-image: url(/icons/debug.svg)">
     Debug
   </button>
 
-  <div id="debug" style="visibility: collapse">
-    <a class="btn" href="/">Home</a>
-    <a class="btn" href="/?page=explorer">VFS</a>
-    <button class="btn" id="gps-london">Common</button>
-    <button class="btn" id="show-logs">Logs</button>
-    <button class="btn" id="export-db">Export</button>
-    <button class="btn" id="import-db">Import</button>
+  <div id="debug"
+       style="visibility: collapse">
+    <a class="btn"
+       href="/">Home</a>
+    <button class="btn"
+            id="gps-london">Common</button>
+    <button class="btn"
+            id="show-logs">Logs</button>
   </div>
 
   <!-- The user profile page. -->
 
-  <div id="p-profile" class="page">
+  <div id="p-profile"
+       class="page">
     <div class="header">
       <img id="photo">
       <span id="reg-name">[?]</span>
@@ -54,69 +71,124 @@
 
     <div class="details">
       <table>
-        <tr><td>Age<td>None
-        <tr><td>Sex<td>None
+        <tr>
+          <td>Age
+          <td>None
+        <tr>
+          <td>Sex
+          <td>None
       </table>
     </div>
 
     <div class="about"></div>
-    <div class="reason" contenteditable></div>
+    <div class="reason"
+         contenteditable></div>
 
     <div class="footer">
       <span class="status"></span>
       <button id="reg-done">Done</button>
-      <button class="report" title="Report abuse">Report</button>
-      <button class="send-report" title="Send Report">Send Report</button>
+      <button class="report"
+              title="Report abuse">Report</button>
+      <button class="send-report"
+              title="Send Report">Send Report</button>
     </div>
   </div>
 
   <!-- Map with all visited places. -->
 
-  <div id="p-places" class="page">
+  <div id="p-places"
+       class="page">
     <div id="all-places"></div>
   </div>
 
   <!-- List of other visitors nearby. -->
 
-  <div id="p-nearby" class="page">
+  <div id="p-nearby"
+       class="page">
     <div id="vplace-map"></div>
     <div id="vtime-bar">
       You've been here <span id="vtime-label"></span>
       [<span id="unvisit">unvisit</span>]
     </div>
     <div id="nearby-status"></div>
-    <div id="visitors" class="user-cards"></div>
+    <div id="visitors"
+         class="user-cards"></div>
   </div>
 
   <!-- All chats, unread first. -->
 
-  <div id="p-unread" class="page">
+  <div id="p-unread"
+       class="page">
     <div class="user-cards"></div>
+  </div>
+
+  <!-- Settings -->
+
+  <div id="p-settings"
+       class="page">
+    <div class="controls">
+      <button id="export-db"
+              class="btn-sq"
+              style="background-image: url(/icons/download.svg)">
+        Export
+      </button>
+      <button id="import-db"
+              class="btn-sq"
+              style="background-image: url(/icons/upload.svg)">
+        Import
+      </button>
+      <button id="vfs-explorer"
+              class="btn-sq"
+              style="background-image: url(/icons/storage.svg)">
+        VFS
+      </button>
+    </div>
   </div>
 
   <!-- The main page with the map. -->
 
-  <div id="p-map" class="page">
+  <div id="p-map"
+       class="page">
     <div id="map"></div>
     <span id="no-gps"></span>
+
     <div id="controls">
-      <button id="userpic" class="btn-sq" title="Show profile" style="background-image: url()">
+      <button id="userpic"
+              class="btn-sq"
+              title="Show profile"
+              style="background-image: url()">
         Profile
       </button>
-      <button id="show-places" class="btn-sq" title="Show visited places"
-        style="background-image: url(/icons/globe.png)">
+      <button id="show-places"
+              class="btn-sq"
+              title="Show visited places"
+              style="background-image: url(/icons/globe.png)">
         Places
       </button>
-      <button id="see-chats" class="btn-sq" title="Show unread messages" style="background-image: url(/icons/chat.png)">
+      <button id="see-chats"
+              class="btn-sq"
+              title="Show unread messages"
+              style="background-image: url(/icons/chat.png)">
         Chat
       </button>
+      <button id="settings"
+              class="btn-sq"
+              title="Settings"
+              style="background-image: url(/icons/config.svg)">
+        Settings
+      </button>
     </div>
-    <button class="btn" id="send">I've Been Here!</button>
+
+    <button class="btn"
+            id="send">
+      I've Been Here!
+    </button>
   </div>
 
   <!-- The 1:1 chat page. -->
 
-  <div id="p-chat" class="page">
+  <div id="p-chat"
+       class="page">
     <div id="u-header">
       <a class="user-href">
         <img id="chat-u-icon" />
@@ -125,14 +197,16 @@
     </div>
     <div id="messages"></div>
     <div id="u-footer">
-      <div id="reply-text" contenteditable></div>
+      <div id="reply-text"
+           contenteditable></div>
       <span id="reply-send">&#x25b6;</span>
     </div>
   </div>
 
   <!-- VFS explorer. -->
 
-  <div id="p-explorer" class="page">
+  <div id="p-explorer"
+       class="page">
 
   </div>
 </body>

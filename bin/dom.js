@@ -4,6 +4,7 @@ define(["require", "exports"], function (require, exports) {
     exports.CSS_DEBUG = 'debug';
     exports.id = {
         get btnSeeChats() { return $('#see-chats'); },
+        get btnSettings() { return $('#settings'); },
         get debugMenu() { return $('#debug'); },
         get btnDebugToggle() { return $('#debug-toggle'); },
         get pageExplorer() { return $('#p-explorer'); },
@@ -13,9 +14,12 @@ define(["require", "exports"], function (require, exports) {
         get logs() { return $('#logs'); },
         get gotoCommon() { return $('#gps-london'); },
         get showLogs() { return $('#show-logs'); },
+        get noGPS() { return $('#no-gps'); },
+        // Settings
         get exportDB() { return $('#export-db'); },
         get importDB() { return $('#import-db'); },
-        get noGPS() { return $('#no-gps'); },
+        get btnExplorer() { return $('#vfs-explorer'); },
+        // Profile
         get regStatus() { return $('#p-profile .status'); },
         get regAbout() { return $('#p-profile > .about'); },
         get regReason() { return $('#p-profile > .reason'); },
@@ -24,6 +28,7 @@ define(["require", "exports"], function (require, exports) {
         get regReport() { return $('#p-profile .report'); },
         get regSendReport() { return $('#p-profile .send-report'); },
         get regDone() { return $('#reg-done'); },
+        // Main Map
         get userPic() { return $('#userpic'); },
         get showPlaces() { return $('#show-places'); },
         get visitors() { return $('#visitors'); },

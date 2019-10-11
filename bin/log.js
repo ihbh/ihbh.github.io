@@ -6,19 +6,19 @@ define(["require", "exports", "./logdb"], function (require, exports, logdb) {
             this.tag = '[' + tag + ']';
         }
         d(...args) {
-            console.debug(this.tag, ...args);
+            console.debug('D', this.tag, ...args);
             this.save('D', args);
         }
         i(...args) {
-            console.info(this.tag, ...args);
+            console.info('I', this.tag, ...args);
             this.save('I', args);
         }
         w(...args) {
-            console.warn(this.tag, ...args);
+            console.warn('W', this.tag, ...args);
             this.save('W', args);
         }
         e(...args) {
-            console.error(this.tag, ...args);
+            console.error('E', this.tag, ...args);
             this.save('E', args);
         }
         save(sev, args) {

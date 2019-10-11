@@ -2,6 +2,7 @@ export const CSS_DEBUG = 'debug';
 
 export const id = {
   get btnSeeChats() { return $('#see-chats') as HTMLButtonElement; },
+  get btnSettings() { return $('#settings') as HTMLButtonElement; },
   get debugMenu() { return $('#debug'); },
   get btnDebugToggle() { return $('#debug-toggle') as HTMLButtonElement; },
   get pageExplorer() { return $('#p-explorer'); },
@@ -11,10 +12,14 @@ export const id = {
   get logs() { return $('#logs'); },
   get gotoCommon() { return $('#gps-london'); },
   get showLogs() { return $('#show-logs'); },
-  get exportDB() { return $('#export-db'); },
-  get importDB() { return $('#import-db'); },
   get noGPS() { return $('#no-gps'); },
 
+  // Settings
+  get exportDB() { return $('#export-db'); },
+  get importDB() { return $('#import-db'); },
+  get btnExplorer() { return $('#vfs-explorer'); },
+
+  // Profile
   get regStatus() { return $('#p-profile .status') as HTMLSpanElement; },
   get regAbout() { return $('#p-profile > .about') as HTMLDivElement; },
   get regReason() { return $('#p-profile > .reason') as HTMLDivElement; },
@@ -24,6 +29,7 @@ export const id = {
   get regSendReport() { return $('#p-profile .send-report') as HTMLButtonElement; },
   get regDone() { return $('#reg-done') as HTMLButtonElement; },
 
+  // Main Map
   get userPic() { return $<HTMLImageElement>('#userpic'); },
   get showPlaces() { return $('#show-places'); },
   get visitors() { return $('#visitors'); },

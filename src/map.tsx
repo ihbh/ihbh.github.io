@@ -19,7 +19,12 @@ export async function init() {
   await initMap();
   await initSendButton();
   await initChatButton();
+  await initSettingsButton();
   await showLastSeenPos();
+}
+
+function initSettingsButton() {
+  dom.id.btnSettings.onclick = () => page.set('settings');
 }
 
 function initChatButton() {

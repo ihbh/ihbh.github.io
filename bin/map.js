@@ -11,9 +11,13 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
         await initMap();
         await initSendButton();
         await initChatButton();
+        await initSettingsButton();
         await showLastSeenPos();
     }
     exports.init = init;
+    function initSettingsButton() {
+        dom.id.btnSettings.onclick = () => page.set('settings');
+    }
     function initChatButton() {
         dom.id.btnSeeChats.onclick = () => page.set('unread');
     }

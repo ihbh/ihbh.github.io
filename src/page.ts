@@ -5,7 +5,17 @@ import * as startup from './startup';
 
 const log = new TaggedLogger('page');
 
-type PageId = 'map' | 'profile' | 'unread' | 'places' | 'nearby' | 'explorer';
+interface PageArgs {
+  map: {};
+  profile: {};
+  unread: {};
+  places: {};
+  nearby: {};
+  settings: {};
+  explorer: {};
+}
+
+type PageId = keyof PageArgs;
 
 export async function init() {
   let id = get();
@@ -20,7 +30,7 @@ export function get(): PageId {
   return qargs.get('page') as PageId;
 }
 
-export function set(id: PageId, args?) {
+export function set<T extends PageId>(id: T, args?: PageArgs[T]) {
   if (get() == id) {
     log.i('select:', id);
     select(id);
