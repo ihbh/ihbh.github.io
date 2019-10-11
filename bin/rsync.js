@@ -78,7 +78,7 @@ define(["require", "exports", "./buffer", "./config", "./error", "./log", "./rpc
             log.d('File synced:', path);
             await updatedSyncState(path, !remove, { res });
         }
-        else if (isPermanentError(err.code)) {
+        else if (isPermanentError(err)) {
             log.i('Permanently rejected:', path, err);
             await updatedSyncState(path, !remove, { err });
         }
@@ -115,18 +115,36 @@ define(["require", "exports", "./buffer", "./config", "./error", "./log", "./rpc
         let key = encodePath(path);
         if (added) {
             ps.push(err ?
-                vfs_1.default.set(conf.RSYNC_FAILED + '/' + key, err || {}) :
+                vfs_1.default.set(conf.RSYNC_FAILED + '/' + key, cloneError(err)) :
                 vfs_1.default.set(conf.RSYNC_SYNCED + '/' + key, res || {}));
         }
         else if (!err) {
             ps.push(vfs_1.default.rm(conf.RSYNC_SYNCED + '/' + key), vfs_1.default.rm(conf.RSYNC_FAILED + '/' + key));
         }
         else {
-            ps.push(vfs_1.default.set(conf.RSYNC_FAILED + '/' + key, err || {}));
+            ps.push(vfs_1.default.set(conf.RSYNC_FAILED + '/' + key, cloneError(err)));
         }
         await Promise.all(ps);
     }
-    function isPermanentError(status) {
+    function cloneError(err) {
+        if (!err)
+            return {};
+        if (err instanceof Error)
+            return err.message;
+        return err + '';
+    }
+    async function getSyncStatus(path) {
+        let key = encodePath(vfs_1.abspath(path));
+        let [res, err] = await Promise.all([
+            vfs_1.default.get(conf.RSYNC_SYNCED + '/' + key),
+            vfs_1.default.get(conf.RSYNC_FAILED + '/' + key),
+        ]);
+        return err ? 'failed' : res ? 'synced' : null;
+    }
+    exports.getSyncStatus = getSyncStatus;
+    function isPermanentError(err) {
+        let status = err instanceof rpc.RpcError ?
+            err.status : 0;
         return status >= 400 && status < 500;
     }
 });

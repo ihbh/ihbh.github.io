@@ -3,7 +3,7 @@ import * as conf from './config';
 import { DerivedError } from "./error";
 import { TaggedLogger } from "./log";
 import * as rpc from './rpc';
-import vfs from './vfs';
+import vfs, { abspath } from './vfs';
 
 const log = new TaggedLogger('rsync');
 
@@ -93,7 +93,7 @@ async function syncFile(path: string, data) {
   if (!err) {
     log.d('File synced:', path);
     await updatedSyncState(path, !remove, { res });
-  } else if (isPermanentError(err.code)) {
+  } else if (isPermanentError(err)) {
     log.i('Permanently rejected:', path, err);
     await updatedSyncState(path, !remove, { err });
   } else {
@@ -137,7 +137,7 @@ async function updatedSyncState(path: string, added: boolean,
 
   if (added) {
     ps.push(err ?
-      vfs.set(conf.RSYNC_FAILED + '/' + key, err || {}) :
+      vfs.set(conf.RSYNC_FAILED + '/' + key, cloneError(err)) :
       vfs.set(conf.RSYNC_SYNCED + '/' + key, res || {}));
   } else if (!err) {
     ps.push(
@@ -145,12 +145,29 @@ async function updatedSyncState(path: string, added: boolean,
       vfs.rm(conf.RSYNC_FAILED + '/' + key));
   } else {
     ps.push(
-      vfs.set(conf.RSYNC_FAILED + '/' + key, err || {}));
+      vfs.set(conf.RSYNC_FAILED + '/' + key, cloneError(err)));
   }
 
   await Promise.all(ps);
 }
 
-function isPermanentError(status: number) {
+function cloneError(err) {
+  if (!err) return {};
+  if (err instanceof Error) return err.message;
+  return err + '';
+}
+
+export async function getSyncStatus(path: string) {
+  let key = encodePath(abspath(path));
+  let [res, err] = await Promise.all([
+    vfs.get(conf.RSYNC_SYNCED + '/' + key),
+    vfs.get(conf.RSYNC_FAILED + '/' + key),
+  ]);
+  return err ? 'failed' : res ? 'synced' : null;
+}
+
+function isPermanentError(err) {
+  let status = err instanceof rpc.RpcError ?
+    err.status : 0;
   return status >= 400 && status < 500;
 }

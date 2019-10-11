@@ -20,8 +20,8 @@ const handlers = {
   '/srv': pfsmod(() => import('./vfs-srv')),
 };
 
-const abspath = (path: string) =>
-  path.replace('~', conf.SHARED_DIR);
+export const abspath = (path: string) =>
+  path.replace(/^~/, conf.SHARED_DIR);
 
 export const root: VFS = {
   async find(path: string): Promise<string[]> {

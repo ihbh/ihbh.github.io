@@ -12,13 +12,17 @@ import { recentTimeToStr } from './timestr';
 let log = new TaggedLogger('chat');
 
 interface ChatMessage {
+  status?: 'synced' | 'failed';
   user: string;
   text: string;
   date: Date;
 }
 
 interface RemoteMessages {
-  [tsid: string]: { text: string };
+  [tsid: string]: {
+    text: string;
+    status?: 'synced' | 'failed';
+  };
 }
 
 const date2tsid = (date: Date) =>
@@ -37,6 +41,7 @@ const rm2cm = (sender: string, remote: RemoteMessages) =>
       user: sender,
       text: remote[tsid].text,
       date: tsid2date(tsid),
+      status: remote[tsid].status,
     };
   });
 
@@ -218,12 +223,17 @@ async function clearUnreadMark() {
 
 async function getMessageTexts(dir: string, tsids?: string[]) {
   try {
+    let rsync = await import('./rsync');
     let messages: RemoteMessages = {};
     if (!tsids) tsids = (await vfs.dir(dir)) || [];
     log.i(`Getting ${tsids.length} messages from ${dir}/*/text`);
     let ps = tsids.map(async tsid => {
-      let text = await vfs.get(`${dir}/${tsid}/text`);
-      messages[tsid] = { text };
+      let path = `${dir}/${tsid}/text`;
+      let [text, status] = await Promise.all([
+        vfs.get(path),
+        rsync.getSyncStatus(path),
+      ]);
+      messages[tsid] = { text, status };
     });
     await Promise.all(ps);
     return messages;
@@ -250,10 +260,12 @@ async function addMessageTexts(dir: string, messages: RemoteMessages) {
 
 function renderMessage(message: ChatMessage): HTMLDivElement {
   let cs = message.user == remoteUid ? 'm t' : 'm y';
-  let ts = recentTimeToStr(message.date);
-  return <div class={cs} time={ts}>
-    <span class="mt">{message.text}</span>
-    <span class="ts">{ts}</span>
+  if (message.status) cs += ' ' + message.status;
+  let lts = recentTimeToStr(message.date, true);
+  let sts = recentTimeToStr(message.date, false);
+  return <div class={cs} time={message.date.toJSON()}>
+    <span class='mt'>{message.text}</span>
+    <span class='ts' title={lts}>{sts}</span>
   </div>;
 }
 

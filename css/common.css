@@ -481,15 +481,11 @@ body .page .ol-attribution * {
 }
 
 #messages .m {
-  margin: 0.5em;
+  margin: 0.25rem;
   border: 1px solid #eee;
-  border-radius: 0.5em;
-  padding: 0.5em;
+  border-radius: 0.25rem;
+  padding: 0.25rem;
   width: 80%;
-}
-
-#messages * {
-  font-size: 0.5em;
 }
 
 #messages .y {
@@ -502,8 +498,24 @@ body .page .ol-attribution * {
   background: #eef;
 }
 
+#messages .mt {
+  font-size: 0.5em;
+  display: flex;
+}
+
 #messages .ts {
-  opacity: 0.5;
+  color: #444;
+  display: flex;
+  font-size: 0.3em;
+  justify-content: flex-end;
+}
+
+#messages .synced .ts {
+  color: #080;
+}
+
+#messages .failed .ts {
+  color: #800;
 }
 
 #u-footer {

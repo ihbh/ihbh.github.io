@@ -12,6 +12,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
             user: sender,
             text: remote[tsid].text,
             date: tsid2date(tsid),
+            status: remote[tsid].status,
         };
     });
     let remoteUid = ''; // remote user id
@@ -163,13 +164,18 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
     }
     async function getMessageTexts(dir, tsids) {
         try {
+            let rsync = await new Promise((resolve_2, reject_2) => { require(['./rsync'], resolve_2, reject_2); });
             let messages = {};
             if (!tsids)
                 tsids = (await vfs_1.default.dir(dir)) || [];
             log.i(`Getting ${tsids.length} messages from ${dir}/*/text`);
             let ps = tsids.map(async (tsid) => {
-                let text = await vfs_1.default.get(`${dir}/${tsid}/text`);
-                messages[tsid] = { text };
+                let path = `${dir}/${tsid}/text`;
+                let [text, status] = await Promise.all([
+                    vfs_1.default.get(path),
+                    rsync.getSyncStatus(path),
+                ]);
+                messages[tsid] = { text, status };
             });
             await Promise.all(ps);
             return messages;
@@ -197,10 +203,13 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
     }
     function renderMessage(message) {
         let cs = message.user == remoteUid ? 'm t' : 'm y';
-        let ts = timestr_1.recentTimeToStr(message.date);
-        return react_1.default.createElement("div", { class: cs, time: ts },
-            react_1.default.createElement("span", { class: "mt" }, message.text),
-            react_1.default.createElement("span", { class: "ts" }, ts));
+        if (message.status)
+            cs += ' ' + message.status;
+        let lts = timestr_1.recentTimeToStr(message.date, true);
+        let sts = timestr_1.recentTimeToStr(message.date, false);
+        return react_1.default.createElement("div", { class: cs, time: message.date.toJSON() },
+            react_1.default.createElement("span", { class: 'mt' }, message.text),
+            react_1.default.createElement("span", { class: 'ts', title: lts }, sts));
     }
     function diff(a, b) {
         let s = new Set(a);

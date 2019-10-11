@@ -10,7 +10,7 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
         '/idb': pfsmod(() => new Promise((resolve_2, reject_2) => { require(['./vfs-idb'], resolve_2, reject_2); })),
         '/srv': pfsmod(() => new Promise((resolve_3, reject_3) => { require(['./vfs-srv'], resolve_3, reject_3); })),
     };
-    const abspath = (path) => path.replace('~', conf.SHARED_DIR);
+    exports.abspath = (path) => path.replace(/^~/, conf.SHARED_DIR);
     exports.root = {
         async find(path) {
             if (path == '/') {
@@ -23,7 +23,7 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
                 }
                 return res;
             }
-            path = abspath(path);
+            path = exports.abspath(path);
             let relpaths = await invokeHandler('find', path);
             let prefix = ROOT_REGEX.exec(path);
             return relpaths.map(rel => prefix + rel);
@@ -79,7 +79,7 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
         }
     }
     function parsePath(path) {
-        path = abspath(path);
+        path = exports.abspath(path);
         if (!PATH_REGEX.test(path))
             throw new SyntaxError('Invalid vfs path: ' + path);
         let i = path.indexOf('/', 1);
