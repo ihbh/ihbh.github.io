@@ -17,6 +17,11 @@ body {
   flex-direction: column;
 }
 
+body.darkmode {
+  filter: invert(1);
+  background: #000;
+}
+
 .btn {
   font-size: 0.75em;
   padding: 1em;
@@ -74,6 +79,18 @@ body {
   padding: 0.2em 0.5em;
   z-index: 3;
   cursor: pointer;
+}
+
+/** The dark mode button. */
+
+#darkmode {
+  left: 0;
+  bottom: 0;
+  display: none;
+}
+
+body[page="map"] #darkmode {
+  display: inherit;
 }
 
 /** The "back home" link. */

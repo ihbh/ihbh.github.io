@@ -17,7 +17,7 @@
       connect-src 'self' blob: localhost:3921 https://ihbh.org:3921;
       img-src 'self' data: blob: *.tile.openstreetmap.org;
       media-src 'self' blob:;
-      script-src 'self' 'unsafe-eval' cdn.rawgit.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.rawgit.com;
       worker-src 'self';
       style-src 'self' 'unsafe-inline' cdn.rawgit.com;
       upgrade-insecure-requests;
@@ -39,6 +39,16 @@
 </head>
 
 <body>
+  <script>
+    if (localStorage.darkmode == 1)
+      document.body.classList.add('darkmode');
+  </script>
+
+  <a id="darkmode"
+     class="overlay-link"
+     href="javascript:void(ls=localStorage,ls.darkmode=ls.darkmode==1?0:1,document.body.classList.toggle('darkmode'))">Dark
+    mode</a>
+
   <a id="home-link"
      class="overlay-link"
      title="Go to the main map page"
