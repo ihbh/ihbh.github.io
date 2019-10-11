@@ -7,6 +7,7 @@ import React from './react';
 import * as ucache from './ucache';
 import * as user from './user';
 import vfs from './vfs';
+import { recentTimeToStr } from './timestr';
 
 let log = new TaggedLogger('chat');
 
@@ -248,10 +249,11 @@ async function addMessageTexts(dir: string, messages: RemoteMessages) {
 }
 
 function renderMessage(message: ChatMessage): HTMLDivElement {
-  let cs = message.user == remoteUid ? 'theirs' : 'yours';
-  let ts = date2tsid(message.date);
+  let cs = message.user == remoteUid ? 'm t' : 'm y';
+  let ts = recentTimeToStr(message.date);
   return <div class={cs} time={ts}>
-    {message.text}
+    <span class="mt">{message.text}</span>
+    <span class="ts">{ts}</span>
   </div>;
 }
 

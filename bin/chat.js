@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "./react", "./ucache", "./user", "./vfs"], function (require, exports, conf, dom, gp, log_1, qargs, react_1, ucache, user, vfs_1) {
+define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "./react", "./ucache", "./user", "./vfs", "./timestr"], function (require, exports, conf, dom, gp, log_1, qargs, react_1, ucache, user, vfs_1, timestr_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('chat');
@@ -196,9 +196,11 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
         }
     }
     function renderMessage(message) {
-        let cs = message.user == remoteUid ? 'theirs' : 'yours';
-        let ts = date2tsid(message.date);
-        return react_1.default.createElement("div", { class: cs, time: ts }, message.text);
+        let cs = message.user == remoteUid ? 'm t' : 'm y';
+        let ts = timestr_1.recentTimeToStr(message.date);
+        return react_1.default.createElement("div", { class: cs, time: ts },
+            react_1.default.createElement("span", { class: "mt" }, message.text),
+            react_1.default.createElement("span", { class: "ts" }, ts));
     }
     function diff(a, b) {
         let s = new Set(a);
