@@ -20,6 +20,7 @@ type PageId = keyof PageArgs;
 export async function init() {
   let id = get();
   select(id);
+  document.body.setAttribute('page', id);
   let mod = await import('./' + id);
   await mod.init();
   log.i('Running the startup tasks.');

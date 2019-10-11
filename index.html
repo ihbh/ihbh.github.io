@@ -39,20 +39,20 @@
 </head>
 
 <body>
+  <a id="home-link"
+     class="overlay-link"
+     title="Go to the main map page"
+     href="?page=map">Home</a>
+
+  <a id="debug-toggle"
+     class="overlay-link"
+     title="Toggle the debug menu">Debug</a>
+
   <div id="logs"
        style="display:none"></div>
 
-  <button id="debug-toggle"
-          title="Show debug menu"
-          class="btn-sq"
-          style="background-image: url(/icons/debug.svg)">
-    Debug
-  </button>
-
   <div id="debug"
        style="visibility: collapse">
-    <a class="btn"
-       href="/">Home</a>
     <button class="btn"
             id="gps-london">Common</button>
     <button class="btn"

@@ -5,6 +5,7 @@ define(["require", "exports", "./log", "./qargs", "./dom", "./startup"], functio
     async function init() {
         let id = get();
         select(id);
+        document.body.setAttribute('page', id);
         let mod = await new Promise((resolve_1, reject_1) => { require(['./' + id], resolve_1, reject_1); });
         await mod.init();
         log.i('Running the startup tasks.');
