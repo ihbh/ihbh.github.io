@@ -6,20 +6,26 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
     let bestPos;
     let watcher;
     async function init() {
-        await initUserPic();
-        await initShowPlaces();
+        initUserPic();
+        initShowPlaces();
+        initSendButton();
+        initChatButton();
+        initSettingsButton();
         await initMap();
-        await initSendButton();
-        await initChatButton();
-        await initSettingsButton();
-        await showLastSeenPos();
+        showLastSeenPos();
     }
     exports.init = init;
     function initSettingsButton() {
         dom.id.btnSettings.onclick = () => page.set('settings');
     }
-    function initChatButton() {
-        dom.id.btnSeeChats.onclick = () => page.set('unread');
+    async function initChatButton() {
+        let btn = dom.id.btnSeeChats;
+        btn.onclick = () => page.set('unread');
+        let { hasUnreadChats } = await new Promise((resolve_1, reject_1) => { require(['./chatman'], resolve_1, reject_1); });
+        if (await hasUnreadChats()) {
+            log.i('Got unread messages.');
+            btn.classList.add('unread');
+        }
     }
     function initShowPlaces() {
         dom.id.showPlaces.onclick = () => page.set('places');
@@ -28,7 +34,7 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
         try {
             let button = dom.id.userPic;
             button.onclick = () => page.set('profile');
-            let usr = await new Promise((resolve_1, reject_1) => { require(['./usr'], resolve_1, reject_1); });
+            let usr = await new Promise((resolve_2, reject_2) => { require(['./usr'], resolve_2, reject_2); });
             let name = await usr.getDisplayName();
             button.textContent = name;
             let photo = await usr.getPhotoUri();
@@ -102,11 +108,11 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
         await updateMap(pos);
     }
     async function setLastGps({ lat, lon }) {
-        let gp = await new Promise((resolve_2, reject_2) => { require(['./gp'], resolve_2, reject_2); });
+        let gp = await new Promise((resolve_3, reject_3) => { require(['./gp'], resolve_3, reject_3); });
         await gp.lastgps.set({ lat, lon });
     }
     async function getLastGps() {
-        let gp = await new Promise((resolve_3, reject_3) => { require(['./gp'], resolve_3, reject_3); });
+        let gp = await new Promise((resolve_4, reject_4) => { require(['./gp'], resolve_4, reject_4); });
         return gp.lastgps.get();
     }
     async function initSendButton() {
@@ -114,7 +120,7 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
         button.disabled = true;
         button.onclick = async () => {
             log.i('#send:click');
-            let pwa = await new Promise((resolve_4, reject_4) => { require(['./pwa'], resolve_4, reject_4); });
+            let pwa = await new Promise((resolve_5, reject_5) => { require(['./pwa'], resolve_5, reject_5); });
             pwa.showInstallPrompt();
             button.disabled = true;
             let tskey = null;
@@ -133,7 +139,7 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
     async function shareDisplayedLocation() {
         if (!bestPos)
             throw new Error('GPS not ready.');
-        let loc = await new Promise((resolve_5, reject_5) => { require(['./loc'], resolve_5, reject_5); });
+        let loc = await new Promise((resolve_6, reject_6) => { require(['./loc'], resolve_6, reject_6); });
         let { latitude: lat, longitude: lng } = bestPos;
         return loc.shareLocation({ lat, lon: lng });
     }

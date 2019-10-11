@@ -14,21 +14,27 @@ let bestPos: Coordinates;
 let watcher: gps.Watcher;
 
 export async function init() {
-  await initUserPic();
-  await initShowPlaces();
+  initUserPic();
+  initShowPlaces();
+  initSendButton();
+  initChatButton();
+  initSettingsButton();
   await initMap();
-  await initSendButton();
-  await initChatButton();
-  await initSettingsButton();
-  await showLastSeenPos();
+  showLastSeenPos();
 }
 
 function initSettingsButton() {
   dom.id.btnSettings.onclick = () => page.set('settings');
 }
 
-function initChatButton() {
-  dom.id.btnSeeChats.onclick = () => page.set('unread');
+async function initChatButton() {
+  let btn = dom.id.btnSeeChats;
+  btn.onclick = () => page.set('unread');
+  let { hasUnreadChats } = await import('./chatman');
+  if (await hasUnreadChats()) {
+    log.i('Got unread messages.');
+    btn.classList.add('unread');
+  }
 }
 
 function initShowPlaces() {

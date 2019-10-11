@@ -40,7 +40,7 @@ body.darkmode {
 }
 
 .btn-sq {
-  font-size: 0.45rem;
+  font-size: 0.4rem;
   padding-top: 1.15rem;
   border: none;
   color: #444;
@@ -380,6 +380,10 @@ body .page .ol-attribution * {
 #send:disabled {
   background: #888;
   box-shadow: none;
+}
+
+#see-chats.unread {
+  font-weight: bold;
 }
 
 /* ?page=places */
