@@ -5,7 +5,8 @@ type ArgId =
   'rpc' | 
   'path' |
   'uid' |
-  'tskey' | 
+  'sfc' |
+  'tskey' |
   'vpt' | 
   'pnt';
 

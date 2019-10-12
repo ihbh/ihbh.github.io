@@ -604,6 +604,10 @@ body .page .ol-attribution * {
 }
 
 #p-explorer .path .controls span {
+  margin-right: 0.5em;
+}
+
+#p-explorer .path .controls .rmdir {
   cursor: pointer;
 }
 
@@ -614,14 +618,37 @@ body .page .ol-attribution * {
   grid-template-columns: repeat(4, 1fr);
 }
 
-#p-explorer .links a {
+#p-explorer .links.sfc {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+#p-explorer .links>div {
   background: #004;
   color: #fff;
   word-break: break-all;
   text-decoration: none;
   padding: 0.5em;
   user-select: none;
-  cursor: pointer;
+}
+
+#p-explorer .links>div a {
+  color: #fff;
+  text-decoration: none;
+}
+
+#p-explorer .links:not(.sfc)>div a {
+  display: block;
+}
+
+#p-explorer .links>div i {
+  color: #777;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#p-explorer .links>div i::before {
+  content: ' = ';
 }
 
 #p-explorer .data {
@@ -629,4 +656,20 @@ body .page .ol-attribution * {
   word-break: break-all;
   padding: 1em;
   flex: 1;
+}
+
+#p-explorer .data:focus {
+  outline: none;
+}
+
+#p-explorer *[fstatus="updating"] {
+  color: #555 !important;
+}
+
+#p-explorer *[fstatus="updated"] {
+  color: #080 !important;
+}
+
+#p-explorer *[fstatus="failed"] {
+  color: #800 !important;
 }

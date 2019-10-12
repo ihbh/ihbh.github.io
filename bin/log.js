@@ -7,7 +7,6 @@ define(["require", "exports", "./logdb"], function (require, exports, logdb) {
         }
         d(...args) {
             console.debug('D', this.tag, ...args);
-            this.save('D', args);
         }
         i(...args) {
             console.info('I', this.tag, ...args);

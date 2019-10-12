@@ -10,13 +10,6 @@ const log = new TaggedLogger('settings');
 export async function init() {
   initExportButton();
   initImportButton();
-  initExplorerButton();
-}
-
-function initExplorerButton() {
-  dom.id.btnExplorer.onclick = () => {
-    page.set('explorer');
-  };
 }
 
 function initExportButton() {

@@ -1,18 +1,12 @@
-define(["require", "exports", "./config", "./dom", "./idb", "./log", "./ls", "./page"], function (require, exports, conf, dom, idb, log_1, ls, page) {
+define(["require", "exports", "./config", "./dom", "./idb", "./log", "./ls"], function (require, exports, conf, dom, idb, log_1, ls) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('settings');
     async function init() {
         initExportButton();
         initImportButton();
-        initExplorerButton();
     }
     exports.init = init;
-    function initExplorerButton() {
-        dom.id.btnExplorer.onclick = () => {
-            page.set('explorer');
-        };
-    }
     function initExportButton() {
         dom.id.exportDB.addEventListener('click', async () => {
             log.i('Exporting data...');

@@ -12,7 +12,10 @@ interface PageArgs {
   places: {};
   nearby: {};
   settings: {};
-  explorer: {};
+  explorer: {
+    path: string;
+    sfc?: number;
+  };
 }
 
 type PageId = keyof PageArgs;
@@ -21,6 +24,7 @@ export async function init() {
   let id = get();
   select(id);
   document.body.setAttribute('page', id);
+  initLinks();
   let mod = await import('./' + id);
   await mod.init();
   log.i('Running the startup tasks.');
@@ -49,4 +53,17 @@ function select(id: PageId) {
 
 export function getPageElement(id = get()) {
   return $<HTMLElement>('body > #p-' + id);
+}
+
+function initLinks() {
+  let buttons = getPageElement()
+    .querySelectorAll('button[href]');
+  log.d('buttons with hrefs:', buttons.length);
+  
+  for (let button of [].slice.call(buttons) as HTMLButtonElement[]) {
+    let id = button.getAttribute('id');
+    let href = button.getAttribute('href');
+    log.d(`button#${id}`, href);
+    button.onclick = () => location.href = href;
+  }
 }

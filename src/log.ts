@@ -9,7 +9,6 @@ export class TaggedLogger {
 
   d(...args) {
     console.debug('D', this.tag, ...args);
-    this.save('D', args);
   }
 
   i(...args) {
