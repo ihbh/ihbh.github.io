@@ -2,6 +2,7 @@ import * as dom from './dom';
 import { TaggedLogger } from "./log";
 import * as page from './page';
 import * as qargs from './qargs';
+import React from './react';
 import * as usr from './usr';
 
 const log = new TaggedLogger('reg');
@@ -15,6 +16,13 @@ export async function init() {
   addSelfTag();
   addEventListeners();
   showUserInfo();
+  initChatLink();
+}
+
+function initChatLink() {
+  dom.id.regChatLink.onclick =
+    () => location.href = '?page=chat&uid=' + uid;
+
 }
 
 function addSelfTag() {
@@ -33,10 +41,31 @@ async function showUserInfo() {
     makeEditable(dom.id.regAbout);
   }
 
+  showUserId();
+
   dom.id.regName.textContent = await usr.getDisplayName(uid);
   dom.id.regAbout.textContent = await usr.getAbout(uid);
   let imguri = await usr.getPhotoUri(uid);
   if (imguri) dom.id.regPhoto.src = imguri;
+}
+
+async function showUserId() {
+  let id = uid;
+  if (!id) {
+    let user = await import('./user');
+    id = await user.uid.get();
+  }
+  setUserProp('uid', id);
+}
+
+function setUserProp(name: string, text: string) {
+  let table = dom.id.regDetails;
+  let tbody = table.querySelector('tbody');
+  tbody.append(
+    <tr>
+      <td>{name}</td>
+      <td>{text}</td>
+    </tr>);
 }
 
 async function addEventListeners() {
@@ -59,7 +88,7 @@ async function addEventListeners() {
         log.i('No reason provided.');
         return;
       }
-      
+
       try {
         dom.id.regSendReport.disabled = true;
         await usr.setAbuseReport(uid, reason);

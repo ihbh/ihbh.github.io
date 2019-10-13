@@ -55,8 +55,7 @@
      href="?page=map">Home</a>
 
   <a id="debug-toggle"
-     class="overlay-link"
-     title="Toggle the debug menu">Debug</a>
+     class="overlay-link">Debug</a>
 
   <div id="logs"
        style="display:none"></div>
@@ -81,12 +80,9 @@
 
     <div class="details">
       <table>
-        <tr>
-          <td>Age
-          <td>None
-        <tr>
-          <td>Sex
-          <td>None
+        <tbody>
+
+        </tbody>
       </table>
     </div>
 
@@ -97,10 +93,9 @@
     <div class="footer">
       <span class="status"></span>
       <button id="reg-done">Done</button>
-      <button class="report"
-              title="Report abuse">Report</button>
-      <button class="send-report"
-              title="Send Report">Send Report</button>
+      <button class="report">Report</button>
+      <button class="send-report">Send Report</button>
+      <button id="chat-link">Chat</button>
     </div>
   </div>
 
@@ -155,7 +150,6 @@
       </button>
       <button id="config"
               class="btn-sq"
-              title="Settings"
               href="?page=explorer&sfc=1&idir=1&path=/conf"
               style="background-image: url(/icons/config.svg)">
         Config
@@ -173,25 +167,21 @@
     <div id="controls">
       <button id="userpic"
               class="btn-sq"
-              title="Show profile"
               style="background-image: url()">
         Profile
       </button>
       <button id="show-places"
               class="btn-sq"
-              title="Show visited places"
               style="background-image: url(/icons/globe.png)">
         Places
       </button>
       <button id="see-chats"
               class="btn-sq"
-              title="Show unread messages"
               style="background-image: url(/icons/chat.png)">
         Chat
       </button>
       <button id="settings"
               class="btn-sq"
-              title="Settings"
               style="background-image: url(/icons/config.svg)">
         Settings
       </button>
@@ -219,7 +209,6 @@
            contenteditable></div>
       <button id="reply-send"
               class="btn-sq"
-              title="Send"
               style="background-image: url(/icons/send.svg)">
         Send
       </button>

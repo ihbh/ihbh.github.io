@@ -1,4 +1,4 @@
-define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./usr"], function (require, exports, dom, log_1, page, qargs, usr) {
+define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", "./usr"], function (require, exports, dom, log_1, page, qargs, react_1, usr) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('reg');
@@ -9,8 +9,13 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./usr"], f
         addSelfTag();
         addEventListeners();
         showUserInfo();
+        initChatLink();
     }
     exports.init = init;
+    function initChatLink() {
+        dom.id.regChatLink.onclick =
+            () => location.href = '?page=chat&uid=' + uid;
+    }
     function addSelfTag() {
         if (uid)
             return;
@@ -25,11 +30,27 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./usr"], f
             makeEditable(dom.id.regName);
             makeEditable(dom.id.regAbout);
         }
+        showUserId();
         dom.id.regName.textContent = await usr.getDisplayName(uid);
         dom.id.regAbout.textContent = await usr.getAbout(uid);
         let imguri = await usr.getPhotoUri(uid);
         if (imguri)
             dom.id.regPhoto.src = imguri;
+    }
+    async function showUserId() {
+        let id = uid;
+        if (!id) {
+            let user = await new Promise((resolve_1, reject_1) => { require(['./user'], resolve_1, reject_1); });
+            id = await user.uid.get();
+        }
+        setUserProp('uid', id);
+    }
+    function setUserProp(name, text) {
+        let table = dom.id.regDetails;
+        let tbody = table.querySelector('tbody');
+        tbody.append(react_1.default.createElement("tr", null,
+            react_1.default.createElement("td", null, name),
+            react_1.default.createElement("td", null, text)));
     }
     async function addEventListeners() {
         if (uid) {
@@ -63,7 +84,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./usr"], f
             };
         }
         else {
-            let reg = await new Promise((resolve_1, reject_1) => { require(['./reg'], resolve_1, reject_1); });
+            let reg = await new Promise((resolve_2, reject_2) => { require(['./reg'], resolve_2, reject_2); });
             dom.id.regPhoto.onclick = async () => {
                 log.i('Clicked the self img.');
                 let url = await reg.selectPhoto();

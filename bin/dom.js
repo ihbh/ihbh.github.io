@@ -23,6 +23,8 @@ define(["require", "exports"], function (require, exports) {
         get regStatus() { return $('#p-profile .status'); },
         get regAbout() { return $('#p-profile > .about'); },
         get regReason() { return $('#p-profile > .reason'); },
+        get regDetails() { return $('#p-profile .details'); },
+        get regChatLink() { return $('#chat-link'); },
         get regPhoto() { return $('#photo'); },
         get regName() { return $('#reg-name'); },
         get regReport() { return $('#p-profile .report'); },

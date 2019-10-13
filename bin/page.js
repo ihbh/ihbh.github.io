@@ -49,5 +49,6 @@ define(["require", "exports", "./log", "./qargs", "./dom", "./startup"], functio
             button.onclick = () => location.href = href;
         }
     }
+    exports.initLinks = initLinks;
 });
 //# sourceMappingURL=page.js.map

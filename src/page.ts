@@ -55,7 +55,7 @@ export function getPageElement(id = get()) {
   return $<HTMLElement>('body > #p-' + id);
 }
 
-function initLinks() {
+export function initLinks() {
   let buttons = getPageElement()
     .querySelectorAll('button[href]');
   log.d('buttons with hrefs:', buttons.length);

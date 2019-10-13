@@ -173,8 +173,8 @@ body .page .ol-attribution * {
   display: flex;
   align-items: center;
   padding: 0.5em;
-  background: #800;
-  color: #fff;
+  background: #cfc;
+  border-bottom: 0.25em solid #8c8;
 }
 
 #p-profile #photo {
@@ -210,9 +210,13 @@ body .page .ol-attribution * {
   background: #060;
 }
 
+#p-profile #chat-link {
+  background: #860;
+}
+
 #p-profile .report {
   display: none;
-  background: #a00;
+  background: #484;
   cursor: pointer;
 }
 
@@ -232,6 +236,10 @@ body .page .ol-attribution * {
 
 #p-profile.self .self-tag {
   display: inherit;
+}
+
+#p-profile.self #chat-link {
+  display: none;
 }
 
 #p-profile #reg-name:empty::before {
@@ -284,15 +292,20 @@ body .page .ol-attribution * {
 
 #p-profile .footer {
   display: flex;
-  flex-direction: row;
-  background: #800;
+  flex-direction: row;  
   padding: 0.5em;
   align-items: center;
+  background: #cfc;
+  border-top: 0.25em solid #8c8;
+}
+
+#p-profile .footer button {
+  margin-left: 0.5em;
+  cursor: pointer;
 }
 
 #p-profile .status {
   flex: 1;
-  color: #fff;
   font-size: 0.5em;
   padding-right: 0.5em;
   overflow: hidden;
@@ -301,7 +314,7 @@ body .page .ol-attribution * {
 }
 
 #p-profile #reg-done {
-  background: #008;
+  background: #484;
   cursor: pointer;
 }
 
