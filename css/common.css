@@ -367,6 +367,7 @@ body .page .ol-attribution * {
   align-self: center;
   margin-top: auto;
   margin-bottom: auto;
+  word-break: break-all;
   z-index: 1;
 }
 
