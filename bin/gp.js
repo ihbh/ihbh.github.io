@@ -34,7 +34,7 @@ define(["require", "exports", "./config", "./log", "./vfs-conf", "./vfs-prop"], 
         ].join(' '),
     });
     exports.rpcurl = vfsconf.register({
-        value: 'https://ihbh.org:3921',
+        value: 'https://data.ihbh.org:3921',
         test: x => typeof x == 'string',
         path: '/rpc/url',
     });

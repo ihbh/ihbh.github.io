@@ -42,7 +42,7 @@ export const gpstimeout = vfsconf.register({
 });
 
 export const rpcurl = vfsconf.register({
-  value: 'https://ihbh.org:3921',
+  value: 'https://data.ihbh.org:3921',
   test: x => typeof x == 'string',
   path: '/rpc/url',
 });
