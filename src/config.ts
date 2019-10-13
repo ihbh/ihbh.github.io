@@ -11,7 +11,6 @@ export const DBG_MAX_LOG_ARG_LEN = 100;
 export const MAP_1M = 1e-5;
 export const MIN_SIGNIFICANT_DIST = 10 * MAP_1M;
 export const GPS_DIGITS = 7;
-export const GPS_TIMEOUT = 15000; // ms
 export const MAP_BOX_SIZE = 250 * MAP_1M;
 export const PLACE_CLICK_TIMEOUT = 150; // ms
 export const OSM_URL = 'https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0';
@@ -32,6 +31,10 @@ export const CHAT_AUTOSAVE_INTERVAL = 1; // seconds
 export const LOG_IDB_NAME = 'logs';
 export const LOG_IDB_INTERVAL = 5; // ms
 export const FS_SLOW_THRS = 10; // ms
+
+export const CONF_SDIR = '/ls/conf';
+export const CONF_VDIR = '/conf';
+
 export const USERDATA_DIR = '/idb/user';
 export const LOCAL_DIR = `${USERDATA_DIR}/local`;
 export const SHARED_DIR = `${USERDATA_DIR}/shared`;

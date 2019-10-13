@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./log", "./vfs-prop"], function (require, exports, conf, log_1, vfs_prop_1) {
+define(["require", "exports", "./config", "./log", "./vfs-conf", "./vfs-prop"], function (require, exports, conf, log_1, vfsconf, vfs_prop_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('gp');
@@ -17,5 +17,17 @@ define(["require", "exports", "./config", "./log", "./vfs-prop"], function (requ
     exports.privkey = prop('local.keys.privkey');
     exports.chats = prop('local.chat.drafts', {});
     exports.lastgps = prop('local.lastgps');
+    exports.darkmode = vfsconf.register({
+        value: 0,
+        test: x => x === 0 || x === 1,
+        path: '/ui/dark-mode',
+    });
+    exports.gpstimeout = vfsconf.register({
+        value: 15000,
+        units: 'ms',
+        test: x => x >= 0 && Number.isFinite(x) && Math.round(x) == x,
+        path: '/ui/gps-timeout',
+        description: 'The main map page monitors GPS for some time to get more accurate coordinates. Once the timeout expires, it stops monitoring to save battery.',
+    });
 });
 //# sourceMappingURL=gp.js.map

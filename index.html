@@ -40,13 +40,13 @@
 
 <body>
   <script>
-    if (localStorage.darkmode == 1)
+    if (localStorage['conf.ui.dark-mode'] == 1)
       document.body.classList.add('darkmode');
   </script>
 
   <a id="darkmode"
      class="overlay-link"
-     href="javascript:void(ls=localStorage,ls.darkmode=ls.darkmode==1?0:1,document.body.classList.toggle('darkmode'))">Dark
+     href="javascript:void(ls=localStorage,dm='conf.ui.dark-mode',ls[dm]=ls[dm]==1?0:1,document.body.classList.toggle('darkmode'))">Dark
     mode</a>
 
   <a id="home-link"
@@ -156,7 +156,7 @@
       <button id="config"
               class="btn-sq"
               title="Settings"
-              href="?page=explorer&path=/ls&sfc=1"
+              href="?page=explorer&sfc=1&path=/conf&idir=/conf-info"
               style="background-image: url(/icons/config.svg)">
         Config
       </button>

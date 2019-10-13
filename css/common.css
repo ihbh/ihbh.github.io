@@ -651,6 +651,16 @@ body .page .ol-attribution * {
   content: ' = ';
 }
 
+#p-explorer .links>div s {
+  color: #ccc;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  margin-top: 0.5em;
+  font-size: 0.75em;
+}
+
 #p-explorer .data {
   white-space: pre-wrap;
   word-break: break-all;

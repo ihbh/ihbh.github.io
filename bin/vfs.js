@@ -1,15 +1,9 @@
-define(["require", "exports", "./config", "./error", "./log", "./prop"], function (require, exports, conf, error_1, log_1, prop_1) {
+define(["require", "exports", "./config", "./error", "./log", "./vfs-roots"], function (require, exports, conf, error_1, log_1, vfs_roots_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('vfs');
     const PATH_REGEX = /^(\/[\w-_%]+)+\/?$/;
-    const ROOT_REGEX = /^\/\w+/;
-    const pfsmod = (importfn) => new prop_1.AsyncProp(() => importfn().then(mod => mod.default));
-    const handlers = {
-        '/ls': pfsmod(() => new Promise((resolve_1, reject_1) => { require(['./vfs-ls'], resolve_1, reject_1); })),
-        '/idb': pfsmod(() => new Promise((resolve_2, reject_2) => { require(['./vfs-idb'], resolve_2, reject_2); })),
-        '/srv': pfsmod(() => new Promise((resolve_3, reject_3) => { require(['./vfs-srv'], resolve_3, reject_3); })),
-    };
+    const ROOT_REGEX = /^\/[\w-]+/;
     exports.abspath = (path) => path.replace(/^~/, conf.SHARED_DIR);
     exports.root = {
         async find(path) {
@@ -32,7 +26,7 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
             if (path.endsWith('/'))
                 path = path.slice(0, -1);
             if (!path)
-                return Object.keys(handlers).map(s => s.slice(1));
+                return Object.keys(vfs_roots_1.default).map(s => s.slice(1));
             return invokeHandler('dir', path);
         },
         async get(path) {
@@ -67,6 +61,8 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
             if (!fn)
                 throw new Error(`${rootdir} doesn't support '${method}'`);
             let result = await fn.call(handler, rempath, ...args);
+            if (method == 'get')
+                log.d(method, path, result);
             return result;
         }
         catch (err) {
@@ -86,7 +82,7 @@ define(["require", "exports", "./config", "./error", "./log", "./prop"], functio
         if (i < 0)
             i = path.length;
         let rootdir = path.slice(0, i);
-        let handler = handlers[rootdir];
+        let handler = vfs_roots_1.default[rootdir];
         if (!handler)
             throw new TypeError('Invalid vfs root dir: ' + path);
         let rempath = path.slice(i) || '/';

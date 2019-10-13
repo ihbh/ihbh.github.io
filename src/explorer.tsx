@@ -3,7 +3,6 @@ import { TaggedLogger } from './log';
 import * as qargs from './qargs';
 import React from './react';
 import vfs from './vfs';
-import * as page from './page';
 
 const log = new TaggedLogger('explorer');
 
@@ -13,6 +12,7 @@ const TAG_LINKS = 'links';
 export async function init() {
   let path = getCurrentVfsPath();
   let sfc = qargs.get('sfc') == '1';
+  let idir = qargs.get('idir');
   log.i('Path:', path);
   let root = dom.id.pageExplorer;
   let controls = <span class="controls"></span>;
@@ -28,7 +28,7 @@ export async function init() {
   renderAsFile(root, path)
     .catch(err => log.w('This is not a file:', err));
 
-  renderAsDir(root, path, sfc)
+  renderAsDir(root, path, sfc, idir)
     .catch(err => log.w('This is not a dir:', err));
 }
 
@@ -118,48 +118,58 @@ function setFStatus(el: HTMLElement, status: 'updating' | 'updated' | 'failed') 
   el.setAttribute('fstatus', status);
 }
 
-async function renderAsDir(root: HTMLElement, dirPath: string, sfc: boolean) {
+async function renderAsDir(root: HTMLElement, dirPath: string, sfc: boolean, idir: string) {
   if (dirPath.endsWith('/'))
     dirPath = dirPath.slice(0, -1);
   log.i('Checking if this is a dir.');
   let names = await vfs.dir(dirPath);
   let links: HTMLElement = <div class={TAG_LINKS}></div>;
   log.i('Show file contents?', sfc);
+  if (sfc) links.classList.add('sfc');
 
-  let fdata = new Map<string, string>();
+  let tags = new Map<string, HTMLElement>();
 
-  if (sfc) {
-    links.classList.add('sfc');
-    let ps = names.map(async name => {
-      try {
-        let data = await vfs.get(dirPath + '/' + name);
-        if (data === null) return;
-        let json = JSON.stringify(data);
-        fdata.set(name, json);
-      } catch { }
-    });
-    await Promise.all(ps);
-  }
-
-  for (let name of names.sort()) {
+  let ps = names.map(async name => {
     let fullpath = encodeURIComponent(dirPath + '/' + name);
     let href = `/?page=explorer&path=${fullpath}`;
     if (sfc) href += '&sfc=1';
+    if (idir) href += '&idir=' + idir;
     let nameTag = <a href={href}>{name}</a>;
     let dataTag: HTMLElement = null;
+    let infoTag: HTMLElement = null;
 
-    if (fdata.has(name)) {
-      dataTag = <i>{fdata.get(name)}</i>;
-      dataTag.setAttribute('spellcheck', 'false');
-      makeEditable(dataTag, dirPath + '/' + name);
-    }
+    try {
+      if (sfc) {
+        let data = await vfs.get(dirPath + '/' + name);
+        if (data !== null) {
+          let json = JSON.stringify(data);
+          dataTag = <i>{json}</i>;
+          dataTag.setAttribute('spellcheck', 'false');
+          makeEditable(dataTag, dirPath + '/' + name);
+        }
+      }
+    } catch { }
 
-    links.appendChild(
+    try {
+      if (idir) {
+        let ipath = idir + '/description' + dirPath + '/' + name;
+        let info = await vfs.get(ipath);
+        if (info) infoTag = <s>{info}</s>;
+      }
+    } catch { }
+
+    tags.set(name,
       <div>
         {nameTag}
         {dataTag}
+        {infoTag}
       </div>);
-  }
+  });
+
+  await Promise.all(ps);
+
+  for (let name of names.sort())
+    links.appendChild(tags.get(name));
 
   root.appendChild(links);
 }

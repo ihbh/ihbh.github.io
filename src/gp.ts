@@ -1,5 +1,6 @@
 import * as conf from './config';
 import { TaggedLogger } from './log';
+import * as vfsconf from './vfs-conf';
 import vfsprop from './vfs-prop';
 
 const log = new TaggedLogger('gp');
@@ -9,11 +10,6 @@ function prop<T>(path: string, defval: T = null) {
     path.split('.').join('/');
   log.d(path, '->', fspath);
   return vfsprop(fspath, defval);
-}
-
-export interface RpcInfo {
-  method: string;
-  args: any;
 }
 
 export const uid = prop<string>('shared.profile.id');
@@ -26,3 +22,17 @@ export const keyseed = prop<string>('local.keys.keyseed');
 export const privkey = prop<string>('local.keys.privkey');
 export const chats = prop<any>('local.chat.drafts', {});
 export const lastgps = prop<{ lat: number, lon: number }>('local.lastgps');
+
+export const darkmode = vfsconf.register({
+  value: 0,
+  test: x => x === 0 || x === 1,
+  path: '/ui/dark-mode',
+});
+
+export const gpstimeout = vfsconf.register({
+  value: 15000,
+  units: 'ms',
+  test: x => x >= 0 && Number.isFinite(x) && Math.round(x) == x,
+  path: '/ui/gps-timeout',
+  description: 'The main map page monitors GPS for some time to get more accurate coordinates. Once the timeout expires, it stops monitoring to save battery.',
+});

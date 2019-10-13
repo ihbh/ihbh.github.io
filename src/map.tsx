@@ -1,5 +1,6 @@
 import * as conf from './config';
 import * as dom from './dom';
+import * as gp from './gp';
 import * as gps from './gps';
 import { TaggedLogger } from './log';
 import { OSM } from './osm';
@@ -81,10 +82,10 @@ async function loadMap() {
   }
 }
 
-function startWatchingGps() {
+async function startWatchingGps() {
   log.i('Refreshing the GPS location.');
   watcher && watcher.stop()
-  watcher = gps.watch(onGpsUpdated, conf.GPS_TIMEOUT);
+  watcher = gps.watch(onGpsUpdated, await gp.gpstimeout.get());
 }
 
 function onGpsUpdated(pos: Coordinates) {

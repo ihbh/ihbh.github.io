@@ -7,6 +7,7 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
     async function init() {
         let path = getCurrentVfsPath();
         let sfc = qargs.get('sfc') == '1';
+        let idir = qargs.get('idir');
         log.i('Path:', path);
         let root = dom.id.pageExplorer;
         let controls = react_1.default.createElement("span", { class: "controls" });
@@ -16,7 +17,7 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
         addRmDirButton(controls);
         renderAsFile(root, path)
             .catch(err => log.w('This is not a file:', err));
-        renderAsDir(root, path, sfc)
+        renderAsDir(root, path, sfc, idir)
             .catch(err => log.w('This is not a dir:', err));
     }
     exports.init = init;
@@ -97,44 +98,55 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
     function setFStatus(el, status) {
         el.setAttribute('fstatus', status);
     }
-    async function renderAsDir(root, dirPath, sfc) {
+    async function renderAsDir(root, dirPath, sfc, idir) {
         if (dirPath.endsWith('/'))
             dirPath = dirPath.slice(0, -1);
         log.i('Checking if this is a dir.');
         let names = await vfs_1.default.dir(dirPath);
         let links = react_1.default.createElement("div", { class: TAG_LINKS });
         log.i('Show file contents?', sfc);
-        let fdata = new Map();
-        if (sfc) {
+        if (sfc)
             links.classList.add('sfc');
-            let ps = names.map(async (name) => {
-                try {
-                    let data = await vfs_1.default.get(dirPath + '/' + name);
-                    if (data === null)
-                        return;
-                    let json = JSON.stringify(data);
-                    fdata.set(name, json);
-                }
-                catch (_a) { }
-            });
-            await Promise.all(ps);
-        }
-        for (let name of names.sort()) {
+        let tags = new Map();
+        let ps = names.map(async (name) => {
             let fullpath = encodeURIComponent(dirPath + '/' + name);
             let href = `/?page=explorer&path=${fullpath}`;
             if (sfc)
                 href += '&sfc=1';
+            if (idir)
+                href += '&idir=' + idir;
             let nameTag = react_1.default.createElement("a", { href: href }, name);
             let dataTag = null;
-            if (fdata.has(name)) {
-                dataTag = react_1.default.createElement("i", null, fdata.get(name));
-                dataTag.setAttribute('spellcheck', 'false');
-                makeEditable(dataTag, dirPath + '/' + name);
+            let infoTag = null;
+            try {
+                if (sfc) {
+                    let data = await vfs_1.default.get(dirPath + '/' + name);
+                    if (data !== null) {
+                        let json = JSON.stringify(data);
+                        dataTag = react_1.default.createElement("i", null, json);
+                        dataTag.setAttribute('spellcheck', 'false');
+                        makeEditable(dataTag, dirPath + '/' + name);
+                    }
+                }
             }
-            links.appendChild(react_1.default.createElement("div", null,
+            catch (_a) { }
+            try {
+                if (idir) {
+                    let ipath = idir + '/description' + dirPath + '/' + name;
+                    let info = await vfs_1.default.get(ipath);
+                    if (info)
+                        infoTag = react_1.default.createElement("s", null, info);
+                }
+            }
+            catch (_b) { }
+            tags.set(name, react_1.default.createElement("div", null,
                 nameTag,
-                dataTag));
-        }
+                dataTag,
+                infoTag));
+        });
+        await Promise.all(ps);
+        for (let name of names.sort())
+            links.appendChild(tags.get(name));
         root.appendChild(links);
     }
 });

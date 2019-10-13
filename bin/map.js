@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", "./page"], function (require, exports, conf, dom, gps, log_1, osm_1, page) {
+define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./log", "./osm", "./page"], function (require, exports, conf, dom, gp, gps, log_1, osm_1, page) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('map');
@@ -68,10 +68,10 @@ define(["require", "exports", "./config", "./dom", "./gps", "./log", "./osm", ".
                 log.w('Location permission denied?');
         }
     }
-    function startWatchingGps() {
+    async function startWatchingGps() {
         log.i('Refreshing the GPS location.');
         watcher && watcher.stop();
-        watcher = gps.watch(onGpsUpdated, conf.GPS_TIMEOUT);
+        watcher = gps.watch(onGpsUpdated, await gp.gpstimeout.get());
     }
     function onGpsUpdated(pos) {
         if (bestPos && gps.dist(bestPos, pos) < conf.MIN_SIGNIFICANT_DIST) {

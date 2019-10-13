@@ -1,13 +1,14 @@
 import { TaggedLogger } from "./log";
 
-type ArgId = 
+type ArgId =
   'page' |
-  'rpc' | 
+  'rpc' |
   'path' |
   'uid' |
   'sfc' |
+  'idir' |
   'tskey' |
-  'vpt' | 
+  'vpt' |
   'pnt';
 
 let log = new TaggedLogger('qargs');

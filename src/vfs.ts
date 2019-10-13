@@ -1,24 +1,14 @@
 import * as conf from './config';
 import { DerivedError } from './error';
-import { VFS } from './vfs-api';
 import { TaggedLogger } from './log';
 import { AsyncProp } from './prop';
+import { VFS } from './vfs-api';
+import handlers from './vfs-roots';
 
 const log = new TaggedLogger('vfs');
 
 const PATH_REGEX = /^(\/[\w-_%]+)+\/?$/;
-const ROOT_REGEX = /^\/\w+/;
-
-const pfsmod = (importfn: () => Promise<{ default: VFS }>) =>
-  new AsyncProp<VFS>(
-    () => importfn().then(
-      mod => mod.default));
-
-const handlers = {
-  '/ls': pfsmod(() => import('./vfs-ls')),
-  '/idb': pfsmod(() => import('./vfs-idb')),
-  '/srv': pfsmod(() => import('./vfs-srv')),
-};
+const ROOT_REGEX = /^\/[\w-]+/;
 
 export const abspath = (path: string) =>
   path.replace(/^~/, conf.SHARED_DIR);
@@ -85,6 +75,8 @@ async function invokeHandler(method: keyof VFS, path: string, ...args) {
     let fn = handler[method] as Function;
     if (!fn) throw new Error(`${rootdir} doesn't support '${method}'`);
     let result = await fn.call(handler, rempath, ...args);
+    if (method == 'get')
+      log.d(method, path, result);
     return result;
   } catch (err) {
     throw new DerivedError(

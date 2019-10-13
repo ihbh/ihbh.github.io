@@ -14,7 +14,6 @@ define(["require", "exports"], function (require, exports) {
     exports.MAP_1M = 1e-5;
     exports.MIN_SIGNIFICANT_DIST = 10 * exports.MAP_1M;
     exports.GPS_DIGITS = 7;
-    exports.GPS_TIMEOUT = 15000; // ms
     exports.MAP_BOX_SIZE = 250 * exports.MAP_1M;
     exports.PLACE_CLICK_TIMEOUT = 150; // ms
     exports.OSM_URL = 'https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0';
@@ -35,6 +34,8 @@ define(["require", "exports"], function (require, exports) {
     exports.LOG_IDB_NAME = 'logs';
     exports.LOG_IDB_INTERVAL = 5; // ms
     exports.FS_SLOW_THRS = 10; // ms
+    exports.CONF_SDIR = '/ls/conf';
+    exports.CONF_VDIR = '/conf';
     exports.USERDATA_DIR = '/idb/user';
     exports.LOCAL_DIR = `${exports.USERDATA_DIR}/local`;
     exports.SHARED_DIR = `${exports.USERDATA_DIR}/shared`;
