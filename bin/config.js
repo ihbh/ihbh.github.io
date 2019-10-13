@@ -46,8 +46,6 @@ define(["require", "exports"], function (require, exports) {
     exports.LASTGPS_DIR = `${exports.LOCAL_DIR}/lastgps`;
     exports.NULL_IMG = 'data:image/jpeg;base64,';
     exports.NOUSERPIC = '/icons/user.svg';
-    // /srv/users/<uid>/profile details are cached and
-    // refreshed every N times
-    exports.UCACHE_REFRESH_RATE = 5;
+    exports.UCACHE_TIMEOUT = 250;
 });
 //# sourceMappingURL=config.js.map

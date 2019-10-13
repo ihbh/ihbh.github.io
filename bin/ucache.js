@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./log"], function (require, exports, conf, log_1) {
+define(["require", "exports", "./config", "./sleep", "./log"], function (require, exports, conf, sleep_1, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('ucache');
@@ -7,18 +7,12 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
         let { default: vfs } = await new Promise((resolve_1, reject_1) => { require(['./vfs'], resolve_1, reject_1); });
         let dirRemote = `/users/${uid}/profile`;
         let dirCached = `${conf.USERDATA_DIR}/users/${uid}`;
-        let useCache = Math.random() > 1 / conf.UCACHE_REFRESH_RATE;
         let info = { uid };
         try {
-            if (!useCache) {
-                try {
-                    await syncFiles(dirCached, dirRemote, ['info', 'name', 'img']);
-                    log.d('Synced user info:', uid);
-                }
-                catch (err) {
-                    log.e('Failed to sync user info:', uid, err);
-                }
-            }
+            await Promise.race([
+                syncFiles(dirCached, dirRemote, ['info', 'name', 'img']),
+                sleep_1.default(conf.UCACHE_TIMEOUT),
+            ]);
             info.about = await vfs.get(`${dirCached}/info`);
             info.name = await vfs.get(`${dirCached}/name`);
             info.photo = await vfs.get(`${dirCached}/img`);
@@ -30,8 +24,14 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
     }
     exports.getUserInfo = getUserInfo;
     async function syncFiles(dirCached, dirRemote, fnames) {
-        let ps = fnames.map(fname => syncFile(dirCached + '/' + fname, dirRemote + '/' + fname));
-        await Promise.all(ps);
+        try {
+            let ps = fnames.map(fname => syncFile(dirCached + '/' + fname, dirRemote + '/' + fname));
+            await Promise.all(ps);
+            log.i('Synced user info:', dirRemote);
+        }
+        catch (err) {
+            log.w('Failed to sync user info:', dirRemote);
+        }
     }
     async function syncFile(fpathCached, fpathRemote) {
         let rpc = await new Promise((resolve_2, reject_2) => { require(['./rpc'], resolve_2, reject_2); });

@@ -45,6 +45,4 @@ export const RSYNC_HASHLEN = 4; // bytes
 export const LASTGPS_DIR = `${LOCAL_DIR}/lastgps`;
 export const NULL_IMG = 'data:image/jpeg;base64,';
 export const NOUSERPIC = '/icons/user.svg';
-// /srv/users/<uid>/profile details are cached and
-// refreshed every N times
-export const UCACHE_REFRESH_RATE = 5;
+export const UCACHE_TIMEOUT = 250;

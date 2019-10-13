@@ -1,4 +1,5 @@
 import * as conf from './config';
+import sleep from './sleep';
 import { TaggedLogger } from './log';
 
 const log = new TaggedLogger('ucache');
@@ -15,19 +16,14 @@ export async function getUserInfo(uid: string) {
   let { default: vfs } = await import('./vfs');
   let dirRemote = `/users/${uid}/profile`;
   let dirCached = `${conf.USERDATA_DIR}/users/${uid}`;
-  let useCache = Math.random() > 1 / conf.UCACHE_REFRESH_RATE;
   let info: UserInfo = { uid };
 
   try {
-    if (!useCache) {
-      try {
-        await syncFiles(dirCached, dirRemote,
-          ['info', 'name', 'img']);
-        log.d('Synced user info:', uid);
-      } catch (err) {
-        log.e('Failed to sync user info:', uid, err);
-      }
-    }
+    await Promise.race([
+      syncFiles(dirCached, dirRemote,
+        ['info', 'name', 'img']),
+      sleep(conf.UCACHE_TIMEOUT),
+    ]);
 
     info.about = await vfs.get(`${dirCached}/info`);
     info.name = await vfs.get(`${dirCached}/name`);
@@ -40,11 +36,16 @@ export async function getUserInfo(uid: string) {
 }
 
 async function syncFiles(dirCached: string, dirRemote: string, fnames: string[]) {
-  let ps = fnames.map(
-    fname => syncFile(
-      dirCached + '/' + fname,
-      dirRemote + '/' + fname));
-  await Promise.all(ps);
+  try {
+    let ps = fnames.map(
+      fname => syncFile(
+        dirCached + '/' + fname,
+        dirRemote + '/' + fname));
+    await Promise.all(ps);
+    log.i('Synced user info:', dirRemote);
+  } catch (err) {
+    log.w('Failed to sync user info:', dirRemote);
+  }
 }
 
 async function syncFile(fpathCached: string, fpathRemote: string) {
