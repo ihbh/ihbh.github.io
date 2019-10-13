@@ -15,7 +15,6 @@ define(["require", "exports"], function (require, exports) {
     exports.MAP_1M = 1e-5;
     exports.MIN_SIGNIFICANT_DIST = 10 * exports.MAP_1M;
     exports.GPS_DIGITS = 7;
-    exports.MAP_BOX_SIZE = 250 * exports.MAP_1M;
     exports.PLACE_CLICK_TIMEOUT = 150; // ms
     exports.OSM_LIB = `/build/ol.js`;
     exports.OSM_CSS = `/css/ol.css`;
@@ -25,7 +24,6 @@ define(["require", "exports"], function (require, exports) {
     exports.PHOTO_QIALITY = 0.75;
     exports.MARKER_ICON_URL = '/icons/marker.png';
     exports.MARKER_ICON_SIZE = 64;
-    exports.MARKER_ICON_SCALE = 0.5;
     exports.DEFAULT_RPC_PORT = 3921;
     exports.RPC_BATCH_DELAY = 150; // ms
     exports.RPC_MAX_BATCH_SIZE = 1024; // bytes

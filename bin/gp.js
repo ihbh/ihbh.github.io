@@ -41,7 +41,20 @@ define(["require", "exports", "./config", "./log", "./vfs-conf", "./vfs-prop"], 
     exports.osmurl = vfsconf.register({
         value: 'https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0',
         test: x => typeof x == 'string',
-        path: '/osm/url',
+        path: '/osm/lib-url',
+    });
+    exports.mapBoxSize = vfsconf.register({
+        value: 250,
+        units: 'm',
+        test: x => Number.isFinite(x) && x > 0,
+        path: '/osm/box-size',
+        description: 'Initial size of the main map view.',
+    });
+    exports.mapMarkerSize = vfsconf.register({
+        value: 32,
+        units: 'px',
+        test: x => Number.isFinite(x) && x > 0,
+        path: '/osm/marker-size',
     });
 });
 //# sourceMappingURL=gp.js.map

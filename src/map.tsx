@@ -103,7 +103,7 @@ function onGpsUpdated(pos: Coordinates) {
 
 async function updateMap({ lat, lon }) {
   try {
-    let s = conf.MAP_BOX_SIZE;
+    let s = conf.MAP_1M * await gp.mapBoxSize.get();
     log.i('Updating OSM view box:', s, { lat, lon });
     osm.setBBox({
       min: { lat: lat - s, lon: lon - s },

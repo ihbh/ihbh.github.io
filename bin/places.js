@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", "./qargs"], function (require, exports, conf, dom, loc, log_1, osm_1, qargs) {
+define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", "./qargs", "./gp"], function (require, exports, conf, dom, loc, log_1, osm_1, qargs, gp) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('places');
@@ -27,7 +27,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", ".
         }
         if (!places.length)
             throw new Error('Nothing to render: no places visited.');
-        let bbox = getBBox(places);
+        let bbox = await getBBox(places);
         let osm = new osm_1.OSM(dom.id.mapAll.id);
         if (conf.DEBUG)
             osm.onaddmarker = pos => addMarkerAt(pos);
@@ -40,7 +40,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", ".
             // tmax -> 1, tmin -> 1/e = 0.37
             let diff = tmax - +time;
             let opacity = Math.exp(-diff / (tmax - tmin));
-            let marker = osm.addMarker({ id, lat, lon, opacity });
+            let marker = await osm.addMarker({ id, lat, lon, opacity });
             marker.onclick = () => handleClick(id);
         }
     }
@@ -54,7 +54,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", ".
             page.set('nearby', { tskey: lastClickedTskey });
         }, conf.PLACE_CLICK_TIMEOUT);
     }
-    function getBBox(places) {
+    async function getBBox(places) {
         let bbox = {
             min: { lat: +Infinity, lon: +Infinity },
             max: { lat: -Infinity, lon: -Infinity },
@@ -65,10 +65,11 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", ".
             bbox.max.lat = Math.max(bbox.max.lat, lat);
             bbox.max.lon = Math.max(bbox.max.lon, lon);
         }
-        bbox.min.lat -= conf.MAP_BOX_SIZE;
-        bbox.min.lon -= conf.MAP_BOX_SIZE;
-        bbox.max.lat += conf.MAP_BOX_SIZE;
-        bbox.max.lon += conf.MAP_BOX_SIZE;
+        let size = conf.MAP_1M * await gp.mapBoxSize.get();
+        bbox.min.lat -= size;
+        bbox.min.lon -= size;
+        bbox.max.lat += size;
+        bbox.max.lon += size;
         return bbox;
     }
     async function addMarkerAt({ lat, lon }) {

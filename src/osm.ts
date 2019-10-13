@@ -2,6 +2,7 @@ import * as dom from './dom';
 import { TaggedLogger } from "./log";
 import * as config from './config';
 import * as ol from 'ol';
+import * as gp from './gp';
 
 const log = new TaggedLogger('osm');
 
@@ -24,7 +25,6 @@ export interface Marker {
 }
 
 async function importOpenLayersLib() {
-  let gp = await import('./gp');
   let url = await gp.osmurl.get();
   let ol = await import(url + config.OSM_LIB);
   if (config.DEBUG) window['ol'] = ol;
@@ -50,7 +50,6 @@ export class OSM {
     this.ol = await importOpenLayersLib();
     let ol = this.ol;
 
-    let gp = await import('./gp');
     let url = await gp.osmurl.get();
     dom.loadStyles(url + config.OSM_CSS);
 
@@ -124,10 +123,12 @@ export class OSM {
     this.map.getView().fit(extent);
   }
 
-  addMarker({ id = '', lat, lon, opacity = 1 }): Marker {
+  async addMarker({ id = '', lat, lon, opacity = 1 }) {
     let ol = this.ol;
     id = id || Math.random().toString(16).slice(2);
     log.i(`marker: id=${id}, lat=${lat}, lon=${lon}`);
+    let iconSize = config.MARKER_ICON_SIZE;
+    let mSize = await gp.mapMarkerSize.get();
 
     let layer = new ol.layer.Vector({
       myKey: id,
@@ -143,8 +144,8 @@ export class OSM {
         image: new ol.style.Icon({
           opacity,
           src: config.MARKER_ICON_URL,
-          size: [config.MARKER_ICON_SIZE, config.MARKER_ICON_SIZE],
-          scale: config.MARKER_ICON_SCALE,
+          size: [iconSize, iconSize],
+          scale: mSize / iconSize,
         })
       }),
     });

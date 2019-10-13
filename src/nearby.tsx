@@ -9,6 +9,7 @@ import { getUserInfo } from './ucache';
 import * as user from './user';
 import { OSM } from './osm';
 import * as tts from './timestr';
+import * as gp from './gp';
 
 const log = new TaggedLogger('page.visitors');
 
@@ -71,7 +72,7 @@ async function initVMap({ lat, lon }) {
   log.i('Rendering map.');
   try {
     let osm = new OSM(dom.id.vplaceMap.id);
-    let s = conf.MAP_BOX_SIZE;
+    let s = conf.MAP_1M * await gp.mapBoxSize.get();
     await osm.render({
       min: { lat: lat - s, lon: lon - s },
       max: { lat: lat + s, lon: lon + s },

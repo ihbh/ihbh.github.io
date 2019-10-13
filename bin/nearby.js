@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", "./react", "./rpc", "./ucache", "./user", "./osm", "./timestr"], function (require, exports, conf, dom, loc, log_1, qargs, react_1, rpc, ucache_1, user, osm_1, tts) {
+define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", "./react", "./rpc", "./ucache", "./user", "./osm", "./timestr", "./gp"], function (require, exports, conf, dom, loc, log_1, qargs, react_1, rpc, ucache_1, user, osm_1, tts, gp) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('page.visitors');
@@ -51,7 +51,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
         log.i('Rendering map.');
         try {
             let osm = new osm_1.OSM(dom.id.vplaceMap.id);
-            let s = conf.MAP_BOX_SIZE;
+            let s = conf.MAP_1M * await gp.mapBoxSize.get();
             await osm.render({
                 min: { lat: lat - s, lon: lon - s },
                 max: { lat: lat + s, lon: lon + s },

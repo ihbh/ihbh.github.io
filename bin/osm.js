@@ -1,11 +1,10 @@
-define(["require", "exports", "./dom", "./log", "./config"], function (require, exports, dom, log_1, config) {
+define(["require", "exports", "./dom", "./log", "./config", "./gp"], function (require, exports, dom, log_1, config, gp) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('osm');
     async function importOpenLayersLib() {
-        let gp = await new Promise((resolve_1, reject_1) => { require(['./gp'], resolve_1, reject_1); });
         let url = await gp.osmurl.get();
-        let ol = await new Promise((resolve_2, reject_2) => { require([url + config.OSM_LIB], resolve_2, reject_2); });
+        let ol = await new Promise((resolve_1, reject_1) => { require([url + config.OSM_LIB], resolve_1, reject_1); });
         if (config.DEBUG)
             window['ol'] = ol;
         return ol;
@@ -22,7 +21,6 @@ define(["require", "exports", "./dom", "./log", "./config"], function (require, 
             log.i('Rendering OSM in #' + this.mapid, JSON.stringify(bbox));
             this.ol = await importOpenLayersLib();
             let ol = this.ol;
-            let gp = await new Promise((resolve_3, reject_3) => { require(['./gp'], resolve_3, reject_3); });
             let url = await gp.osmurl.get();
             dom.loadStyles(url + config.OSM_CSS);
             this.map = new ol.Map({
@@ -84,10 +82,12 @@ define(["require", "exports", "./dom", "./log", "./config"], function (require, 
             this.map.getView().setCenter(ol.proj.fromLonLat([clon, clat]));
             this.map.getView().fit(extent);
         }
-        addMarker({ id = '', lat, lon, opacity = 1 }) {
+        async addMarker({ id = '', lat, lon, opacity = 1 }) {
             let ol = this.ol;
             id = id || Math.random().toString(16).slice(2);
             log.i(`marker: id=${id}, lat=${lat}, lon=${lon}`);
+            let iconSize = config.MARKER_ICON_SIZE;
+            let mSize = await gp.mapMarkerSize.get();
             let layer = new ol.layer.Vector({
                 myKey: id,
                 source: new ol.source.Vector({
@@ -101,8 +101,8 @@ define(["require", "exports", "./dom", "./log", "./config"], function (require, 
                     image: new ol.style.Icon({
                         opacity,
                         src: config.MARKER_ICON_URL,
-                        size: [config.MARKER_ICON_SIZE, config.MARKER_ICON_SIZE],
-                        scale: config.MARKER_ICON_SCALE,
+                        size: [iconSize, iconSize],
+                        scale: mSize / iconSize,
                     })
                 }),
             });

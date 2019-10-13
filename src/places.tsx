@@ -4,6 +4,7 @@ import * as loc from './loc';
 import { TaggedLogger } from './log';
 import { BBox, OSM } from './osm';
 import * as qargs from './qargs';
+import * as gp from './gp';
 
 const log = new TaggedLogger('places');
 
@@ -35,7 +36,7 @@ async function loadMap() {
   if (!places.length)
     throw new Error('Nothing to render: no places visited.');
 
-  let bbox = getBBox(places);
+  let bbox = await getBBox(places);
   let osm = new OSM(dom.id.mapAll.id);
   if (conf.DEBUG)
     osm.onaddmarker = pos => addMarkerAt(pos);
@@ -50,7 +51,7 @@ async function loadMap() {
     // tmax -> 1, tmin -> 1/e = 0.37
     let diff = tmax - +time;
     let opacity = Math.exp(-diff / (tmax - tmin));
-    let marker = osm.addMarker({ id, lat, lon, opacity });
+    let marker = await osm.addMarker({ id, lat, lon, opacity });
     marker.onclick = () => handleClick(id);
   }
 }
@@ -66,7 +67,7 @@ function handleClick(id) {
   }, conf.PLACE_CLICK_TIMEOUT);
 }
 
-function getBBox(places: loc.Place[]): BBox {
+async function getBBox(places: loc.Place[]) {
   let bbox: BBox = {
     min: { lat: +Infinity, lon: +Infinity },
     max: { lat: -Infinity, lon: -Infinity },
@@ -79,10 +80,12 @@ function getBBox(places: loc.Place[]): BBox {
     bbox.max.lon = Math.max(bbox.max.lon, lon);
   }
 
-  bbox.min.lat -= conf.MAP_BOX_SIZE;
-  bbox.min.lon -= conf.MAP_BOX_SIZE;
-  bbox.max.lat += conf.MAP_BOX_SIZE;
-  bbox.max.lon += conf.MAP_BOX_SIZE;
+  let size = conf.MAP_1M * await gp.mapBoxSize.get();
+
+  bbox.min.lat -= size;
+  bbox.min.lon -= size;
+  bbox.max.lat += size;
+  bbox.max.lon += size;
 
   return bbox;
 }
