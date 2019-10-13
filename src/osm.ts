@@ -24,8 +24,10 @@ export interface Marker {
 }
 
 async function importOpenLayersLib() {
-  let ol = await import(config.OSM_LIB);
-  window['ol'] = ol;
+  let gp = await import('./gp');
+  let url = await gp.osmurl.get();
+  let ol = await import(url + config.OSM_LIB);
+  if (config.DEBUG) window['ol'] = ol;
   return ol;
 }
 
@@ -48,7 +50,9 @@ export class OSM {
     this.ol = await importOpenLayersLib();
     let ol = this.ol;
 
-    dom.loadStyles(config.OSM_CSS);
+    let gp = await import('./gp');
+    let url = await gp.osmurl.get();
+    dom.loadStyles(url + config.OSM_CSS);
 
     this.map = new ol.Map({
       target: this.mapid,

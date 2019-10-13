@@ -265,9 +265,13 @@ function generateRequestId() {
   return id.slice(-8);
 }
 
-let rpcurl = new AsyncProp<string>(() => {
-  let url = qargs.get('rpc')
-    || conf.DEFAULT_RPC_URL;
+let rpcurl = new AsyncProp<string>(async () => {  
+  let url = qargs.get('rpc');
+
+  if (!url) {
+    let gp = await import('./gp');
+    url = await gp.rpcurl.get();
+  }
 
   if (url.indexOf('://') < 0) {
     let scheme = conf.DEBUG ? 'http' : 'https';

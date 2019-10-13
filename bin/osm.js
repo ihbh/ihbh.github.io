@@ -3,8 +3,11 @@ define(["require", "exports", "./dom", "./log", "./config"], function (require, 
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('osm');
     async function importOpenLayersLib() {
-        let ol = await new Promise((resolve_1, reject_1) => { require([config.OSM_LIB], resolve_1, reject_1); });
-        window['ol'] = ol;
+        let gp = await new Promise((resolve_1, reject_1) => { require(['./gp'], resolve_1, reject_1); });
+        let url = await gp.osmurl.get();
+        let ol = await new Promise((resolve_2, reject_2) => { require([url + config.OSM_LIB], resolve_2, reject_2); });
+        if (config.DEBUG)
+            window['ol'] = ol;
         return ol;
     }
     class OSM {
@@ -19,7 +22,9 @@ define(["require", "exports", "./dom", "./log", "./config"], function (require, 
             log.i('Rendering OSM in #' + this.mapid, JSON.stringify(bbox));
             this.ol = await importOpenLayersLib();
             let ol = this.ol;
-            dom.loadStyles(config.OSM_CSS);
+            let gp = await new Promise((resolve_3, reject_3) => { require(['./gp'], resolve_3, reject_3); });
+            let url = await gp.osmurl.get();
+            dom.loadStyles(url + config.OSM_CSS);
             this.map = new ol.Map({
                 target: this.mapid,
                 layers: [

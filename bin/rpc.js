@@ -144,9 +144,12 @@ define(["require", "exports", "./config", "./log", "./prop", "./qargs"], functio
             id += Math.random().toString(16).slice(2);
         return id.slice(-8);
     }
-    let rpcurl = new prop_1.AsyncProp(() => {
-        let url = qargs.get('rpc')
-            || conf.DEFAULT_RPC_URL;
+    let rpcurl = new prop_1.AsyncProp(async () => {
+        let url = qargs.get('rpc');
+        if (!url) {
+            let gp = await new Promise((resolve_2, reject_2) => { require(['./gp'], resolve_2, reject_2); });
+            url = await gp.rpcurl.get();
+        }
         if (url.indexOf('://') < 0) {
             let scheme = conf.DEBUG ? 'http' : 'https';
             url = scheme + '://' + url;

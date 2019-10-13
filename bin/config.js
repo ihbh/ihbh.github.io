@@ -17,9 +17,8 @@ define(["require", "exports"], function (require, exports) {
     exports.GPS_DIGITS = 7;
     exports.MAP_BOX_SIZE = 250 * exports.MAP_1M;
     exports.PLACE_CLICK_TIMEOUT = 150; // ms
-    exports.OSM_URL = 'https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0';
-    exports.OSM_LIB = `${exports.OSM_URL}/build/ol.js`;
-    exports.OSM_CSS = `${exports.OSM_URL}/css/ol.css`;
+    exports.OSM_LIB = `/build/ol.js`;
+    exports.OSM_CSS = `/css/ol.css`;
     exports.RX_USERNAME = /^[a-z]{3,15}$/i;
     exports.RX_USERID = /^[a-f\d]{16}$/i;
     exports.PHOTO_SIZE = 64;
@@ -27,7 +26,6 @@ define(["require", "exports"], function (require, exports) {
     exports.MARKER_ICON_URL = '/icons/marker.png';
     exports.MARKER_ICON_SIZE = 64;
     exports.MARKER_ICON_SCALE = 0.5;
-    exports.DEFAULT_RPC_URL = 'https://ihbh.org:3921';
     exports.DEFAULT_RPC_PORT = 3921;
     exports.RPC_BATCH_DELAY = 150; // ms
     exports.RPC_MAX_BATCH_SIZE = 1024; // bytes

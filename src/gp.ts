@@ -34,5 +34,21 @@ export const gpstimeout = vfsconf.register({
   units: 'ms',
   test: x => x >= 0 && Number.isFinite(x) && Math.round(x) == x,
   path: '/ui/gps-timeout',
-  description: 'The main map page monitors GPS for some time to get more accurate coordinates. Once the timeout expires, it stops monitoring to save battery.',
+  description: [
+    'The main map page monitors GPS for some time to get',
+    'more accurate coordinates. Once the timeout expires,',
+    'it stops monitoring to save battery.',
+  ].join(' '),
+});
+
+export const rpcurl = vfsconf.register({
+  value: 'https://ihbh.org:3921',
+  test: x => typeof x == 'string',
+  path: '/rpc/url',
+});
+
+export const osmurl = vfsconf.register({
+  value: 'https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0',
+  test: x => typeof x == 'string',
+  path: '/osm/url',
 });
