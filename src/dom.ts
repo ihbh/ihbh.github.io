@@ -24,7 +24,6 @@ export const id = {
   get regAbout() { return $('#p-profile > .about') as HTMLDivElement; },
   get regReason() { return $('#p-profile > .reason') as HTMLDivElement; },
   get regDetails() { return $('#p-profile .details') as HTMLTableElement; },
-  get regChatLink() { return $('#chat-link') as HTMLButtonElement; },
   get regPhoto() { return $('#photo') as HTMLImageElement; },
   get regName() { return $('#reg-name') as HTMLSpanElement; },
   get regReport() { return $('#p-profile .report') as HTMLButtonElement; },

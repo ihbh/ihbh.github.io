@@ -82,7 +82,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
     function makeUserCard(info) {
         let href = '?page=chat&uid=' + info.uid;
         return react_1.default.createElement("a", { href: href },
-            react_1.default.createElement("img", { src: info.photo || conf.NULL_IMG }),
+            react_1.default.createElement("img", { src: info.photo || conf.NOUSERPIC }),
             react_1.default.createElement("span", null, info.name || info.uid));
     }
     async function getPeopleNearby({ lat, lon }) {

@@ -52,7 +52,7 @@ export async function init() {
 function renderUserCard(info: UserInfo) {
   let href = '?page=chat&uid=' + info.uid;
   return <a href={href}>
-    <img src={info.photo || conf.NULL_IMG} />
+    <img src={info.photo || conf.NOUSERPIC} />
     <span>{info.name || info.uid}</span>
   </a>;
 }

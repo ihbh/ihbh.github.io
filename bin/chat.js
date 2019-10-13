@@ -81,10 +81,10 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
     async function getRemoteUserInfo() {
         dom.id.chatUserHref.href = '?page=profile&uid=' + remoteUid;
         dom.id.chatUserName.textContent = remoteUid;
-        dom.id.chatUserIcon.src = conf.NULL_IMG;
+        dom.id.chatUserIcon.src = conf.NOUSERPIC;
         let info = await ucache.getUserInfo(remoteUid);
         dom.id.chatUserName.textContent = info.name || info.uid;
-        dom.id.chatUserIcon.src = info.photo || conf.NULL_IMG;
+        dom.id.chatUserIcon.src = info.photo || conf.NOUSERPIC;
     }
     async function fetchAndRenderMessages() {
         log.i('Syncing chat messages.');

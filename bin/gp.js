@@ -11,8 +11,9 @@ define(["require", "exports", "./config", "./log", "./vfs-conf", "./vfs-prop"], 
     exports.uid = prop('shared.profile.id');
     exports.userinfo = prop('shared.profile.info');
     exports.username = prop('shared.profile.name');
-    exports.userimg = prop('shared.profile.img'); // data:image/jpeg;base64,...
+    exports.userimg = prop('shared.profile.img');
     exports.pubkey = prop('shared.profile.pubkey');
+    exports.hdimg = prop('local.profile.hdimg');
     exports.keyseed = prop('local.keys.keyseed');
     exports.privkey = prop('local.keys.privkey');
     exports.chats = prop('local.chat.drafts', {});

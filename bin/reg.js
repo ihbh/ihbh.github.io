@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./gp", "./log"], function (require, exports, conf, gp, log_1) {
+define(["require", "exports", "./config", "./gp", "./log", "./buffer"], function (require, exports, conf, gp, log_1, buffer_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const IMG_MAXSIZE = 4096;
@@ -15,9 +15,14 @@ define(["require", "exports", "./config", "./gp", "./log"], function (require, e
             input.onchange = async () => {
                 try {
                     log.i('Selected files:', input.files.length);
+                    if (input.files.length != 1)
+                        throw new Error('Only 1 file must be selected.');
                     let file = input.files[0];
                     if (!file)
                         throw new Error('No file selected.');
+                    if (conf.DEBUG)
+                        window['file'] = file;
+                    await saveOriginalImage(file);
                     let url = await getJpegFromFile(file);
                     resolve(url);
                 }
@@ -28,6 +33,12 @@ define(["require", "exports", "./config", "./gp", "./log"], function (require, e
         });
     }
     exports.selectPhoto = selectPhoto;
+    async function saveOriginalImage(file) {
+        let buffer = await file.arrayBuffer();
+        log.i('Saving original image:', buffer.byteLength, 'bytes');
+        let hex = new buffer_1.default(buffer).toString('hex');
+        await gp.hdimg.set(hex);
+    }
     async function getJpegFromFile(file) {
         log.i('selected file:', file.type, file.size, 'bytes');
         let bitmap = await createImageBitmap(file);
@@ -45,10 +56,9 @@ define(["require", "exports", "./config", "./gp", "./log"], function (require, e
         context.drawImage(bitmap, dx, dy, wh, wh);
         let blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg'));
         let blobUrl = URL.createObjectURL(blob);
-        log.i('jpeg blob url:', blobUrl);
+        log.i('blob url:', blobUrl);
         return blobUrl;
     }
-    exports.getJpegFromFile = getJpegFromFile;
     function getResizedPhoto(img) {
         if (!img.src)
             return null;

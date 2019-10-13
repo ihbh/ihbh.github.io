@@ -10,11 +10,19 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
         addEventListeners();
         showUserInfo();
         initChatLink();
+        addUnregTag();
     }
     exports.init = init;
     function initChatLink() {
-        dom.id.regChatLink.onclick =
-            () => location.href = '?page=chat&uid=' + uid;
+        if (uid) {
+            dom.id.regPhoto.onclick =
+                () => location.href = '?page=chat&uid=' + uid;
+        }
+    }
+    async function addUnregTag() {
+        let reg = await usr.isRegistered();
+        if (!reg)
+            document.body.classList.add('unreg');
     }
     function addSelfTag() {
         if (uid)
@@ -38,12 +46,8 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
             dom.id.regPhoto.src = imguri;
     }
     async function showUserId() {
-        let id = uid;
-        if (!id) {
-            let user = await new Promise((resolve_1, reject_1) => { require(['./user'], resolve_1, reject_1); });
-            id = await user.uid.get();
-        }
-        setUserProp('uid', id);
+        if (uid)
+            setUserProp('uid', uid);
     }
     function setUserProp(name, text) {
         let table = dom.id.regDetails;
@@ -84,7 +88,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
             };
         }
         else {
-            let reg = await new Promise((resolve_2, reject_2) => { require(['./reg'], resolve_2, reject_2); });
+            let reg = await new Promise((resolve_1, reject_1) => { require(['./reg'], resolve_1, reject_1); });
             dom.id.regPhoto.onclick = async () => {
                 log.i('Clicked the self img.');
                 let url = await reg.selectPhoto();

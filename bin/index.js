@@ -1,4 +1,4 @@
-define(["require", "exports", "./dbg", "./dom", "./log", "./gp", "./page", "./pwa"], function (require, exports, dbg, dom, log_1, gp, page, pwa) {
+define(["require", "exports", "./dbg", "./dom", "./log", "./page", "./pwa", "./usr"], function (require, exports, dbg, dom, log_1, page, pwa, usr_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('index');
@@ -7,9 +7,9 @@ define(["require", "exports", "./dbg", "./dom", "./log", "./gp", "./page", "./pw
             log.w('dbg.init() failed:', err);
         });
         await pwa.init();
-        let isUserRegistered = !!await gp.username.get();
-        log.i('user registered?', isUserRegistered);
-        if (!isUserRegistered) {
+        let reg = usr_1.isRegistered();
+        log.i('user registered?', reg);
+        if (!reg) {
             if (page.get() == 'profile')
                 await page.init();
             else

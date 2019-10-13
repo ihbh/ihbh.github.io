@@ -93,6 +93,10 @@ body[page="map"] #darkmode {
   display: inherit;
 }
 
+body.unreg #darkmode {
+  display: inherit;
+}
+
 /** The "back home" link. */
 
 #home-link {
@@ -101,6 +105,10 @@ body[page="map"] #darkmode {
 }
 
 body[page="map"] #home-link {
+  display: none;
+}
+
+body.unreg #home-link {
   display: none;
 }
 
@@ -172,6 +180,7 @@ body .page .ol-attribution * {
 #p-profile .header {
   display: flex;
   align-items: center;
+  position: relative;
   padding: 0.5em;
   background: #cfc;
   border-bottom: 0.25em solid #8c8;
@@ -181,9 +190,7 @@ body .page .ol-attribution * {
   border-radius: 50%;
   width: 64px;
   height: 64px;
-}
-
-#p-profile.self #photo {
+  object-fit: cover;
   cursor: pointer;
 }
 
@@ -193,6 +200,12 @@ body .page .ol-attribution * {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+#p-profile.self #reg-name:empty::before {
+  content: 'Your name';
+  font-style: italic;
+  color: #ccc;
 }
 
 #p-profile button {
@@ -207,11 +220,11 @@ body .page .ol-attribution * {
 
 #p-profile .self-tag {
   display: none;
-  background: #060;
-}
-
-#p-profile #chat-link {
-  background: #860;
+  color: #888;
+  font-size: 8pt;
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
 
 #p-profile .report {
@@ -236,10 +249,6 @@ body .page .ol-attribution * {
 
 #p-profile.self .self-tag {
   display: inherit;
-}
-
-#p-profile.self #chat-link {
-  display: none;
 }
 
 #p-profile #reg-name:empty::before {
@@ -472,6 +481,7 @@ body .page .ol-attribution * {
   width: 64px;
   height: 64px;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .user-cards span {

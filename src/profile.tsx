@@ -17,12 +17,19 @@ export async function init() {
   addEventListeners();
   showUserInfo();
   initChatLink();
+  addUnregTag();
 }
 
 function initChatLink() {
-  dom.id.regChatLink.onclick =
-    () => location.href = '?page=chat&uid=' + uid;
+  if (uid) {
+    dom.id.regPhoto.onclick =
+      () => location.href = '?page=chat&uid=' + uid;
+  }
+}
 
+async function addUnregTag() {
+  let reg = await usr.isRegistered();
+  if (!reg) document.body.classList.add('unreg');
 }
 
 function addSelfTag() {
@@ -50,12 +57,7 @@ async function showUserInfo() {
 }
 
 async function showUserId() {
-  let id = uid;
-  if (!id) {
-    let user = await import('./user');
-    id = await user.uid.get();
-  }
-  setUserProp('uid', id);
+  if (uid) setUserProp('uid', uid);
 }
 
 function setUserProp(name: string, text: string) {

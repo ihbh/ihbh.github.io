@@ -15,9 +15,10 @@ function prop<T>(path: string, defval: T = null) {
 export const uid = prop<string>('shared.profile.id');
 export const userinfo = prop<string>('shared.profile.info');
 export const username = prop<string>('shared.profile.name');
-export const userimg = prop<string>('shared.profile.img'); // data:image/jpeg;base64,...
+export const userimg = prop<string>('shared.profile.img');
 export const pubkey = prop<string>('shared.profile.pubkey');
 
+export const hdimg = prop<string>('local.profile.hdimg');
 export const keyseed = prop<string>('local.keys.keyseed');
 export const privkey = prop<string>('local.keys.privkey');
 export const chats = prop<any>('local.chat.drafts', {});

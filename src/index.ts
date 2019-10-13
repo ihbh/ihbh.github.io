@@ -1,9 +1,9 @@
 import * as dbg from './dbg';
 import * as dom from './dom';
 import { TaggedLogger } from './log';
-import * as gp from './gp';
 import * as page from './page';
 import * as pwa from './pwa';
+import { isRegistered } from './usr';
 
 const log = new TaggedLogger('index');
 
@@ -14,10 +14,10 @@ dom.whenLoaded().then(async () => {
   
   await pwa.init();
 
-  let isUserRegistered = !!await gp.username.get();
-  log.i('user registered?', isUserRegistered);
+  let reg = isRegistered();
+  log.i('user registered?', reg);
 
-  if (!isUserRegistered) {
+  if (!reg) {
     if (page.get() == 'profile')
       await page.init();
     else

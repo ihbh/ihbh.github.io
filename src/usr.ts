@@ -8,6 +8,12 @@ function verifyUserId(uid: string) {
     throw new Error('Invalid user id: ' + uid);
 }
 
+export async function isRegistered() {
+  let gp = await import('./gp');
+  let name = await gp.username.get();
+  return !!name;
+}
+
 export async function getPhotoUri(uid = '') {
   if (uid) {
     verifyUserId(uid);

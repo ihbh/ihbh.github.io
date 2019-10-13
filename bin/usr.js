@@ -6,16 +6,22 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
         if (!conf.RX_USERID.test(uid))
             throw new Error('Invalid user id: ' + uid);
     }
+    async function isRegistered() {
+        let gp = await new Promise((resolve_1, reject_1) => { require(['./gp'], resolve_1, reject_1); });
+        let name = await gp.username.get();
+        return !!name;
+    }
+    exports.isRegistered = isRegistered;
     async function getPhotoUri(uid = '') {
         if (uid) {
             verifyUserId(uid);
-            let ucache = await new Promise((resolve_1, reject_1) => { require(['./ucache'], resolve_1, reject_1); });
+            let ucache = await new Promise((resolve_2, reject_2) => { require(['./ucache'], resolve_2, reject_2); });
             let info = await ucache.getUserInfo(uid);
             return info.photo;
         }
         else {
             let time = Date.now();
-            let gp = await new Promise((resolve_2, reject_2) => { require(['./gp'], resolve_2, reject_2); });
+            let gp = await new Promise((resolve_3, reject_3) => { require(['./gp'], resolve_3, reject_3); });
             let datauri = await gp.userimg.get();
             if (!datauri)
                 return null;
@@ -29,24 +35,24 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
     async function getDisplayName(uid = '') {
         if (uid) {
             verifyUserId(uid);
-            let ucache = await new Promise((resolve_3, reject_3) => { require(['./ucache'], resolve_3, reject_3); });
+            let ucache = await new Promise((resolve_4, reject_4) => { require(['./ucache'], resolve_4, reject_4); });
             let info = await ucache.getUserInfo(uid);
             return info.name;
         }
         else {
-            let gp = await new Promise((resolve_4, reject_4) => { require(['./gp'], resolve_4, reject_4); });
+            let gp = await new Promise((resolve_5, reject_5) => { require(['./gp'], resolve_5, reject_5); });
             return gp.username.get();
         }
     }
     exports.getDisplayName = getDisplayName;
     async function getAbout(uid = '') {
         if (uid) {
-            let ucache = await new Promise((resolve_5, reject_5) => { require(['./ucache'], resolve_5, reject_5); });
+            let ucache = await new Promise((resolve_6, reject_6) => { require(['./ucache'], resolve_6, reject_6); });
             let info = await ucache.getUserInfo(uid);
             return info.about;
         }
         else {
-            let gp = await new Promise((resolve_6, reject_6) => { require(['./gp'], resolve_6, reject_6); });
+            let gp = await new Promise((resolve_7, reject_7) => { require(['./gp'], resolve_7, reject_7); });
             return gp.userinfo.get();
         }
     }
@@ -55,14 +61,14 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
         if (!text)
             throw new Error('Abuse report cannot be empty.');
         verifyUserId(uid);
-        let vfs = await new Promise((resolve_7, reject_7) => { require(['./vfs'], resolve_7, reject_7); });
+        let vfs = await new Promise((resolve_8, reject_8) => { require(['./vfs'], resolve_8, reject_8); });
         let dir = conf.REPORTS_DIR + '/' + uid;
         await vfs.root.set(dir, text);
     }
     exports.setAbuseReport = setAbuseReport;
     async function getAbuseReport(uid) {
         verifyUserId(uid);
-        let vfs = await new Promise((resolve_8, reject_8) => { require(['./vfs'], resolve_8, reject_8); });
+        let vfs = await new Promise((resolve_9, reject_9) => { require(['./vfs'], resolve_9, reject_9); });
         let dir = conf.REPORTS_DIR + '/' + uid;
         let text = await vfs.root.get(dir);
         return text;

@@ -1,6 +1,13 @@
 import * as conf from "./config";
 import * as gp from './gp';
 import { TaggedLogger } from "./log";
+import Buffer from "./buffer";
+
+declare global {
+  interface File {
+    arrayBuffer(): Promise<ArrayBuffer>;
+  }
+}
 
 const IMG_MAXSIZE = 4096;
 const IMG_MIME = 'image/jpeg';
@@ -24,8 +31,12 @@ export async function selectPhoto(): Promise<string> {
     input.onchange = async () => {
       try {
         log.i('Selected files:', input.files.length);
+        if (input.files.length != 1)
+          throw new Error('Only 1 file must be selected.');
         let file = input.files[0];
         if (!file) throw new Error('No file selected.');
+        if (conf.DEBUG) window['file'] = file;
+        await saveOriginalImage(file);
         let url = await getJpegFromFile(file);
         resolve(url);
       } catch (err) {
@@ -35,7 +46,14 @@ export async function selectPhoto(): Promise<string> {
   });
 }
 
-export async function getJpegFromFile(file: File) {
+async function saveOriginalImage(file: File) {
+  let buffer = await file.arrayBuffer();
+  log.i('Saving original image:', buffer.byteLength, 'bytes');
+  let hex = new Buffer(buffer).toString('hex');
+  await gp.hdimg.set(hex);
+}
+
+async function getJpegFromFile(file: File) {
   log.i('selected file:', file.type, file.size, 'bytes');
   let bitmap = await createImageBitmap(file);
   log.i('bitmap:', bitmap);
@@ -53,7 +71,7 @@ export async function getJpegFromFile(file: File) {
   let blob = await new Promise((resolve) =>
     canvas.toBlob(resolve, 'image/jpeg'));
   let blobUrl = URL.createObjectURL(blob);
-  log.i('jpeg blob url:', blobUrl);
+  log.i('blob url:', blobUrl);
   return blobUrl;
 }
 
