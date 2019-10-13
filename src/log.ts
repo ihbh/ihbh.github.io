@@ -1,32 +1,42 @@
 import * as logdb from './logdb';
+import * as conf from './config';
+
+const cname = {
+  D: 'debug',
+  I: 'info',
+  W: 'warn',
+  E: 'error',
+};
+
+function cleanup(x) {
+  if (typeof x == 'string' && x.length > conf.LOG_MAXLEN)
+    return x.slice(0, conf.LOG_MAXLEN) + '...(' + x.length + ' chars)';
+  return x;
+}
+
+function log(sev: string, tag: string, args: any[]) {
+  args = args.map(cleanup);
+  console[cname[sev]](sev, '[' + tag + ']', ...args);
+  if (sev != 'D')
+    logdb.writeLog(sev, tag, args);
+}
 
 export class TaggedLogger {
-  readonly tag: string;
-
-  constructor(tag: string) {
-    this.tag = '[' + tag + ']';
-  }
+  constructor(public tag: string) { }
 
   d(...args) {
-    console.debug('D', this.tag, ...args);
+    log('D', this.tag, args);
   }
 
   i(...args) {
-    console.info('I', this.tag, ...args);
-    this.save('I', args);
+    log('I', this.tag, args);
   }
 
   w(...args) {
-    console.warn('W', this.tag, ...args);
-    this.save('W', args);
+    log('W', this.tag, args);
   }
 
   e(...args) {
-    console.error('E', this.tag, ...args);
-    this.save('E', args);
-  }
-
-  private save(sev: string, args: any[]) {
-    logdb.writeLog(sev, this.tag, args);
+    log('E', this.tag, args);
   }
 }

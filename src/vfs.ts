@@ -9,6 +9,7 @@ const log = new TaggedLogger('vfs');
 
 const PATH_REGEX = /^(\/[\w-_%]+)+\/?$/;
 const ROOT_REGEX = /^\/[\w-]+/;
+const STAT_REGEX = /^\w+$/;
 
 export const abspath = (path: string) =>
   path.replace(/^~/, conf.SHARED_DIR);
@@ -43,6 +44,12 @@ export const root: VFS = {
   async get(path: string): Promise<any> {
     if (path.endsWith('/'))
       return this.dir(path.slice(0, -1));
+    let i = path.indexOf(':');
+    if (i >= 0) {
+      let fpath = path.slice(0, i);
+      let sprop = path.slice(i + 1);
+      return this.stat(fpath, sprop);
+    }
     return invokeHandler('get', path);
   },
 
@@ -63,11 +70,17 @@ export const root: VFS = {
     let paths = await this.find(path);
     let ps = paths.map(filepath => this.rm(filepath));
     await Promise.all(ps);
+  },
+
+  async stat(path: string, prop: string) {
+    if (!STAT_REGEX.test(prop))
+      throw new Error('Bad vfs stat: ' + prop);
+    return invokeHandler('stat', path, prop);
   }
 };
 
 async function invokeHandler(method: keyof VFS, path: string, ...args) {
-  log.d(method + '()', path);
+  log.d(method, path, ...args);
   let time = Date.now();
   try {
     let [phandler, rempath, rootdir] = parsePath(path);
@@ -75,8 +88,8 @@ async function invokeHandler(method: keyof VFS, path: string, ...args) {
     let fn = handler[method] as Function;
     if (!fn) throw new Error(`${rootdir} doesn't support '${method}'`);
     let result = await fn.call(handler, rempath, ...args);
-    if (method == 'get')
-      log.d(method, path, result);
+    if (result !== undefined)
+      log.d(method, path, '->', JSON.stringify(result));
     return result;
   } catch (err) {
     throw new DerivedError(

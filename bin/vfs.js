@@ -4,6 +4,7 @@ define(["require", "exports", "./config", "./error", "./log", "./vfs-roots"], fu
     const log = new log_1.TaggedLogger('vfs');
     const PATH_REGEX = /^(\/[\w-_%]+)+\/?$/;
     const ROOT_REGEX = /^\/[\w-]+/;
+    const STAT_REGEX = /^\w+$/;
     exports.abspath = (path) => path.replace(/^~/, conf.SHARED_DIR);
     exports.root = {
         async find(path) {
@@ -32,6 +33,12 @@ define(["require", "exports", "./config", "./error", "./log", "./vfs-roots"], fu
         async get(path) {
             if (path.endsWith('/'))
                 return this.dir(path.slice(0, -1));
+            let i = path.indexOf(':');
+            if (i >= 0) {
+                let fpath = path.slice(0, i);
+                let sprop = path.slice(i + 1);
+                return this.stat(fpath, sprop);
+            }
             return invokeHandler('get', path);
         },
         async set(path, json) {
@@ -49,10 +56,15 @@ define(["require", "exports", "./config", "./error", "./log", "./vfs-roots"], fu
             let paths = await this.find(path);
             let ps = paths.map(filepath => this.rm(filepath));
             await Promise.all(ps);
+        },
+        async stat(path, prop) {
+            if (!STAT_REGEX.test(prop))
+                throw new Error('Bad vfs stat: ' + prop);
+            return invokeHandler('stat', path, prop);
         }
     };
     async function invokeHandler(method, path, ...args) {
-        log.d(method + '()', path);
+        log.d(method, path, ...args);
         let time = Date.now();
         try {
             let [phandler, rempath, rootdir] = parsePath(path);
@@ -61,8 +73,8 @@ define(["require", "exports", "./config", "./error", "./log", "./vfs-roots"], fu
             if (!fn)
                 throw new Error(`${rootdir} doesn't support '${method}'`);
             let result = await fn.call(handler, rempath, ...args);
-            if (method == 'get')
-                log.d(method, path, result);
+            if (result !== undefined)
+                log.d(method, path, '->', JSON.stringify(result));
             return result;
         }
         catch (err) {

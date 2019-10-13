@@ -1,27 +1,38 @@
-define(["require", "exports", "./logdb"], function (require, exports, logdb) {
+define(["require", "exports", "./logdb", "./config"], function (require, exports, logdb, conf) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const cname = {
+        D: 'debug',
+        I: 'info',
+        W: 'warn',
+        E: 'error',
+    };
+    function cleanup(x) {
+        if (typeof x == 'string' && x.length > conf.LOG_MAXLEN)
+            return x.slice(0, conf.LOG_MAXLEN) + '...(' + x.length + ' chars)';
+        return x;
+    }
+    function log(sev, tag, args) {
+        args = args.map(cleanup);
+        console[cname[sev]](sev, '[' + tag + ']', ...args);
+        if (sev != 'D')
+            logdb.writeLog(sev, tag, args);
+    }
     class TaggedLogger {
         constructor(tag) {
-            this.tag = '[' + tag + ']';
+            this.tag = tag;
         }
         d(...args) {
-            console.debug('D', this.tag, ...args);
+            log('D', this.tag, args);
         }
         i(...args) {
-            console.info('I', this.tag, ...args);
-            this.save('I', args);
+            log('I', this.tag, args);
         }
         w(...args) {
-            console.warn('W', this.tag, ...args);
-            this.save('W', args);
+            log('W', this.tag, args);
         }
         e(...args) {
-            console.error('E', this.tag, ...args);
-            this.save('E', args);
-        }
-        save(sev, args) {
-            logdb.writeLog(sev, this.tag, args);
+            log('E', this.tag, args);
         }
     }
     exports.TaggedLogger = TaggedLogger;

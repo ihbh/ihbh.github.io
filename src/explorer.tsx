@@ -20,7 +20,7 @@ export async function init() {
   root.appendChild(
     <div class="path">
       {controls}
-      {path}
+      <span>{path}</span>
     </div>);
 
   addRmDirButton(controls);
@@ -130,38 +130,45 @@ async function renderAsDir(root: HTMLElement, dirPath: string, sfc: boolean, idi
   let tags = new Map<string, HTMLElement>();
 
   let ps = names.map(async name => {
-    let fullpath = encodeURIComponent(dirPath + '/' + name);
-    let href = `/?page=explorer&path=${fullpath}`;
+    let path = dirPath + '/' + name;
+    let href = `/?page=explorer&path=${encodeURIComponent(path)}`;
     if (sfc) href += '&sfc=1';
     if (idir) href += '&idir=' + idir;
     let nameTag = <a href={href}>{name}</a>;
     let dataTag: HTMLElement = null;
     let infoTag: HTMLElement = null;
+    let unitTag: HTMLElement = null;
 
     try {
       if (sfc) {
-        let data = await vfs.get(dirPath + '/' + name);
+        let data = await vfs.get(path);
         if (data !== null) {
           let json = JSON.stringify(data);
           dataTag = <i>{json}</i>;
           dataTag.setAttribute('spellcheck', 'false');
-          makeEditable(dataTag, dirPath + '/' + name);
+          makeEditable(dataTag, path);
         }
       }
     } catch { }
 
     try {
       if (idir) {
-        let ipath = idir + '/description' + dirPath + '/' + name;
-        let info = await vfs.get(ipath);
-        if (info) infoTag = <s>{info}</s>;
+        let description = await vfs.stat(path, 'description');
+        let units = await vfs.stat(path, 'units');
+        if (description)
+          infoTag = <s>{description}</s>;
+        if (units)
+          unitTag = <b>{units}</b>;
       }
     } catch { }
 
     tags.set(name,
       <div>
         {nameTag}
+        {dataTag ? ' = ' : null}
         {dataTag}
+        {unitTag ? ' ' : null}
+        {unitTag}
         {infoTag}
       </div>);
   });

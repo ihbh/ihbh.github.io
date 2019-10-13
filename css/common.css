@@ -586,21 +586,20 @@ body .page .ol-attribution * {
 /* ?page=explorer */
 
 #p-explorer * {
-  font-size: 10pt;
+  font-size: 12pt;
   font-family: monospace;
 }
 
 #p-explorer .path {
-  background: #000;
-  color: #fff;
-  padding: 1em;
+  background: #ccd;
+  color: #000;
+  padding: 0.5em;
   word-break: break-all;
-  border-bottom: 0.5em solid #800;
+  border-bottom: 0.25em solid #800;
 }
 
 #p-explorer .path .controls {
-  font-weight: bold;
-  color: #800;
+  color: #c00;
 }
 
 #p-explorer .path .controls span {
@@ -623,42 +622,39 @@ body .page .ol-attribution * {
 }
 
 #p-explorer .links>div {
-  background: #004;
-  color: #fff;
+  background: #ddd;
+  color: #000;
   word-break: break-all;
   text-decoration: none;
   padding: 0.5em;
   user-select: none;
 }
 
-#p-explorer .links>div a {
-  color: #fff;
+#p-explorer .links>div * {
   text-decoration: none;
+  font-style: normal;
 }
 
+/* prop name */
 #p-explorer .links:not(.sfc)>div a {
   display: block;
 }
 
+/* prop value */
 #p-explorer .links>div i {
-  color: #777;
-  text-decoration: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-weight: bold;
 }
 
-#p-explorer .links>div i::before {
-  content: ' = ';
+/* prop units */
+#p-explorer .links>div b {
+  color: #444;
 }
 
+/* prop description */
 #p-explorer .links>div s {
-  color: #ccc;
-  text-decoration: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: #444;
   display: block;
   margin-top: 0.5em;
-  font-size: 0.75em;
 }
 
 #p-explorer .data {

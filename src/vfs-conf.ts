@@ -16,7 +16,7 @@ const log = new TaggedLogger('vfs-conf');
 const props = new Map<string, ConfProp<any>>();
 
 export function register<T>(args: ConfProp<T>) {
-  log.d(args.path, '=', args);
+  log.d('register', args.path, ':', args.value);
   props.set(args.path, args);
   return vfsprop<T>(conf.CONF_VDIR + args.path);
 }
@@ -25,7 +25,7 @@ export function register<T>(args: ConfProp<T>) {
 const remap = (relpath: string) =>
   conf.CONF_SDIR + relpath;
 
-export const vfsdata = new class implements VFS {
+export default new class implements VFS {
   async dir(dir: string) {
     if (!dir.endsWith('/'))
       dir += '/';
@@ -54,22 +54,14 @@ export const vfsdata = new class implements VFS {
     if (!prop.test(data)) throw new Error('Invalid value.');
     return vfs.set(remap(path), data);
   }
-};
 
-export const vfsinfo = new class implements VFS {
-  async get(path: string) {
-    // /units/conf/ui/foo -> props.get("ui/foo").units
-    let [, tag, root, ...rest] = path.split('/');
-    if ('/' + root != conf.CONF_VDIR) {
-      log.w('Bad info path:', path);
-      return null;
-    }
-    let name = '/' + rest.join('/');
-    let prop = props.get(name);
+  async stat(path: string, tag: string) {
+    // /ui/foo:units -> props.get("ui/foo").units
+    let prop = props.get(path);
     if (!prop) {
       log.w('No such prop:', path);
       return null;
     }
     return prop[tag] || null;
   }
-}
+};

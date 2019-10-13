@@ -13,7 +13,7 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
         let controls = react_1.default.createElement("span", { class: "controls" });
         root.appendChild(react_1.default.createElement("div", { class: "path" },
             controls,
-            path));
+            react_1.default.createElement("span", null, path)));
         addRmDirButton(controls);
         renderAsFile(root, path)
             .catch(err => log.w('This is not a file:', err));
@@ -109,8 +109,8 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
             links.classList.add('sfc');
         let tags = new Map();
         let ps = names.map(async (name) => {
-            let fullpath = encodeURIComponent(dirPath + '/' + name);
-            let href = `/?page=explorer&path=${fullpath}`;
+            let path = dirPath + '/' + name;
+            let href = `/?page=explorer&path=${encodeURIComponent(path)}`;
             if (sfc)
                 href += '&sfc=1';
             if (idir)
@@ -118,30 +118,36 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
             let nameTag = react_1.default.createElement("a", { href: href }, name);
             let dataTag = null;
             let infoTag = null;
+            let unitTag = null;
             try {
                 if (sfc) {
-                    let data = await vfs_1.default.get(dirPath + '/' + name);
+                    let data = await vfs_1.default.get(path);
                     if (data !== null) {
                         let json = JSON.stringify(data);
                         dataTag = react_1.default.createElement("i", null, json);
                         dataTag.setAttribute('spellcheck', 'false');
-                        makeEditable(dataTag, dirPath + '/' + name);
+                        makeEditable(dataTag, path);
                     }
                 }
             }
             catch (_a) { }
             try {
                 if (idir) {
-                    let ipath = idir + '/description' + dirPath + '/' + name;
-                    let info = await vfs_1.default.get(ipath);
-                    if (info)
-                        infoTag = react_1.default.createElement("s", null, info);
+                    let description = await vfs_1.default.stat(path, 'description');
+                    let units = await vfs_1.default.stat(path, 'units');
+                    if (description)
+                        infoTag = react_1.default.createElement("s", null, description);
+                    if (units)
+                        unitTag = react_1.default.createElement("b", null, units);
                 }
             }
             catch (_b) { }
             tags.set(name, react_1.default.createElement("div", null,
                 nameTag,
+                dataTag ? ' = ' : null,
                 dataTag,
+                unitTag ? ' ' : null,
+                unitTag,
                 infoTag));
         });
         await Promise.all(ps);

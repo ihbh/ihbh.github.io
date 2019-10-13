@@ -4,14 +4,14 @@ define(["require", "exports", "./config", "./log", "./vfs", "./vfs-prop"], funct
     const log = new log_1.TaggedLogger('vfs-conf');
     const props = new Map();
     function register(args) {
-        log.d(args.path, '=', args);
+        log.d('register', args.path, ':', args.value);
         props.set(args.path, args);
         return vfs_prop_1.default(conf.CONF_VDIR + args.path);
     }
     exports.register = register;
     // /ui/foo -> /ls/conf/ui/foo
     const remap = (relpath) => conf.CONF_SDIR + relpath;
-    exports.vfsdata = new class {
+    exports.default = new class {
         async dir(dir) {
             if (!dir.endsWith('/'))
                 dir += '/';
@@ -40,17 +40,9 @@ define(["require", "exports", "./config", "./log", "./vfs", "./vfs-prop"], funct
                 throw new Error('Invalid value.');
             return vfs_1.default.set(remap(path), data);
         }
-    };
-    exports.vfsinfo = new class {
-        async get(path) {
-            // /units/conf/ui/foo -> props.get("ui/foo").units
-            let [, tag, root, ...rest] = path.split('/');
-            if ('/' + root != conf.CONF_VDIR) {
-                log.w('Bad info path:', path);
-                return null;
-            }
-            let name = '/' + rest.join('/');
-            let prop = props.get(name);
+        async stat(path, tag) {
+            // /ui/foo:units -> props.get("ui/foo").units
+            let prop = props.get(path);
             if (!prop) {
                 log.w('No such prop:', path);
                 return null;
