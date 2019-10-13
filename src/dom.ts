@@ -46,7 +46,7 @@ export const id = {
   get chatUserName() { return $('#chat-u-name'); },
   get chatMessages() { return $('#messages'); },
   get chatReplyText() { return $('#reply-text'); },
-  get chatReplySend() { return $('#reply-send'); },
+  get chatReplySend() { return $('#reply-send') as HTMLButtonElement; },
 };
 
 export function $<T extends HTMLElement>(selector: string) {

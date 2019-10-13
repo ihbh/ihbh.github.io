@@ -25,10 +25,10 @@ body.darkmode {
 .btn {
   font-size: 0.75em;
   padding: 1em;
-  background: #800;
-  color: #fff;
+  background: #fff;
+  color: #000;
   border: none;
-  box-shadow: 0 0 7pt 1pt #000;
+  box-shadow: 0 0 1pt 1pt #000;
   user-select: none;
   text-align: center;
   text-decoration: none;
@@ -483,8 +483,8 @@ body .page .ol-attribution * {
   flex-direction: row;
   align-items: center;
   padding: 0.5em;
-  background: #800;
-  color: #fff;
+  background: #cfc;
+  border-bottom: 0.25em solid #8c8;
 }
 
 #u-header img {
@@ -568,19 +568,6 @@ body .page .ol-attribution * {
 #reply-text:focus {
   outline: none;
   border-color: #ccf;
-}
-
-#reply-send {
-  border-radius: 50%;
-  background: #800;
-  color: #fff;
-  width: 32px;
-  height: 32px;
-  user-select: none;
-  font-size: 0.5em;
-  display: flex;
-  align-items: center;
-  text-align: center;
 }
 
 /* ?page=explorer */
