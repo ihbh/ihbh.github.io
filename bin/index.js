@@ -7,7 +7,7 @@ define(["require", "exports", "./dbg", "./dom", "./log", "./page", "./pwa", "./u
             log.w('dbg.init() failed:', err);
         });
         await pwa.init();
-        let reg = usr_1.isRegistered();
+        let reg = await usr_1.isRegistered();
         log.i('user registered?', reg);
         if (!reg) {
             if (page.get() == 'profile')

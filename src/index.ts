@@ -14,7 +14,7 @@ dom.whenLoaded().then(async () => {
   
   await pwa.init();
 
-  let reg = isRegistered();
+  let reg = await isRegistered();
   log.i('user registered?', reg);
 
   if (!reg) {

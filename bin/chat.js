@@ -102,6 +102,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
         await cachedIncomingMessages(incoming);
         let diff = Date.now() - time;
         log.i('Rendered all messages in', diff, 'ms');
+        await setOutgoingMessagesTag();
         await clearUnreadMark();
     }
     function addMessagesToDOM(messages) {
@@ -156,6 +157,12 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
         log.i('Getting outgoing messages.');
         let dir = `~/chats/${remoteUid}`;
         return await getMessageTexts(dir);
+    }
+    async function setOutgoingMessagesTag() {
+        log.i('Adding a tag to remember this chat.');
+        let path = `${conf.USERDATA_DIR}/chats/${remoteUid}/time`;
+        let time = new Date().toJSON();
+        await vfs_1.default.set(path, time);
     }
     async function clearUnreadMark() {
         log.i('Marking all messages as read.');

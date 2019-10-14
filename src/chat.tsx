@@ -150,6 +150,7 @@ async function fetchAndRenderMessages() {
   let diff = Date.now() - time;
   log.i('Rendered all messages in', diff, 'ms');
 
+  await setOutgoingMessagesTag();
   await clearUnreadMark();
 }
 
@@ -213,6 +214,13 @@ async function getOutgoingMessages() {
   log.i('Getting outgoing messages.');
   let dir = `~/chats/${remoteUid}`;
   return await getMessageTexts(dir);
+}
+
+async function setOutgoingMessagesTag() {
+  log.i('Adding a tag to remember this chat.');
+  let path = `${conf.USERDATA_DIR}/chats/${remoteUid}/time`;
+  let time = new Date().toJSON();
+  await vfs.set(path, time);
 }
 
 async function clearUnreadMark() {
