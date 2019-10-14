@@ -25,8 +25,12 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", ".
                 places = loc.getTestVisitedPlacesSmall();
                 break;
         }
-        if (!places.length)
-            throw new Error('Nothing to render: no places visited.');
+        if (!places.length) {
+            log.i('Nothing to render: no places visited.');
+            let page = await new Promise((resolve_1, reject_1) => { require(['./page'], resolve_1, reject_1); });
+            dom.id.mapAll.textContent = 'No visited places yet.';
+            return;
+        }
         let bbox = await getBBox(places);
         let osm = new osm_1.OSM(dom.id.mapAll.id);
         if (conf.DEBUG)
@@ -50,7 +54,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", ".
             lastClickedTskey = id;
         timer = timer || setTimeout(async () => {
             log.i('Opening place:', lastClickedTskey);
-            let page = await new Promise((resolve_1, reject_1) => { require(['./page'], resolve_1, reject_1); });
+            let page = await new Promise((resolve_2, reject_2) => { require(['./page'], resolve_2, reject_2); });
             page.set('nearby', { tskey: lastClickedTskey });
         }, conf.PLACE_CLICK_TIMEOUT);
     }
@@ -74,9 +78,9 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", ".
     }
     async function addMarkerAt({ lat, lon }) {
         log.i(`Creating a marker at lat=${lat} lon=${lon}`);
-        let loc = await new Promise((resolve_2, reject_2) => { require(['./loc'], resolve_2, reject_2); });
+        let loc = await new Promise((resolve_3, reject_3) => { require(['./loc'], resolve_3, reject_3); });
         let tskey = await loc.shareLocation({ lat, lon });
-        let page = await new Promise((resolve_3, reject_3) => { require(['./page'], resolve_3, reject_3); });
+        let page = await new Promise((resolve_4, reject_4) => { require(['./page'], resolve_4, reject_4); });
         page.set('nearby', { tskey });
     }
 });

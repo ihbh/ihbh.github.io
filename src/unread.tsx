@@ -37,14 +37,15 @@ export async function init() {
 
   for (let uid of uids) {
     let card = cards.get(uid);
-    if (!card) {
+    if (card) {
+      container.removeChild(card);
+    } else {
       log.i('Unread chat from a new user:', uid);
       let info = await getUserInfo(uid);
       card = renderUserCard(info);
       cards.set(uid, card);
     }
     card.classList.add('unread');
-    container.removeChild(card);
     container.insertBefore(card, container.firstChild);
   }
 }

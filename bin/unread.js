@@ -29,14 +29,16 @@ define(["require", "exports", "./config", "./dom", "./log", "./react", "./ucache
             log.i('No new unread messages.');
         for (let uid of uids) {
             let card = cards.get(uid);
-            if (!card) {
+            if (card) {
+                container.removeChild(card);
+            }
+            else {
                 log.i('Unread chat from a new user:', uid);
                 let info = await ucache_1.getUserInfo(uid);
                 card = renderUserCard(info);
                 cards.set(uid, card);
             }
             card.classList.add('unread');
-            container.removeChild(card);
             container.insertBefore(card, container.firstChild);
         }
     }

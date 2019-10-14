@@ -33,8 +33,12 @@ async function loadMap() {
       break;
   }
 
-  if (!places.length)
-    throw new Error('Nothing to render: no places visited.');
+  if (!places.length) {
+    log.i('Nothing to render: no places visited.');
+    let page = await import('./page');
+    dom.id.mapAll.textContent = 'No visited places yet.';
+    return;
+  }
 
   let bbox = await getBBox(places);
   let osm = new OSM(dom.id.mapAll.id);
