@@ -2,21 +2,23 @@
 // developers.google.com/web/fundamentals/primers/service-workers/
 (function init() {
   const TIMEOUT = 250; // ms
+  const CACHE_NAME = 'store';
+
   const log = {
     d: (...args) => console.log('D [sw]', ...args),
     i: (...args) => console.log('I [sw]', ...args),
     w: (...args) => console.log('W [sw]', ...args),
   };
-  const openCache = () => caches.open('store');
+
   const sleep = (dt: number) => new Promise<void>(
     resolve => setTimeout(() => resolve(null), dt));
 
-  log.i('loaded; timeout:', TIMEOUT, 'ms');
+  log.i('loaded; ttl:', TIMEOUT, 'ms');
 
   self.addEventListener('install', (event: any) => {
     log.i('install');
     event.waitUntil(
-      openCache().then(cache => {
+      caches.open(CACHE_NAME).then(cache => {
         return cache.add('/');
       })
     );
@@ -44,7 +46,7 @@
           if (response.ok) {
             log.d('caching:', relurl);
             let clonedResponse = response.clone();
-            openCache().then(cache => {
+            caches.open(CACHE_NAME).then(cache => {
               cache.put(request, clonedResponse);
               log.d('updated:', relurl);
             });
@@ -70,7 +72,29 @@
     log.i('activate');
   });
 
-  self.addEventListener('message', event => {
-    log.i('message', event);
+  self.addEventListener('message', async event => {
+    let { origin, data } = event;
+    log.i('message', origin, data);
+    if (!data) return;
+
+    let { id, type, args } = data;
+    let source = event.source as any;
+
+    switch (type) {
+      case 'cache.clear':
+        log.i('Deleting cache');
+        caches.delete(CACHE_NAME);
+        break;
+      case 'cache.keys':
+        log.i('Getting cached URLs');
+        let cache = await caches.open(CACHE_NAME);
+        let reqs = await cache.keys();
+        let keys = reqs.map(r => r.url.replace(location.origin, ''));
+        let resp = { id, res: keys };
+        source.postMessage(resp);
+        break;
+      default:
+        log.w('Unknown message type:', type);
+    }
   });
 })();

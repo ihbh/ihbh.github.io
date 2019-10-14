@@ -115,7 +115,7 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
                 href += '&sfc=1';
             if (idir)
                 href += '&idir=' + idir;
-            let nameTag = react_1.default.createElement("a", { href: href }, name);
+            let nameTag = react_1.default.createElement("a", { href: href }, decodeURIComponent(name));
             let dataTag = null;
             let infoTag = null;
             let unitTag = null;

@@ -71,8 +71,8 @@ function addRmDirButton(controls: HTMLElement) {
         update();
         if (remaining)
           return;
-        await vfs.rmdir(path);
         reset();
+        await vfs.rmdir(path);
       }, 1000);
     }
   };
@@ -134,7 +134,7 @@ async function renderAsDir(root: HTMLElement, dirPath: string, sfc: boolean, idi
     let href = `/?page=explorer&path=${encodeURIComponent(path)}`;
     if (sfc) href += '&sfc=1';
     if (idir) href += '&idir=' + idir;
-    let nameTag = <a href={href}>{name}</a>;
+    let nameTag = <a href={href}>{decodeURIComponent(name)}</a>;
     let dataTag: HTMLElement = null;
     let infoTag: HTMLElement = null;
     let unitTag: HTMLElement = null;

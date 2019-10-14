@@ -9,4 +9,5 @@ export default {
   '/idb': pfsmod(() => import('./vfs-idb').then(m => m.default)),
   '/srv': pfsmod(() => import('./vfs-srv').then(m => m.default)),
   '/conf': pfsmod(() => import('./vfs-conf').then(m => m.default)),
+  '/sw': pfsmod(() => import('./vfs-sw').then(m => m.default)),
 };
