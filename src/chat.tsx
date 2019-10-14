@@ -241,7 +241,7 @@ async function getMessageTexts(dir: string, tsids?: string[]) {
         vfs.get(path),
         rsync.getSyncStatus(path),
       ]);
-      messages[tsid] = { text, status };
+      if (text) messages[tsid] = { text, status };
     });
     await Promise.all(ps);
     return messages;

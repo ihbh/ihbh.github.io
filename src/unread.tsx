@@ -60,7 +60,9 @@ function renderUserCard(info: UserInfo) {
 
 async function getActiveChats(): Promise<UserInfo[]> {
   log.i('Getting the list of chats.');
-  let uids = await vfs.dir('~/chats');
+  let uids1 = await vfs.dir('~/chats');
+  let uids2 = await vfs.dir(`${conf.USERDATA_DIR}/chats`);
+  let uids = [...new Set([...uids1, ...uids2])];
   if (!uids || !uids.length) return [];
 
   log.i('Getting user details:', uids.length);
@@ -68,7 +70,7 @@ async function getActiveChats(): Promise<UserInfo[]> {
   return Promise.all(ps);
 }
 
-async function getUnreadChats(): Promise<string[]> {  
+async function getUnreadChats(): Promise<string[]> {
   let uid = await user.uid.get();
   let uids = await vfs.dir(`/srv/users/${uid}/unread`);
   return uids || [];

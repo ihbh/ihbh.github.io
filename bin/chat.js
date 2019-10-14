@@ -182,7 +182,8 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
                     vfs_1.default.get(path),
                     rsync.getSyncStatus(path),
                 ]);
-                messages[tsid] = { text, status };
+                if (text)
+                    messages[tsid] = { text, status };
             });
             await Promise.all(ps);
             return messages;
