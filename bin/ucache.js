@@ -1,21 +1,23 @@
-define(["require", "exports", "./config", "./sleep", "./log"], function (require, exports, conf, sleep_1, log_1) {
+define(["require", "exports", "./config", "./log"], function (require, exports, conf, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('ucache');
+    const PROPS = {
+        info: 'about',
+        name: 'name',
+        img: 'photo',
+    };
     async function getUserInfo(uid) {
         log.i('Getting user info:', uid);
-        let { default: vfs } = await new Promise((resolve_1, reject_1) => { require(['./vfs'], resolve_1, reject_1); });
         let dirRemote = `/users/${uid}/profile`;
         let dirCached = `${conf.USERDATA_DIR}/users/${uid}`;
-        let info = { uid };
+        let info = await getCachedInfo(uid);
         try {
-            await Promise.race([
-                syncFiles(dirCached, dirRemote, ['info', 'name', 'img']),
-                sleep_1.default(conf.UCACHE_TIMEOUT),
-            ]);
-            info.about = await vfs.get(`${dirCached}/info`);
-            info.name = await vfs.get(`${dirCached}/name`);
-            info.photo = await vfs.get(`${dirCached}/img`);
+            let ps = syncFiles(dirCached, dirRemote);
+            if (!info.name) {
+                await ps;
+                info = await getCachedInfo(uid);
+            }
         }
         catch (err) {
             log.w('Failed to get user info:', uid, err);
@@ -23,8 +25,17 @@ define(["require", "exports", "./config", "./sleep", "./log"], function (require
         return info;
     }
     exports.getUserInfo = getUserInfo;
-    async function syncFiles(dirCached, dirRemote, fnames) {
+    async function getCachedInfo(uid) {
+        let { default: vfs } = await new Promise((resolve_1, reject_1) => { require(['./vfs'], resolve_1, reject_1); });
+        let dir = `${conf.USERDATA_DIR}/users/${uid}`;
+        let info = { uid };
+        let fnames = Object.keys(PROPS);
+        await Promise.all(fnames.map(async (fname) => info[PROPS[fname]] = await vfs.get(dir + '/' + fname)));
+        return info;
+    }
+    async function syncFiles(dirCached, dirRemote) {
         try {
+            let fnames = Object.keys(PROPS);
             let ps = fnames.map(fname => syncFile(dirCached + '/' + fname, dirRemote + '/' + fname));
             await Promise.all(ps);
             log.d('Synced user info:', dirRemote);

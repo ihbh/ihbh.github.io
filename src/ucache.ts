@@ -1,5 +1,4 @@
 import * as conf from './config';
-import sleep from './sleep';
 import { TaggedLogger } from './log';
 
 const log = new TaggedLogger('ucache');
@@ -11,23 +10,25 @@ export interface UserInfo {
   about?: string;
 }
 
+const PROPS = {
+  info: 'about',
+  name: 'name',
+  img: 'photo',
+};
+
 export async function getUserInfo(uid: string) {
   log.i('Getting user info:', uid);
-  let { default: vfs } = await import('./vfs');
   let dirRemote = `/users/${uid}/profile`;
   let dirCached = `${conf.USERDATA_DIR}/users/${uid}`;
-  let info: UserInfo = { uid };
+  let info = await getCachedInfo(uid);
 
   try {
-    await Promise.race([
-      syncFiles(dirCached, dirRemote,
-        ['info', 'name', 'img']),
-      sleep(conf.UCACHE_TIMEOUT),
-    ]);
+    let ps = syncFiles(dirCached, dirRemote);
 
-    info.about = await vfs.get(`${dirCached}/info`);
-    info.name = await vfs.get(`${dirCached}/name`);
-    info.photo = await vfs.get(`${dirCached}/img`);
+    if (!info.name) {
+      await ps;
+      info = await getCachedInfo(uid);
+    }
   } catch (err) {
     log.w('Failed to get user info:', uid, err);
   }
@@ -35,8 +36,22 @@ export async function getUserInfo(uid: string) {
   return info;
 }
 
-async function syncFiles(dirCached: string, dirRemote: string, fnames: string[]) {
+async function getCachedInfo(uid: string) {
+  let { default: vfs } = await import('./vfs');
+  let dir = `${conf.USERDATA_DIR}/users/${uid}`;
+  let info: UserInfo = { uid };
+  let fnames = Object.keys(PROPS);
+
+  await Promise.all(
+    fnames.map(async fname =>
+      info[PROPS[fname]] = await vfs.get(dir + '/' + fname)));
+
+  return info;
+}
+
+async function syncFiles(dirCached: string, dirRemote: string) {
   try {
+    let fnames = Object.keys(PROPS);
     let ps = fnames.map(
       fname => syncFile(
         dirCached + '/' + fname,
