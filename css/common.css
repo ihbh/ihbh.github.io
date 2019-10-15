@@ -622,7 +622,6 @@ body .page .ol-attribution * {
 }
 
 #p-explorer .links {
-  padding: 0.25em;
   display: grid;
   grid-gap: 0.25em;
   grid-template-columns: repeat(4, 1fr);
@@ -669,10 +668,11 @@ body .page .ol-attribution * {
 }
 
 #p-explorer .data {
+  padding: 0.25em;
   white-space: pre-wrap;
   word-break: break-all;
-  padding: 1em;
   flex: 1;
+  font-size: 10pt;
 }
 
 #p-explorer .data:focus {

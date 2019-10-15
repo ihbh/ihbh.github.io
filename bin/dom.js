@@ -7,7 +7,6 @@ define(["require", "exports"], function (require, exports) {
         get btnSettings() { return $('#settings'); },
         get debugMenu() { return $('#debug'); },
         get btnDebugToggle() { return $('#debug-toggle'); },
-        get pageExplorer() { return $('#p-explorer'); },
         get map() { return $('#map'); },
         get mapAll() { return $('#all-places'); },
         get sendLocation() { return $('#send'); },
@@ -15,6 +14,12 @@ define(["require", "exports"], function (require, exports) {
         get gotoCommon() { return $('#gps-london'); },
         get showLogs() { return $('#show-logs'); },
         get noGPS() { return $('#no-gps'); },
+        // VFS explorer
+        get pageExplorer() { return $('#p-explorer'); },
+        get expControls() { return $('#p-explorer .controls'); },
+        get expVfsPath() { return $('#p-explorer .vfs-path'); },
+        get expPath() { return $('#p-explorer .path'); },
+        get expData() { return $('#p-explorer .data'); },
         // Settings
         get exportDB() { return $('#export-db'); },
         get importDB() { return $('#import-db'); },

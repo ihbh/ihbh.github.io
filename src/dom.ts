@@ -5,7 +5,6 @@ export const id = {
   get btnSettings() { return $('#settings') as HTMLButtonElement; },
   get debugMenu() { return $('#debug'); },
   get btnDebugToggle() { return $('#debug-toggle') as HTMLButtonElement; },
-  get pageExplorer() { return $('#p-explorer'); },
   get map() { return $('#map'); },
   get mapAll() { return $('#all-places'); },
   get sendLocation() { return $<HTMLButtonElement>('#send'); },
@@ -13,6 +12,13 @@ export const id = {
   get gotoCommon() { return $('#gps-london'); },
   get showLogs() { return $('#show-logs'); },
   get noGPS() { return $('#no-gps'); },
+
+  // VFS explorer
+  get pageExplorer() { return $('#p-explorer'); },
+  get expControls() { return $('#p-explorer .controls'); },
+  get expVfsPath() { return $('#p-explorer .vfs-path'); },
+  get expPath() { return $('#p-explorer .path'); },
+  get expData() { return $('#p-explorer .data'); },
 
   // Settings
   get exportDB() { return $('#export-db'); },

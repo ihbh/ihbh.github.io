@@ -11,13 +11,15 @@ let pFlushLogs: Promise<void>;
 
 writeLog('I', '[-]', [new Date().toJSON()]);
 
-export async function getLogs(): Promise<string[][]> {
+export async function getLogs(n = conf.DBG_MAX_SHOW_LOGS)
+  : Promise<string[][]> {
+
   if (!dbt) return [];
   let json = await dbt.save();
   let keys = Object.keys(json);
   return keys.sort()
-    .slice(-conf.DBG_MAX_SHOW_LOGS)
-    .map(ts => json[ts]);
+    .slice(-n)
+    .map(ts => [ts, ...json[ts]]);
 }
 
 function getLogKey(logts: number) {

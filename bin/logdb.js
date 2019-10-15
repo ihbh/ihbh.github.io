@@ -9,14 +9,14 @@ define(["require", "exports", "./config"], function (require, exports, conf) {
     let pendingLogs = [];
     let pFlushLogs;
     writeLog('I', '[-]', [new Date().toJSON()]);
-    async function getLogs() {
+    async function getLogs(n = conf.DBG_MAX_SHOW_LOGS) {
         if (!dbt)
             return [];
         let json = await dbt.save();
         let keys = Object.keys(json);
         return keys.sort()
-            .slice(-conf.DBG_MAX_SHOW_LOGS)
-            .map(ts => json[ts]);
+            .slice(-n)
+            .map(ts => [ts, ...json[ts]]);
     }
     exports.getLogs = getLogs;
     function getLogKey(logts) {

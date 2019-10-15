@@ -6,28 +6,35 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
     const TAG_LINKS = 'links';
     async function init() {
         let path = getCurrentVfsPath();
-        let sfc = qargs.get('sfc') == '1';
-        let idir = qargs.get('idir');
         log.i('Path:', path);
-        let root = dom.id.pageExplorer;
-        let controls = react_1.default.createElement("span", { class: "controls" });
-        root.appendChild(react_1.default.createElement("div", { class: "path" },
-            controls,
-            react_1.default.createElement("span", null, path)));
-        addRmDirButton(controls);
-        renderAsFile(root, path)
-            .catch(err => log.w('This is not a file:', err));
-        renderAsDir(root, path, sfc, idir)
-            .catch(err => log.w('This is not a dir:', err));
+        addRmDirButton();
+        addRefreshButton();
+        refreshContents();
     }
     exports.init = init;
+    function refreshContents() {
+        let path = getCurrentVfsPath();
+        let sfc = qargs.get('sfc') == '1';
+        let idir = qargs.get('idir');
+        dom.id.expVfsPath.textContent = path;
+        dom.id.expData.innerHTML = '';
+        renderAsFile(path)
+            .catch(err => log.w('This is not a file:', err));
+        renderAsDir(path, sfc, idir)
+            .catch(err => log.w('This is not a dir:', err));
+    }
     function getCurrentVfsPath() {
         return qargs.get('path') || '/';
     }
-    function addRmDirButton(controls) {
+    function addRefreshButton() {
+        let button = react_1.default.createElement("span", { class: "refresh" }, "[refresh]");
+        dom.id.expControls.append(button);
+        button.onclick = () => refreshContents();
+    }
+    function addRmDirButton() {
         let path = getCurrentVfsPath();
-        let button = react_1.default.createElement("span", { class: "rmdir", title: "Delete the entire dir" }, "[x]");
-        controls.prepend(button);
+        let button = react_1.default.createElement("span", { class: "rmdir" }, "[rm]");
+        dom.id.expControls.append(button);
         let timer = 0;
         let remaining = 0;
         const reset = () => {
@@ -59,7 +66,8 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
             }
         };
     }
-    async function renderAsFile(root, path) {
+    async function renderAsFile(path) {
+        let root = dom.id.expData;
         if (path.endsWith('/'))
             return;
         log.i('Checking if this is a file.');
@@ -67,8 +75,10 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
         if (data === null)
             return;
         log.i('This is a file.');
-        let json = JSON.stringify(data);
-        let div = react_1.default.createElement("div", { class: "data" }, json);
+        let type = typeof data;
+        let json = type == 'string' ?
+            data : JSON.stringify(data);
+        let div = react_1.default.createElement("div", { type: type, class: "data" }, json);
         makeEditable(div, path);
         root.appendChild(div);
     }
@@ -84,7 +94,9 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
                 return;
             try {
                 setFStatus(el, 'updating');
-                let newData = JSON.parse(newText);
+                let type = el.getAttribute('type');
+                let newData = type == 'string' ?
+                    newText : JSON.parse(newText);
                 await vfs_1.default.set(path, newData);
                 prevText = newText;
                 setFStatus(el, 'updated');
@@ -98,7 +110,8 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
     function setFStatus(el, status) {
         el.setAttribute('fstatus', status);
     }
-    async function renderAsDir(root, dirPath, sfc, idir) {
+    async function renderAsDir(dirPath, sfc, idir) {
+        let root = dom.id.expData;
         if (dirPath.endsWith('/'))
             dirPath = dirPath.slice(0, -1);
         log.i('Checking if this is a dir.');
