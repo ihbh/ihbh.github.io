@@ -5,9 +5,9 @@
   const CACHE_NAME = 'store';
 
   const log = {
-    d: (...args) => console.log('D [sw]', ...args),
-    i: (...args) => console.log('I [sw]', ...args),
-    w: (...args) => console.log('W [sw]', ...args),
+    d: (...args) => console.debug('D [sw]', ...args),
+    i: (...args) => console.info('I [sw]', ...args),
+    w: (...args) => console.warn('W [sw]', ...args),
   };
 
   const sleep = (dt: number) => new Promise<void>(

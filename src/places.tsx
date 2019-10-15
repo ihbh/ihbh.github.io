@@ -21,6 +21,7 @@ export async function init() {
 
 async function loadMap() {
   let places = await loc.getVisitedPlaces();
+  log.i('Viisted places:', places.length, places);
 
   switch (qargs.get('vpt')) {
     case 'b':
@@ -41,6 +42,7 @@ async function loadMap() {
   }
 
   let bbox = await getBBox(places);
+  log.i('Map bounding box:', bbox);
   let osm = new OSM(dom.id.mapAll.id);
   if (conf.DEBUG)
     osm.onaddmarker = pos => addMarkerAt(pos);
@@ -49,6 +51,7 @@ async function loadMap() {
   let psorted = places.sort((p1, p2) => +p1.time - +p2.time);
   let tmin = +psorted[0].time;
   let tmax = +psorted[psorted.length - 1].time;
+  log.i('tmin:', tmin, 'tmax:', tmax);
 
   for (let { lon, lat, time } of psorted) {
     let id = loc.deriveTsKey(time);

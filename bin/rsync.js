@@ -52,7 +52,7 @@ define(["require", "exports", "./buffer", "./config", "./error", "./log", "./rpc
         }
     }
     exports.start = start;
-    async function syncFile(path, data) {
+    async function syncFile(path, data = null) {
         let remove = data === null;
         let relpath = path.slice(conf.RSYNC_SHARED.length);
         if (relpath[0] != '/')

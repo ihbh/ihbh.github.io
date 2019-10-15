@@ -1,8 +1,9 @@
-define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", "./react", "./rpc", "./ucache", "./user", "./osm", "./timestr", "./gp"], function (require, exports, conf, dom, loc, log_1, qargs, react_1, rpc, ucache_1, user, osm_1, tts, gp) {
+define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./osm", "./qargs", "./react", "./rpc", "./timestr", "./ucache", "./user"], function (require, exports, conf, dom, gp, loc, log_1, osm_1, qargs, react_1, rpc, tts, ucache_1, user) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const log = new log_1.TaggedLogger('page.visitors');
+    const log = new log_1.TaggedLogger('nearby');
     let tskey = '';
+    let allvisits;
     async function init() {
         log.i('init()');
         try {
@@ -13,7 +14,6 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
             let { lat, lon, time } = await loc.getPlace(tskey);
             if (!lat || !lon)
                 throw new Error(`No such visited place: ?tskey=` + tskey);
-            initVMap({ lat, lon });
             dom.id.vtimeLabel.textContent =
                 tts.recentTimeToStr(new Date(time * 1000));
             setStatus('Checking who has been here before...');
@@ -36,6 +36,8 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
             else {
                 setStatus(`Nobody has been here before.`);
             }
+            initVMap({ lat, lon });
+            initVisitCount({ lat, lon });
         }
         catch (err) {
             setStatus(err + '');
@@ -47,6 +49,22 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
         let div = dom.id.nearbyStatus;
         div.textContent = text || '';
     }
+    async function initVisitCount({ lat, lon }) {
+        let places = await loc.getVisitedPlaces();
+        let nearby = places.filter(p => {
+            let dist = loc.dist(p, { lat, lon });
+            log.d('Place tskey:', loc.deriveTsKey(p.time), 'dist:', dist);
+            return dist < conf.MAP_NEARBY;
+        });
+        let n = nearby.length;
+        if (n > 1) {
+            let text = n > 2 ? n - 1 + ' times' : 'once';
+            dom.id.otherVisits.textContent =
+                `and ${text} before`;
+        }
+        allvisits = nearby.map(p => loc.deriveTsKey(p.time));
+        log.i('All visits here:', allvisits);
+    }
     async function initVMap({ lat, lon }) {
         log.i('Rendering map.');
         try {
@@ -57,7 +75,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
                 max: { lat: lat + s, lon: lon + s },
             });
             await osm.addMarker({ lat, lon });
-            log.i('Don rendering map.');
+            log.i('Done rendering map.');
         }
         catch (err) {
             log.w('Failed to render map:', err);
@@ -69,7 +87,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./qargs", 
                 log.i('Unvisiting:', tskey);
                 setStatus('Unvisiting this place.');
                 let { root: vfs } = await new Promise((resolve_2, reject_2) => { require(['./vfs'], resolve_2, reject_2); });
-                await vfs.rm(`${conf.VPLACES_DIR}/${tskey}/`);
+                await Promise.all(allvisits.map(tskey => vfs.rmdir(`${conf.VPLACES_DIR}/${tskey}`)));
                 setStatus(`This place has been unvisited. Others won't see you here anymore.`);
             }
             catch (err) {

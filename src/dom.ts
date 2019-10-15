@@ -36,9 +36,11 @@ export const id = {
   get visitors() { return $('#visitors'); },
   get activeChats() { return $('#p-unread > .user-cards'); },
 
+  // Nearby visitors
   get nearbyStatus() { return $('#nearby-status'); },
   get vplaceMap() { return $('#vplace-map'); },
   get vtimeBar() { return $('#vtime-bar'); },
+  get otherVisits() { return $('#nvtimes'); },
   get vtimeLabel() { return $('#vtime-label'); },
   get unvisit() { return $('#unvisit'); },
 

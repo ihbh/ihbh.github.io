@@ -1,6 +1,12 @@
 define(["require", "exports", "./config", "./vfs"], function (require, exports, conf, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    /** Distance in meters. */
+    function dist(p, q) {
+        let d2 = (p.lat - q.lat) ** 2 + (p.lon - q.lon) ** 2;
+        return d2 ** 0.5 / conf.MAP_1M;
+    }
+    exports.dist = dist;
     async function getPlace(tskey) {
         let dir = conf.VPLACES_DIR + '/' + tskey;
         let [lat, lon, time] = await Promise.all([

@@ -42,7 +42,7 @@ async function syncFiles(dirCached: string, dirRemote: string, fnames: string[])
         dirCached + '/' + fname,
         dirRemote + '/' + fname));
     await Promise.all(ps);
-    log.i('Synced user info:', dirRemote);
+    log.d('Synced user info:', dirRemote);
   } catch (err) {
     log.w('Failed to sync user info:', dirRemote);
   }

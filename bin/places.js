@@ -15,6 +15,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", ".
     exports.init = init;
     async function loadMap() {
         let places = await loc.getVisitedPlaces();
+        log.i('Viisted places:', places.length, places);
         switch (qargs.get('vpt')) {
             case 'b':
                 log.i('Using big test visited places.');
@@ -32,6 +33,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", ".
             return;
         }
         let bbox = await getBBox(places);
+        log.i('Map bounding box:', bbox);
         let osm = new osm_1.OSM(dom.id.mapAll.id);
         if (conf.DEBUG)
             osm.onaddmarker = pos => addMarkerAt(pos);
@@ -39,6 +41,7 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", ".
         let psorted = places.sort((p1, p2) => +p1.time - +p2.time);
         let tmin = +psorted[0].time;
         let tmax = +psorted[psorted.length - 1].time;
+        log.i('tmin:', tmin, 'tmax:', tmax);
         for (let { lon, lat, time } of psorted) {
             let id = loc.deriveTsKey(time);
             // tmax -> 1, tmin -> 1/e = 0.37

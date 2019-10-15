@@ -10,6 +10,7 @@ export const LOG_MAXLEN = 64;
 // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
 // 1e-5 corresponds to 1m precision
 export const MAP_1M = 1e-5;
+export const MAP_NEARBY = 100; // meters
 export const MIN_SIGNIFICANT_DIST = 10 * MAP_1M;
 export const GPS_DIGITS = 7;
 export const PLACE_CLICK_TIMEOUT = 150; // ms

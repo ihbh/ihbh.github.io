@@ -13,6 +13,7 @@ define(["require", "exports"], function (require, exports) {
     // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
     // 1e-5 corresponds to 1m precision
     exports.MAP_1M = 1e-5;
+    exports.MAP_NEARBY = 100; // meters
     exports.MIN_SIGNIFICANT_DIST = 10 * exports.MAP_1M;
     exports.GPS_DIGITS = 7;
     exports.PLACE_CLICK_TIMEOUT = 150; // ms

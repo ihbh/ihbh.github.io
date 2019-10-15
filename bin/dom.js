@@ -34,9 +34,11 @@ define(["require", "exports"], function (require, exports) {
         get showPlaces() { return $('#show-places'); },
         get visitors() { return $('#visitors'); },
         get activeChats() { return $('#p-unread > .user-cards'); },
+        // Nearby visitors
         get nearbyStatus() { return $('#nearby-status'); },
         get vplaceMap() { return $('#vplace-map'); },
         get vtimeBar() { return $('#vtime-bar'); },
+        get otherVisits() { return $('#nvtimes'); },
         get vtimeLabel() { return $('#vtime-label'); },
         get unvisit() { return $('#unvisit'); },
         get chatUserIcon() { return $('#chat-u-icon'); },

@@ -23,6 +23,12 @@ export interface VisitorNote {
   pos: GpsCoords;
 }
 
+/** Distance in meters. */
+export function dist(p: GpsCoords, q: GpsCoords) {
+  let d2 = (p.lat - q.lat) ** 2 + (p.lon - q.lon) ** 2;
+  return d2 ** 0.5 / conf.MAP_1M;
+}
+
 export async function getPlace(tskey: string): Promise<Place> {
   let dir = conf.VPLACES_DIR + '/' + tskey;
   let [lat, lon, time] = await Promise.all([

@@ -67,7 +67,7 @@ export async function start() {
   }
 }
 
-async function syncFile(path: string, data) {
+async function syncFile(path: string, data = null) {
   let remove = data === null;
   let relpath = path.slice(conf.RSYNC_SHARED.length);
   if (relpath[0] != '/')

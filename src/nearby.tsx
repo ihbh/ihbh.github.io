@@ -1,17 +1,17 @@
 import * as conf from './config';
 import * as dom from './dom';
+import * as gp from './gp';
 import * as loc from './loc';
 import { TaggedLogger } from './log';
+import { OSM } from './osm';
 import * as qargs from './qargs';
 import React from './react';
 import * as rpc from './rpc';
+import * as tts from './timestr';
 import { getUserInfo } from './ucache';
 import * as user from './user';
-import { OSM } from './osm';
-import * as tts from './timestr';
-import * as gp from './gp';
 
-const log = new TaggedLogger('page.visitors');
+const log = new TaggedLogger('nearby');
 
 interface UserInfo {
   uid: string;
@@ -20,6 +20,7 @@ interface UserInfo {
 }
 
 let tskey = '';
+let allvisits: string[];
 
 export async function init() {
   log.i('init()');
@@ -34,7 +35,6 @@ export async function init() {
     if (!lat || !lon)
       throw new Error(`No such visited place: ?tskey=` + tskey);
 
-    initVMap({ lat, lon });
     dom.id.vtimeLabel.textContent =
       tts.recentTimeToStr(new Date(time * 1000));
 
@@ -57,6 +57,9 @@ export async function init() {
     } else {
       setStatus(`Nobody has been here before.`);
     }
+
+    initVMap({ lat, lon });
+    initVisitCount({ lat, lon });
   } catch (err) {
     setStatus(err + '');
     throw err;
@@ -66,6 +69,27 @@ export async function init() {
 function setStatus(text: string) {
   let div = dom.id.nearbyStatus;
   div.textContent = text || '';
+}
+
+async function initVisitCount({ lat, lon }) {
+  let places = await loc.getVisitedPlaces();
+  let nearby = places.filter(p => {
+    let dist = loc.dist(p, { lat, lon });
+    log.d('Place tskey:', loc.deriveTsKey(p.time), 'dist:', dist);
+    return dist < conf.MAP_NEARBY;
+  });
+
+  let n = nearby.length;
+
+  if (n > 1) {
+    let text = n > 2 ? n - 1 + ' times' : 'once';
+    dom.id.otherVisits.textContent =
+      `and ${text} before`;
+  }
+
+  allvisits = nearby.map(
+    p => loc.deriveTsKey(p.time));
+  log.i('All visits here:', allvisits);
 }
 
 async function initVMap({ lat, lon }) {
@@ -78,7 +102,7 @@ async function initVMap({ lat, lon }) {
       max: { lat: lat + s, lon: lon + s },
     });
     await osm.addMarker({ lat, lon });
-    log.i('Don rendering map.');
+    log.i('Done rendering map.');
   } catch (err) {
     log.w('Failed to render map:', err);
   }
@@ -90,7 +114,9 @@ function initUnvisitLink() {
       log.i('Unvisiting:', tskey);
       setStatus('Unvisiting this place.');
       let { root: vfs } = await import('./vfs');
-      await vfs.rm(`${conf.VPLACES_DIR}/${tskey}/`);
+      await Promise.all(
+        allvisits.map(tskey =>
+          vfs.rmdir(`${conf.VPLACES_DIR}/${tskey}`)));
       setStatus(`This place has been unvisited. Others won't see you here anymore.`);
     } catch (err) {
       log.e('Failed to unvisit:', err);
