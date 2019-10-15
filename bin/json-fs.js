@@ -6,6 +6,7 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         constructor(args) {
             this.keys = args.keys;
             this.read = args.read;
+            this.clear = args.clear;
             this.parseKey = args.parseKey ||
                 (key => key.split('.'));
         }
@@ -45,6 +46,11 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
                 if (this.keyToPath(key) == path)
                     return this.read(key);
             return null;
+        }
+        async rmdir(path) {
+            if (path != '/')
+                throw new Error('Bad path: ' + path);
+            return this.clear();
         }
     }
     exports.default = JsonFS;

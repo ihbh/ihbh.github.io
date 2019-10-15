@@ -6,18 +6,21 @@ const log = new TaggedLogger('json-fs');
 
 interface Args {
   keys: AsyncProp<string[]>;
-  read(key: string): Promise<any>;
-  parseKey(key: string): string[];
+  read: (key: string) => Promise<any>;
+  clear: () => Promise<void>;
+  parseKey: (key: string) => string[];
 }
 
 export default class JsonFS implements VFS {
   private keys: AsyncProp<string[]>;
   private read: (key: string) => Promise<any>;
+  private clear: () => Promise<void>;
   private parseKey: (key: string) => string[];
 
   constructor(args: Args) {
     this.keys = args.keys;
     this.read = args.read;
+    this.clear = args.clear;
     this.parseKey = args.parseKey ||
       (key => key.split('.'));
   }
@@ -62,5 +65,11 @@ export default class JsonFS implements VFS {
       if (this.keyToPath(key) == path)
         return this.read(key);
     return null;
+  }
+
+  async rmdir(path: string) {
+    if (path != '/')
+      throw new Error('Bad path: ' + path);
+    return this.clear();
   }
 };
