@@ -7,7 +7,7 @@ import handlers from './vfs-roots';
 
 const log = new TaggedLogger('vfs');
 
-const PATH_REGEX = /^(\/[\w-_%]+)+\/?$/;
+const PATH_REGEX = /^(\/[\w-_%.]+)+\/?$/;
 const ROOT_REGEX = /^\/[\w-]+/;
 const STAT_REGEX = /^\w+$/;
 

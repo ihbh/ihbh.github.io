@@ -2,7 +2,7 @@ define(["require", "exports", "./config", "./error", "./log", "./vfs-roots"], fu
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('vfs');
-    const PATH_REGEX = /^(\/[\w-_%]+)+\/?$/;
+    const PATH_REGEX = /^(\/[\w-_%.]+)+\/?$/;
     const ROOT_REGEX = /^\/[\w-]+/;
     const STAT_REGEX = /^\w+$/;
     exports.abspath = (path) => path.replace(/^~/, conf.SHARED_DIR);
