@@ -7,13 +7,10 @@ export default new HubFS({
     let pwa = await import('./pwa');
 
     return new JsonFS({
-      keys: new AsyncProp({
-        nocache: true,
-        async get() {
-          let keys: string[] = await pwa.invoke('cache.keys');
-          return keys.map(encodeURIComponent);
-        },
-      }),
+      keys: async () => {
+        let keys: string[] = await pwa.invoke('cache.keys');
+        return keys.map(encodeURIComponent);
+      },
 
       read: async key => {
         let url = decodeURIComponent(key);
@@ -24,16 +21,16 @@ export default new HubFS({
         await pwa.invoke('cache.clear');
       },
 
-      parseKey: key => {
+      path: key => {
         let url = decodeURIComponent(key);
         let i = url.indexOf('://');
         let j = url.indexOf('/', i < 0 ? 0 : i + 3);
-        if (j < 0) return [url];
+        if (j < 0) return url;
         let schema = url.slice(0, i);
         let domain = url.slice(i + 3, j);
         let path = url.slice(j + 1);
-        return [schema, domain, ...path.split('/')]
-          .map(encodeURIComponent);
+        return '/' + [schema, domain, ...path.split('/')]
+          .map(encodeURIComponent).join('/');
       },
     });
   }),

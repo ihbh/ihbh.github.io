@@ -27,8 +27,17 @@ define(["require", "exports"], function (require, exports) {
                 return Object.keys(this.root);
             return this.invoke('dir', path);
         }
+        async find(path) {
+            return this.invoke('find', path);
+        }
         async get(path) {
             return this.invoke('get', path);
+        }
+        async set(path, data) {
+            return this.invoke('set', path, data);
+        }
+        async rm(path) {
+            return this.invoke('rm', path);
         }
         async rmdir(path) {
             return this.invoke('rmdir', path);

@@ -1,41 +1,35 @@
 import { VFS } from './vfs-api';
 import { TaggedLogger } from './log';
-import { AsyncProp } from './prop';
 
 const log = new TaggedLogger('json-fs');
 
 interface Args {
-  keys: AsyncProp<string[]>;
+  keys: () => Promise<string[]>;
   read: (key: string) => Promise<any>;
-  clear: () => Promise<void>;
-  parseKey: (key: string) => string[];
+  write?: (key: string, data) => Promise<any>;
+  remove?: (key: string) => Promise<any>;
+  clear?: () => Promise<void>;
+  path?: (key: string) => string;
+  key?: (path: string) => string;
 }
 
 export default class JsonFS implements VFS {
-  private keys: AsyncProp<string[]>;
-  private read: (key: string) => Promise<any>;
-  private clear: () => Promise<void>;
-  private parseKey: (key: string) => string[];
+  private args: Args;
 
   constructor(args: Args) {
-    this.keys = args.keys;
-    this.read = args.read;
-    this.clear = args.clear;
-    this.parseKey = args.parseKey ||
-      (key => key.split('.'));
-  }
-
-  private keyToPath(key: string) {
-    return '/' + this.parseKey(key).join('/');
+    this.args = {
+      path: key => '/' + key.split('.').join('/'),
+      key: path => path.slice(1).split('/').join('.'),
+      ...args
+    };
   }
 
   async find(dir: string): Promise<string[]> {
     log.d('find()', dir);
     if (!dir.endsWith('/'))
       dir += '/';
-    let keys = await this.keys.get();
-    let paths = keys.map(
-      key => this.keyToPath(key));
+    let keys = await this.args.keys();
+    let paths = keys.map(this.args.path);
     if (dir == '/')
       return paths;
     return paths.filter(
@@ -60,16 +54,36 @@ export default class JsonFS implements VFS {
   async get(path: string): Promise<any> {
     if (!path || path.endsWith('/'))
       throw new Error('Bad path: ' + path);
-    let keys = await this.keys.get();
+    let keys = await this.args.keys();
     for (let key of keys)
-      if (this.keyToPath(key) == path)
-        return this.read(key);
+      if (this.args.path(key) == path)
+        return this.args.read(key);
     return null;
   }
 
+  async set(path: string, data): Promise<any> {
+    if (!this.args.write)
+      throw new Error('This is a read only json fs.');
+    if (!path || path.endsWith('/'))
+      throw new Error('Bad path: ' + path);
+    let key = this.args.key(path);
+    await this.args.write(key, data);
+  }
+
+  async rm(path: string): Promise<any> {
+    if (!this.args.remove)
+      throw new Error('This is a read only json fs.');
+    if (!path || path.endsWith('/'))
+      throw new Error('Bad path: ' + path);
+    let key = this.args.key(path);
+    await this.args.remove(key);
+  }
+
   async rmdir(path: string) {
+    if (!this.args.clear)
+      throw new Error('This is a read only json fs.');
     if (path != '/')
       throw new Error('Bad path: ' + path);
-    return this.clear();
+    return this.args.clear();
   }
 };

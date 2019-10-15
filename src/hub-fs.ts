@@ -33,8 +33,20 @@ export default class HubFS implements VFS {
     return this.invoke('dir', path);
   }
 
+  async find(path: string) {
+    return this.invoke('find', path);
+  }
+
   async get(path: string) {
     return this.invoke('get', path);
+  }
+
+  async set(path: string, data) {
+    return this.invoke('set', path, data);
+  }
+
+  async rm(path: string) {
+    return this.invoke('rm', path);
   }
 
   async rmdir(path: string) {
