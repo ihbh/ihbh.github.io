@@ -407,6 +407,11 @@ body .page .ol-attribution * {
 
 #see-chats.unread {
   font-weight: bold;
+  color: #0ff;
+}
+
+#see-chats.unread::after {
+  content: '+1';
 }
 
 /* ?page=places */
@@ -493,6 +498,7 @@ body .page .ol-attribution * {
 
 .user-cards .unread {
   font-weight: bold;
+  color: #0ff;
 }
 
 #nearby-status {
