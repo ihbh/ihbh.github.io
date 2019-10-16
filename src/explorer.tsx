@@ -39,7 +39,8 @@ function getCurrentVfsPath() {
 
 function addRefreshButton() {
   let button: HTMLElement =
-    <span class="refresh">[refresh]</span>;
+    <img src="/icons/refresh.svg"
+      title="Refresh contents"></img>;
   dom.id.expControls.append(button);
   button.onclick = () => refreshContents();
 }
@@ -47,7 +48,8 @@ function addRefreshButton() {
 function addRmDirButton() {
   let path = getCurrentVfsPath();
   let button: HTMLElement =
-    <span class="rmdir">[rm]</span>;
+    <img src="/icons/delete.svg"
+      title="Delete this dir"></img>;
   dom.id.expControls.append(button);
 
   let timer = 0;

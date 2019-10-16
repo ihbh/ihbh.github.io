@@ -42,6 +42,11 @@ export const id = {
   get visitors() { return $('#visitors'); },
   get activeChats() { return $('#p-unread > .user-cards'); },
 
+  // Feedback
+  get sendFeedback() { return $('#send-feedback') as HTMLButtonElement; },
+  get feedbackText() { return $('#p-feedback .text'); },
+  get feedbackStatus() { return $('#p-feedback .status'); },
+
   // Nearby visitors
   get nearbyStatus() { return $('#nearby-status'); },
   get vplaceMap() { return $('#vplace-map'); },

@@ -23,6 +23,7 @@ export const keyseed = prop<string>('local.keys.keyseed');
 export const privkey = prop<string>('local.keys.privkey');
 export const chats = prop<any>('local.chat.drafts', {});
 export const lastgps = prop<{ lat: number, lon: number }>('local.lastgps');
+export const feedback = prop<string>('local.feedback');
 
 export const darkmode = vfsconf.register({
   value: 0,

@@ -32,6 +32,7 @@ define(["require", "exports"], function (require, exports) {
     exports.LOG_IDB_NAME = 'logs';
     exports.LOG_IDB_INTERVAL = 5; // ms
     exports.FS_SLOW_THRS = 10; // ms
+    exports.FEEDBACK_SAVE_TIMEOUT = 500;
     exports.CONF_SDIR = '/ls/conf';
     exports.CONF_VDIR = '/conf';
     exports.USERDATA_DIR = '/idb/user';

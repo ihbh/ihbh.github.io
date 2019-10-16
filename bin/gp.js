@@ -18,6 +18,7 @@ define(["require", "exports", "./config", "./log", "./vfs-conf", "./vfs-prop"], 
     exports.privkey = prop('local.keys.privkey');
     exports.chats = prop('local.chat.drafts', {});
     exports.lastgps = prop('local.lastgps');
+    exports.feedback = prop('local.feedback');
     exports.darkmode = vfsconf.register({
         value: 0,
         test: x => x === 0 || x === 1,

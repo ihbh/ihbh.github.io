@@ -30,6 +30,8 @@ export const LOG_IDB_NAME = 'logs';
 export const LOG_IDB_INTERVAL = 5; // ms
 export const FS_SLOW_THRS = 10; // ms
 
+export const FEEDBACK_SAVE_TIMEOUT = 500;
+
 export const CONF_SDIR = '/ls/conf';
 export const CONF_VDIR = '/conf';
 

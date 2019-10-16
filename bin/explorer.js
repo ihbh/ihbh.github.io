@@ -27,13 +27,13 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
         return qargs.get('path') || '/';
     }
     function addRefreshButton() {
-        let button = react_1.default.createElement("span", { class: "refresh" }, "[refresh]");
+        let button = react_1.default.createElement("img", { src: "/icons/refresh.svg", title: "Refresh contents" });
         dom.id.expControls.append(button);
         button.onclick = () => refreshContents();
     }
     function addRmDirButton() {
         let path = getCurrentVfsPath();
-        let button = react_1.default.createElement("span", { class: "rmdir" }, "[rm]");
+        let button = react_1.default.createElement("img", { src: "/icons/delete.svg", title: "Delete this dir" });
         dom.id.expControls.append(button);
         let timer = 0;
         let remaining = 0;

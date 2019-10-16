@@ -8,6 +8,17 @@ function verifyUserId(uid: string) {
     throw new Error('Invalid user id: ' + uid);
 }
 
+export async function sendFeedback(text: string) {
+  log.i('Recording feedback.');
+  let time = new Date().toJSON()
+    .replace(/\..+$/, '')
+    .replace(/[^\d]/g, '-');
+  let path = `~/feedbacks/${time}`;
+  let vfs = await import('./vfs');
+  await vfs.root.set(path, text);
+  log.i('Feedback recorded.');
+}
+
 export async function isRegistered() {
   let gp = await import('./gp');
   let name = await gp.username.get();

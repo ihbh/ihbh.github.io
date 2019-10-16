@@ -301,7 +301,7 @@ body .page .ol-attribution * {
 
 #p-profile .footer {
   display: flex;
-  flex-direction: row;  
+  flex-direction: row;
   padding: 0.5em;
   align-items: center;
   background: #cfc;
@@ -609,16 +609,15 @@ body .page .ol-attribution * {
   border-bottom: 0.25em solid #800;
 }
 
-#p-explorer .path .controls {
-  color: #c00;
-}
-
-#p-explorer .path .controls span {
+#p-explorer .path .controls * {
   margin-right: 0.5em;
+  cursor: pointer;
+  width: 1em;
+  height: 1em;
 }
 
-#p-explorer .path .controls .rmdir {
-  cursor: pointer;
+#p-explorer .path .controls *:hover {
+  filter: invert(1);
 }
 
 #p-explorer .links {
@@ -640,27 +639,35 @@ body .page .ol-attribution * {
   user-select: none;
 }
 
+#p-explorer .links>div:hover {
+  filter: invert(1);
+}
+
 #p-explorer .links>div * {
   text-decoration: none;
   font-style: normal;
 }
 
 /* prop name */
+
 #p-explorer .links:not(.sfc)>div a {
   display: block;
 }
 
 /* prop value */
+
 #p-explorer .links>div i {
   font-weight: bold;
 }
 
 /* prop units */
+
 #p-explorer .links>div b {
   color: #444;
 }
 
 /* prop description */
+
 #p-explorer .links>div s {
   color: #444;
   display: block;
@@ -689,4 +696,34 @@ body .page .ol-attribution * {
 
 #p-explorer *[fstatus="failed"] {
   color: #800 !important;
+}
+
+/* ?page=feedback */
+
+#p-feedback * {
+  font-size: 0.75em;
+}
+
+#p-feedback .text {
+  flex: 1;
+  padding: 0.5em;
+}
+
+#p-feedback .text:empty::before {
+  color: #888;
+  font-style: italic;
+  content: 'What did you want to say?';
+}
+
+#p-feedback .footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.5em;
+  background: #400;
+  color: #fff;
+}
+
+#p-feedback .status {
+  flex: 1;
 }
