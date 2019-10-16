@@ -5,9 +5,11 @@ define(["require", "exports"], function (require, exports) {
         constructor(root) {
             this.root = root;
         }
-        async invoke(op, path, ...args) {
+        async invoke(fsop, path, ...args) {
             if (!path.startsWith('/'))
                 throw new Error('Bad path: ' + path);
+            if (path == '/' && fsop == 'dir')
+                return Object.keys(this.root);
             let i = path.indexOf('/', 1);
             if (i < 0)
                 i = path.length;
@@ -16,31 +18,11 @@ define(["require", "exports"], function (require, exports) {
             if (!fsprop)
                 throw new Error('Bad path: ' + path);
             let fs = await fsprop.get();
-            let handler = fs[op];
+            let handler = fs[fsop];
             if (!handler)
-                throw new Error('Not supported: ' + op + ' on ' + path);
+                throw new Error('Not supported: ' + fsop + ' on ' + path);
             let rel = path.slice(i) || '/';
             return handler.call(fs, rel, ...args);
-        }
-        async dir(path) {
-            if (path == '/')
-                return Object.keys(this.root);
-            return this.invoke('dir', path);
-        }
-        async find(path) {
-            return this.invoke('find', path);
-        }
-        async get(path) {
-            return this.invoke('get', path);
-        }
-        async set(path, data) {
-            return this.invoke('set', path, data);
-        }
-        async rm(path) {
-            return this.invoke('rm', path);
-        }
-        async rmdir(path) {
-            return this.invoke('rmdir', path);
         }
     }
     exports.default = HubFS;

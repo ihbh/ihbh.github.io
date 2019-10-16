@@ -37,29 +37,11 @@ define(["require", "exports", "./idb", "./log"], function (require, exports, idb
             let fs = await getTableFS(dbname, tname);
             return fs.dir(tpath);
         }
-        async get(path) {
-            log.d('get', path);
+        async invoke(fsop, path, ...args) {
+            log.d(fsop, path, ...args);
             let [dbname, tname, tpath] = splitPath(path);
             let fs = await getTableFS(dbname, tname);
-            return fs.get(tpath);
-        }
-        async set(path, data) {
-            log.d('set', path);
-            let [dbname, tname, tpath] = splitPath(path);
-            let fs = await getTableFS(dbname, tname);
-            await fs.set(tpath, data);
-        }
-        async rm(path) {
-            log.d('rm', path);
-            let [dbname, tname, tpath] = splitPath(path);
-            let fs = await getTableFS(dbname, tname);
-            await fs.rm(tpath);
-        }
-        async rmdir(path) {
-            log.d('rmdir', path);
-            let [dbname, tname, tpath] = splitPath(path);
-            let fs = await getTableFS(dbname, tname);
-            await fs.rmdir(tpath);
+            return fs.invoke(fsop, tpath, ...args);
         }
     };
     async function getTableFS(dbname, tname) {
@@ -95,11 +77,11 @@ define(["require", "exports", "./idb", "./log"], function (require, exports, idb
             throw new TypeError('Bad idbfs path: ' + path);
     }
     function verifyDBName(name) {
-        if (!/^\w+$/.test(name))
+        if (!name)
             throw new Error('Bad db name: ' + name);
     }
     function verifyTName(name) {
-        if (!/^\w+$/.test(name))
+        if (!name)
             throw new Error('Bad db table name: ' + name);
     }
 });

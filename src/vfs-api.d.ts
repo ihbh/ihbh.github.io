@@ -1,4 +1,5 @@
 export declare interface VFS {
+  invoke?(fsop: keyof VFS, path: string, ...args): Promise<any>;
   find?(path: string): Promise<string[]>;
   dir?(path: string): Promise<string[]>;
   get?(path: string): Promise<any>;

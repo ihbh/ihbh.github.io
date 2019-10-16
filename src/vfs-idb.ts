@@ -44,32 +44,11 @@ export default new class IDBFS implements VFS {
     return fs.dir(tpath);
   }
 
-  async get(path: string) {
-    log.d('get', path);
+  async invoke(fsop: keyof VFS, path: string, ...args) {
+    log.d(fsop, path, ...args);
     let [dbname, tname, tpath] = splitPath(path);
     let fs = await getTableFS(dbname, tname);
-    return fs.get(tpath);
-  }
-
-  async set(path: string, data) {
-    log.d('set', path);
-    let [dbname, tname, tpath] = splitPath(path);
-    let fs = await getTableFS(dbname, tname);
-    await fs.set(tpath, data);
-  }
-
-  async rm(path: string) {
-    log.d('rm', path);
-    let [dbname, tname, tpath] = splitPath(path);
-    let fs = await getTableFS(dbname, tname);
-    await fs.rm(tpath);
-  }
-
-  async rmdir(path: string) {
-    log.d('rmdir', path);
-    let [dbname, tname, tpath] = splitPath(path);
-    let fs = await getTableFS(dbname, tname);
-    await fs.rmdir(tpath);
+    return fs.invoke(fsop, tpath, ...args);
   }
 };
 
@@ -112,11 +91,11 @@ function verifyPath(path: string) {
 }
 
 function verifyDBName(name: string) {
-  if (!/^\w+$/.test(name))
+  if (!name)
     throw new Error('Bad db name: ' + name);
 }
 
 function verifyTName(name: string) {
-  if (!/^\w+$/.test(name))
+  if (!name)
     throw new Error('Bad db table name: ' + name);
 }

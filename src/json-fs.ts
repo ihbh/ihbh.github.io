@@ -24,6 +24,12 @@ export default class JsonFS implements VFS {
     };
   }
 
+  async invoke(fsop: keyof VFS, path: string, ...args) {
+    if (!this[fsop])
+      throw new Error('jsonfs.' + fsop + ' not supported');
+    return this[fsop](path, ...args);
+  }
+
   async find(dir: string): Promise<string[]> {
     log.d('find()', dir);
     if (!dir.endsWith('/'))

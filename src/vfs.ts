@@ -14,7 +14,7 @@ const STAT_REGEX = /^\w+$/;
 export const abspath = (path: string) =>
   path.replace(/^~/, conf.SHARED_DIR);
 
-export const root: VFS = {
+export const root = new class RootFS implements VFS {
   async find(path: string): Promise<string[]> {
     if (path == '/') {
       // find() via recursive dir()
@@ -28,18 +28,18 @@ export const root: VFS = {
     }
 
     path = abspath(path);
-    let relpaths = await invokeHandler('find', path);
+    let relpaths = await this.invoke('find', path);
     let prefix = ROOT_REGEX.exec(path);
     return relpaths.map(rel => prefix + rel);
-  },
+  }
 
   async dir(path: string): Promise<string[]> {
     if (path.endsWith('/'))
       path = path.slice(0, -1);
     if (!path)
       return Object.keys(handlers).map(s => s.slice(1));
-    return invokeHandler('dir', path);
-  },
+    return this.invoke('dir', path);
+  }
 
   async get(path: string): Promise<any> {
     if (path.endsWith('/'))
@@ -50,20 +50,20 @@ export const root: VFS = {
       let sprop = path.slice(i + 1);
       return this.stat(fpath, sprop);
     }
-    return invokeHandler('get', path);
-  },
+    return this.invoke('get', path);
+  }
 
   async set(path: string, json): Promise<void> {
     if (!path.endsWith('/'))
-      return invokeHandler('set', path, json);
+      return this.invoke('set', path, json);
     if (!json)
       return this.rm(path);
     throw new TypeError(`Cannot vfs.set() on dir ${path}`);
-  },
+  }
 
   async rm(path: string): Promise<void> {
-    return invokeHandler('rm', path);
-  },
+    return this.invoke('rm', path);
+  }
 
   async rmdir(path: string) {
     log.i('rmdir', path);
@@ -74,36 +74,39 @@ export const root: VFS = {
     let paths = await this.find(path);
     let ps = paths.map(filepath => this.rm(filepath));
     await Promise.all(ps);
-  },
+  }
 
   async stat(path: string, prop: string) {
     if (!STAT_REGEX.test(prop))
       throw new Error('Bad vfs stat: ' + prop);
-    return invokeHandler('stat', path, prop);
+    return this.invoke('stat', path, prop);
+  }
+
+  async invoke(fsop: keyof VFS, path: string, ...args) {
+    log.d(fsop, path, ...args);
+    let time = Date.now();
+    try {
+      let [phandler, rempath, rootdir] = parsePath(path);
+      let handler = await phandler.get();
+      let fn = handler[fsop] as Function;
+      if (!fn && !handler.invoke)
+        throw new Error(`${rootdir} doesn't support '${fsop}'`);
+      let result = fn ?
+        await fn.call(handler, rempath, ...args) :
+        await handler.invoke(fsop, rempath, ...args);
+      if (result !== undefined)
+        log.d(fsop, path, '->', JSON.stringify(result));
+      return result;
+    } catch (err) {
+      throw new DerivedError(
+        `vfs.${fsop} failed on ${path}`, err);
+    } finally {
+      let diff = Date.now() - time;
+      if (diff > conf.FS_SLOW_THRS)
+        log.d(fsop + ' is slow:', diff, 'ms', path);
+    }
   }
 };
-
-async function invokeHandler(method: keyof VFS, path: string, ...args) {
-  log.d(method, path, ...args);
-  let time = Date.now();
-  try {
-    let [phandler, rempath, rootdir] = parsePath(path);
-    let handler = await phandler.get();
-    let fn = handler[method] as Function;
-    if (!fn) throw new Error(`${rootdir} doesn't support '${method}'`);
-    let result = await fn.call(handler, rempath, ...args);
-    if (result !== undefined)
-      log.d(method, path, '->', JSON.stringify(result));
-    return result;
-  } catch (err) {
-    throw new DerivedError(
-      `vfs.${method}() failed on ${path}`, err);
-  } finally {
-    let diff = Date.now() - time;
-    if (diff > conf.FS_SLOW_THRS)
-      log.d(method + '() is slow:', diff, 'ms', path);
-  }
-}
 
 function parsePath(path: string): [AsyncProp<VFS>, string, string] {
   path = abspath(path);

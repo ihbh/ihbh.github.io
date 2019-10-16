@@ -6,6 +6,11 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         constructor(args) {
             this.args = Object.assign({ path: key => '/' + key.split('.').join('/'), key: path => path.slice(1).split('/').join('.') }, args);
         }
+        async invoke(fsop, path, ...args) {
+            if (!this[fsop])
+                throw new Error('jsonfs.' + fsop + ' not supported');
+            return this[fsop](path, ...args);
+        }
         async find(dir) {
             log.d('find()', dir);
             if (!dir.endsWith('/'))
