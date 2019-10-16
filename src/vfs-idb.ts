@@ -6,18 +6,20 @@ import { TaggedLogger } from './log';
 
 const log = new TaggedLogger('idbfs');
 
-const idbfs: VFS = {
-  async find(path: string): Promise<string[]> {
-    checkPath(path);
-    log.d('find()', path);
+// JsonFS for every dbname/table.
+const tfs = new Map<string, Promise<VFS>>();
 
-    let parts = path == '/' ? [''] : path.split('/');
-    let depth = parts.length - 1;
+export default new class IDBFS implements VFS {
+  async find(path: string) {
+    log.d('find', path);
+    let [dbname, tname, tpath] = splitPath(path);
 
-    if (depth < 2) {
-      // find() via recursive dir()
+    // find() via recursive dir()
+    if (!dbname || !tname) {
       let res: string[] = [];
-      let prefix = path == '/' ? '/' : path + '/';
+      let prefix = path;
+      if (!prefix.endsWith('/'))
+        prefix += '/';
       let names = await this.dir(path);
       for (let name of names) {
         let paths = await this.find(prefix + name);
@@ -26,97 +28,95 @@ const idbfs: VFS = {
       return res;
     }
 
-    let [, dbname, tname, ...props] = parts;
+    let fs = await getTableFS(dbname, tname);
+    let relpaths = await fs.find(tpath);
+    return relpaths.map(
+      rel => '/' + dbname + '/' + tname + rel);
+  }
 
+  async dir(path: string) {
+    log.d('dir', path);
+    let [dbname, tname, tpath] = splitPath(path);
+    if (!dbname) return DB.names();
     let db = DB.open(dbname);
-    let t = db.open(tname);
-    let prefix = props.join('.');
-    let tpref = '/' + dbname + '/' + tname;
-    let keys = await t.keys();
-    let mkeys = keys.filter(key => !prefix
-      || prefix == key
-      || key.startsWith(prefix + '.'));
-    return mkeys.map(key => tpref + '/'
-      + key.split('.').join('/'));
-  },
+    if (!tname) return db.tnames();
+    let fs = await getTableFS(dbname, tname);
+    return fs.dir(tpath);
+  }
 
-  async dir(path: string): Promise<string[]> {
-    checkPath(path);
-    log.d('dir()', path);
+  async get(path: string) {
+    log.d('get', path);
+    let [dbname, tname, tpath] = splitPath(path);
+    let fs = await getTableFS(dbname, tname);
+    return fs.get(tpath);
+  }
 
-    let [dbname, tname, ...props] = path.slice(1).split('/');
-    if (!dbname)
-      return DB.names();
+  async set(path: string, data) {
+    log.d('set', path);
+    let [dbname, tname, tpath] = splitPath(path);
+    let fs = await getTableFS(dbname, tname);
+    await fs.set(tpath, data);
+  }
 
-    let db = DB.open(dbname);
-    if (!tname)
-      return db.tnames();
+  async rm(path: string) {
+    log.d('rm', path);
+    let [dbname, tname, tpath] = splitPath(path);
+    let fs = await getTableFS(dbname, tname);
+    await fs.rm(tpath);
+  }
 
-    let t = db.open(tname);
-    let prefix = props.join('.');
-    let keys = await t.keys();
-    let names = new Set<string>();
-
-    for (let key of keys) {
-      if (prefix && !key.startsWith(prefix + '.'))
-        continue;
-      let suffix = !prefix ? key :
-        key.slice(prefix.length + 1);
-      let name = suffix.split('.')[0];
-      names.add(name);
-    }
-
-    return [...names];
-  },
-
-  async get(path: string): Promise<any> {
-    let { dbname, table, key } = parsePath(path);
-    log.d('get', dbname + '.' + table + ':' + key);
-    let db = DB.open(dbname);
-    let t = db.open(table);
-    let json = await t.get(key);
-    return json === undefined ? null : json;
-  },
-
-  async set(path: string, json): Promise<void> {
-    let { dbname, table, key } = parsePath(path);
-    log.d('set', dbname + '.' + table + ':' + key, json);
-    let db = DB.open(dbname);
-    let t = db.open(table);
-    return t.set(key, json);
-  },
-
-  async rm(path: string): Promise<void> {
-    let { dbname, table, key } = parsePath(path);
-    log.d('rm', dbname + '.' + table + ':' + key);
-    let db = DB.open(dbname);
-    let t = db.open(table);
-    if (!path.endsWith('/')) {
-      await t.remove(key);
-    } else {
-      let names = await t.keys();
-      let ps: Promise<void>[] = [];
-      for (let name of names)
-        if (name.startsWith(key))
-          ps.push(t.remove(name));
-      await Promise.all(ps);
-    }
-  },
+  async rmdir(path: string) {
+    log.d('rmdir', path);
+    let [dbname, tname, tpath] = splitPath(path);
+    let fs = await getTableFS(dbname, tname);
+    await fs.rmdir(tpath);
+  }
 };
 
-function parsePath(path: string) {
-  if (path[0] != '/' || path.includes('.'))
-    throw new TypeError('Bad path: ' + path);
-  let [dbname, table, ...props] = path.slice(1).split('/');
-  if (!dbname || !table || !props.length)
-    throw new SyntaxError('Bad idbfs path: ' + path);
-  let key = props.join('.');
-  return { dbname, table, key };
+async function getTableFS(dbname: string, tname: string) {
+  verifyDBName(dbname);
+  verifyTName(tname);
+
+  let key = dbname + ':' + tname;
+  let pfs = tfs.get(key);
+  if (pfs) return pfs;
+
+  pfs = createTableFS(dbname, tname);
+  tfs.set(key, pfs);
+  return pfs;
 }
 
-function checkPath(path: string) {
+async function createTableFS(dbname: string, tname: string) {
+  log.d('Creating a new table fs:', dbname + '/' + tname);
+  let { default: JsonFS } = await import('./json-fs');
+  let db = DB.open(dbname);
+  let t = db.open(tname);
+
+  return new JsonFS({
+    keys: () => t.keys(),
+    read: key => t.get(key),
+    remove: key => t.remove(key),
+    write: (key, data) => t.set(key, data),
+  });
+}
+
+function splitPath(path: string) {
+  verifyPath(path);
+  let [, dbname, tname, ...tpath] = path.split('/');
+  return [dbname, tname, '/' + tpath.join('/')];
+}
+
+function verifyPath(path: string) {
   if (path[0] != '/')
-    throw new TypeError('Bad path: ' + path);
+    throw new TypeError('Bad idbfs path: ' + path);
 }
 
-export default idbfs;
+function verifyDBName(name: string) {
+  if (!/^\w+$/.test(name))
+    throw new Error('Bad db name: ' + name);
+}
+
+function verifyTName(name: string) {
+  if (!/^\w+$/.test(name))
+    throw new Error('Bad db table name: ' + name);
+}

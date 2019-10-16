@@ -3,16 +3,18 @@ define(["require", "exports", "./idb", "./log"], function (require, exports, idb
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('idbfs');
-    const idbfs = {
+    // JsonFS for every dbname/table.
+    const tfs = new Map();
+    exports.default = new class IDBFS {
         async find(path) {
-            checkPath(path);
-            log.d('find()', path);
-            let parts = path == '/' ? [''] : path.split('/');
-            let depth = parts.length - 1;
-            if (depth < 2) {
-                // find() via recursive dir()
+            log.d('find', path);
+            let [dbname, tname, tpath] = splitPath(path);
+            // find() via recursive dir()
+            if (!dbname || !tname) {
                 let res = [];
-                let prefix = path == '/' ? '/' : path + '/';
+                let prefix = path;
+                if (!prefix.endsWith('/'))
+                    prefix += '/';
                 let names = await this.dir(path);
                 for (let name of names) {
                     let paths = await this.find(prefix + name);
@@ -20,87 +22,85 @@ define(["require", "exports", "./idb", "./log"], function (require, exports, idb
                 }
                 return res;
             }
-            let [, dbname, tname, ...props] = parts;
-            let db = idb_1.DB.open(dbname);
-            let t = db.open(tname);
-            let prefix = props.join('.');
-            let tpref = '/' + dbname + '/' + tname;
-            let keys = await t.keys();
-            let mkeys = keys.filter(key => !prefix
-                || prefix == key
-                || key.startsWith(prefix + '.'));
-            return mkeys.map(key => tpref + '/'
-                + key.split('.').join('/'));
-        },
+            let fs = await getTableFS(dbname, tname);
+            let relpaths = await fs.find(tpath);
+            return relpaths.map(rel => '/' + dbname + '/' + tname + rel);
+        }
         async dir(path) {
-            checkPath(path);
-            log.d('dir()', path);
-            let [dbname, tname, ...props] = path.slice(1).split('/');
+            log.d('dir', path);
+            let [dbname, tname, tpath] = splitPath(path);
             if (!dbname)
                 return idb_1.DB.names();
             let db = idb_1.DB.open(dbname);
             if (!tname)
                 return db.tnames();
-            let t = db.open(tname);
-            let prefix = props.join('.');
-            let keys = await t.keys();
-            let names = new Set();
-            for (let key of keys) {
-                if (prefix && !key.startsWith(prefix + '.'))
-                    continue;
-                let suffix = !prefix ? key :
-                    key.slice(prefix.length + 1);
-                let name = suffix.split('.')[0];
-                names.add(name);
-            }
-            return [...names];
-        },
+            let fs = await getTableFS(dbname, tname);
+            return fs.dir(tpath);
+        }
         async get(path) {
-            let { dbname, table, key } = parsePath(path);
-            log.d('get', dbname + '.' + table + ':' + key);
-            let db = idb_1.DB.open(dbname);
-            let t = db.open(table);
-            let json = await t.get(key);
-            return json === undefined ? null : json;
-        },
-        async set(path, json) {
-            let { dbname, table, key } = parsePath(path);
-            log.d('set', dbname + '.' + table + ':' + key, json);
-            let db = idb_1.DB.open(dbname);
-            let t = db.open(table);
-            return t.set(key, json);
-        },
+            log.d('get', path);
+            let [dbname, tname, tpath] = splitPath(path);
+            let fs = await getTableFS(dbname, tname);
+            return fs.get(tpath);
+        }
+        async set(path, data) {
+            log.d('set', path);
+            let [dbname, tname, tpath] = splitPath(path);
+            let fs = await getTableFS(dbname, tname);
+            await fs.set(tpath, data);
+        }
         async rm(path) {
-            let { dbname, table, key } = parsePath(path);
-            log.d('rm', dbname + '.' + table + ':' + key);
-            let db = idb_1.DB.open(dbname);
-            let t = db.open(table);
-            if (!path.endsWith('/')) {
-                await t.remove(key);
-            }
-            else {
-                let names = await t.keys();
-                let ps = [];
-                for (let name of names)
-                    if (name.startsWith(key))
-                        ps.push(t.remove(name));
-                await Promise.all(ps);
-            }
-        },
+            log.d('rm', path);
+            let [dbname, tname, tpath] = splitPath(path);
+            let fs = await getTableFS(dbname, tname);
+            await fs.rm(tpath);
+        }
+        async rmdir(path) {
+            log.d('rmdir', path);
+            let [dbname, tname, tpath] = splitPath(path);
+            let fs = await getTableFS(dbname, tname);
+            await fs.rmdir(tpath);
+        }
     };
-    function parsePath(path) {
-        if (path[0] != '/' || path.includes('.'))
-            throw new TypeError('Bad path: ' + path);
-        let [dbname, table, ...props] = path.slice(1).split('/');
-        if (!dbname || !table || !props.length)
-            throw new SyntaxError('Bad idbfs path: ' + path);
-        let key = props.join('.');
-        return { dbname, table, key };
+    async function getTableFS(dbname, tname) {
+        verifyDBName(dbname);
+        verifyTName(tname);
+        let key = dbname + ':' + tname;
+        let pfs = tfs.get(key);
+        if (pfs)
+            return pfs;
+        pfs = createTableFS(dbname, tname);
+        tfs.set(key, pfs);
+        return pfs;
     }
-    function checkPath(path) {
+    async function createTableFS(dbname, tname) {
+        log.d('Creating a new table fs:', dbname + '/' + tname);
+        let { default: JsonFS } = await new Promise((resolve_1, reject_1) => { require(['./json-fs'], resolve_1, reject_1); });
+        let db = idb_1.DB.open(dbname);
+        let t = db.open(tname);
+        return new JsonFS({
+            keys: () => t.keys(),
+            read: key => t.get(key),
+            remove: key => t.remove(key),
+            write: (key, data) => t.set(key, data),
+        });
+    }
+    function splitPath(path) {
+        verifyPath(path);
+        let [, dbname, tname, ...tpath] = path.split('/');
+        return [dbname, tname, '/' + tpath.join('/')];
+    }
+    function verifyPath(path) {
         if (path[0] != '/')
-            throw new TypeError('Bad path: ' + path);
+            throw new TypeError('Bad idbfs path: ' + path);
     }
-    exports.default = idbfs;
+    function verifyDBName(name) {
+        if (!/^\w+$/.test(name))
+            throw new Error('Bad db name: ' + name);
+    }
+    function verifyTName(name) {
+        if (!/^\w+$/.test(name))
+            throw new Error('Bad db table name: ' + name);
+    }
 });
 //# sourceMappingURL=vfs-idb.js.map

@@ -35,9 +35,12 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             if (!path || path.endsWith('/'))
                 throw new Error('Bad path: ' + path);
             let keys = await this.args.keys();
-            for (let key of keys)
-                if (this.args.path(key) == path)
-                    return this.args.read(key);
+            for (let key of keys) {
+                if (this.args.path(key) == path) {
+                    let data = await this.args.read(key);
+                    return data === undefined ? null : data;
+                }
+            }
             return null;
         }
         async set(path, data) {
