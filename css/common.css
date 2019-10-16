@@ -461,7 +461,7 @@ body .page .ol-attribution * {
 
 #p-settings .controls {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   grid-gap: 0.5em;
   margin: 0.5em;
 }
