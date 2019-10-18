@@ -4,6 +4,15 @@ In short, it's an app that shares your location with others: you go somewhere, o
 
 This web app is meant to work as a Progressive Web App (PWA) to avoid hurdles with Android and iOS app stores.
 
+# Contents
+
+|                                    |                               |
+| ---------------------------------- | ----------------------------- |
+| [Get started](/docs/get-started)   | [How-to guides](/docs/how-to) |
+| [How it works](/docs/how-it-works) | [Reference](/docs/reference)  |
+
+[Why is the documentation structured this way?](https://www.divio.com/blog/documentation/)
+
 # Credits
 
 Icons made by Prosymbols and Freepik from flaticon.com.
