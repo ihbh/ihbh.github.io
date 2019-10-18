@@ -20,10 +20,40 @@ export async function init() {
   addUnregTag();
 }
 
+export async function render() {
+  return <div id="p-profile" class="page">
+    <div class="header">
+      <img id="photo"
+        src="/icons/user.svg" />
+      <span id="reg-name">[?]</span>
+      <span class="self-tag">This is your profile</span>
+    </div>
+
+    <div class="details">
+      <table>
+        <tbody>
+
+        </tbody>
+      </table>
+    </div>
+
+    <div class="about"></div>
+    <div class="reason"
+      contenteditable></div>
+
+    <div class="footer">
+      <span class="status"></span>
+      <button id="reg-done">Done</button>
+      <button class="report">Report</button>
+      <button class="send-report">Send Report</button>
+    </div>
+  </div>;
+}
+
 function initChatLink() {
   if (uid) {
     dom.id.regPhoto.onclick =
-      () => location.href = '?page=chat&uid=' + uid;
+      () => page.set('chat', { uid });
   }
 }
 
@@ -34,7 +64,7 @@ async function addUnregTag() {
 
 function addSelfTag() {
   if (uid) return;
-  let p = page.getPageElement();
+  let p = page.root();
   p.classList.add('self');
 }
 
@@ -74,7 +104,7 @@ async function addEventListeners() {
   if (uid) {
     dom.id.regReport.onclick = async () => {
       log.i('Clicked Report.');
-      let p = page.getPageElement();
+      let p = page.root();
       p.classList.add('report');
       let reason = await usr.getAbuseReport(uid);
       dom.id.regReason.textContent = reason || '';
@@ -95,7 +125,7 @@ async function addEventListeners() {
         dom.id.regSendReport.disabled = true;
         await usr.setAbuseReport(uid, reason);
         dom.id.regStatus.textContent = 'Report has been recorded.';
-        let p = page.getPageElement();
+        let p = page.root();
         p.classList.add('reported');
       } finally {
         dom.id.regSendReport.disabled = false;

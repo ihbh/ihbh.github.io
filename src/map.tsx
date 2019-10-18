@@ -5,6 +5,7 @@ import * as gps from './gps';
 import { TaggedLogger } from './log';
 import { OSM } from './osm';
 import * as page from './page';
+import React from './react';
 
 declare const PositionError;
 
@@ -14,6 +15,42 @@ let osm: OSM;
 let bestPos: Coordinates;
 let watcher: gps.Watcher;
 
+export async function render() {
+  return <div id="p-map"
+    class="page">
+    <div id="map"></div>
+    <span id="no-gps"></span>
+
+    <div id="controls">
+      <button id="userpic"
+        class="btn-sq"
+        style="background-image: url()">
+        Profile
+      </button>
+      <button id="show-places"
+        class="btn-sq"
+        style="background-image: url(/icons/globe.png)">
+        Places
+      </button>
+      <button id="see-chats"
+        class="btn-sq"
+        style="background-image: url(/icons/chat.png)">
+        Chat
+      </button>
+      <button id="settings"
+        class="btn-sq"
+        style="background-image: url(/icons/config.svg)">
+        Settings
+      </button>
+    </div>
+
+    <button class="btn"
+      id="send">
+      I've Been Here!
+    </button>
+  </div>;
+}
+
 export async function init() {
   initUserPic();
   initShowPlaces();
@@ -22,6 +59,11 @@ export async function init() {
   initSettingsButton();
   await initMap();
   showLastSeenPos();
+}
+
+export function stop() {
+  watcher && watcher.stop();
+  watcher = null;
 }
 
 function initSettingsButton() {

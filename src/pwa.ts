@@ -1,5 +1,5 @@
-import { TaggedLogger } from './log';
 import * as conf from './config';
+import { TaggedLogger } from './log';
 
 let log = new TaggedLogger('pwa');
 let deferredPrompt;

@@ -1,4 +1,4 @@
-define(["require", "exports", "./log", "./config"], function (require, exports, log_1, conf) {
+define(["require", "exports", "./config", "./log"], function (require, exports, conf, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('pwa');

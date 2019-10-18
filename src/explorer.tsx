@@ -1,3 +1,4 @@
+import * as page from './page';
 import * as dom from './dom';
 import { TaggedLogger } from './log';
 import * as qargs from './qargs';
@@ -8,6 +9,17 @@ const log = new TaggedLogger('explorer');
 
 const RMDIR_TIMEOUT = 5;
 const TAG_LINKS = 'links';
+
+export async function render() {
+  return <div id="p-explorer"
+    class="page">
+    <div class="path">
+      <span class="vfs-path"></span>
+      <span class="controls"></span>
+    </div>
+    <div class="data"></div>
+  </div>;
+}
 
 export async function init() {
   let path = getCurrentVfsPath();
@@ -146,9 +158,11 @@ async function renderAsDir(dirPath: string, sfc: boolean, idir: string) {
 
   let ps = names.map(async name => {
     let path = dirPath + '/' + name;
-    let href = `/?page=explorer&path=${encodeURIComponent(path)}`;
-    if (sfc) href += '&sfc=1';
-    if (idir) href += '&idir=' + idir;
+    let href = page.href('explorer', { 
+      path,
+      sfc: sfc ? 1 : null,
+      idir: idir ? 1 : null,
+     });
     let nameTag = <a href={href}>{decodeURIComponent(name)}</a>;
     let dataTag: HTMLElement = null;
     let infoTag: HTMLElement = null;

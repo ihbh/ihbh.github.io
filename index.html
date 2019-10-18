@@ -2,6 +2,8 @@
 <html>
 
 <head>
+  <script>window.gtime0=Date.now()</script>
+
   <meta http-equiv="Content-Type"
         content="text/html;charset=utf-8">
   <meta http-equiv="Encoding"
@@ -20,8 +22,7 @@
       script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.rawgit.com;
       worker-src 'self';
       style-src 'self' 'unsafe-inline' cdn.rawgit.com;
-      upgrade-insecure-requests;
-  ">
+      upgrade-insecure-requests;">
 
   <title>I've Been Here</title>
 
@@ -39,20 +40,13 @@
 </head>
 
 <body>
-  <script>
-    if (localStorage['conf.ui.dark-mode'] == 1)
-      document.body.classList.add('darkmode');
-  </script>
-
   <a id="darkmode"
-     class="overlay-link"
-     href="javascript:void(ls=localStorage,dm='conf.ui.dark-mode',ls[dm]=ls[dm]==1?0:1,document.body.classList.toggle('darkmode'))">Dark
-    mode</a>
+     class="overlay-link">Dark mode</a>
 
   <a id="home-link"
      class="overlay-link"
      title="Go to the main map page"
-     href="?page=map">Home</a>
+     href="/">Home</a>
 
   <a id="debug-toggle"
      class="overlay-link">Debug</a>
@@ -68,184 +62,7 @@
             id="show-logs">Logs</button>
   </div>
 
-  <!-- The user profile page. -->
-
-  <div id="p-profile"
-       class="page">
-    <div class="header">
-      <img id="photo"
-           src="/icons/user.svg">
-      <span id="reg-name">[?]</span>
-      <span class="self-tag">This is your profile</span>
-    </div>
-
-    <div class="details">
-      <table>
-        <tbody>
-
-        </tbody>
-      </table>
-    </div>
-
-    <div class="about"></div>
-    <div class="reason"
-         contenteditable></div>
-
-    <div class="footer">
-      <span class="status"></span>
-      <button id="reg-done">Done</button>
-      <button class="report">Report</button>
-      <button class="send-report">Send Report</button>
-    </div>
-  </div>
-
-  <!-- Map with all visited places. -->
-
-  <div id="p-places"
-       class="page">
-    <div id="all-places"></div>
-  </div>
-
-  <!-- List of other visitors nearby. -->
-
-  <div id="p-nearby"
-       class="page">
-    <div id="vplace-map"></div>
-    <div id="vtime-bar">
-      You've been here <span id="vtime-label"></span>
-      <span id="nvtimes"></span>
-      [<span id="unvisit">unvisit</span>]
-    </div>
-    <div id="nearby-status"></div>
-    <div id="visitors"
-         class="user-cards"></div>
-  </div>
-
-  <!-- All chats, unread first. -->
-
-  <div id="p-unread"
-       class="page">
-    <div class="user-cards"></div>
-  </div>
-
-  <!-- Settings -->
-
-  <div id="p-settings"
-       class="page">
-    <div class="controls">
-      <button id="export-db"
-              class="btn-sq"
-              style="background-image: url(/icons/download.svg)">
-        Export
-      </button>
-      <button id="import-db"
-              class="btn-sq"
-              style="background-image: url(/icons/upload.svg)">
-        Import
-      </button>
-      <button id="vfs-explorer"
-              class="btn-sq"
-              href="?page=explorer"
-              style="background-image: url(/icons/storage.svg)">
-        VFS
-      </button>
-      <button id="config"
-              class="btn-sq"
-              href="?page=explorer&sfc=1&idir=1&path=/conf"
-              style="background-image: url(/icons/config.svg)">
-        Config
-      </button>
-      <button id="feedback"
-              class="btn-sq"
-              href="?page=feedback"
-              style="background-image: url(/icons/upvote.svg)">
-        Feedback
-      </button>
-    </div>
-  </div>
-
-  <!-- The main page with the map. -->
-
-  <div id="p-map"
-       class="page">
-    <div id="map"></div>
-    <span id="no-gps"></span>
-
-    <div id="controls">
-      <button id="userpic"
-              class="btn-sq"
-              style="background-image: url()">
-        Profile
-      </button>
-      <button id="show-places"
-              class="btn-sq"
-              style="background-image: url(/icons/globe.png)">
-        Places
-      </button>
-      <button id="see-chats"
-              class="btn-sq"
-              style="background-image: url(/icons/chat.png)">
-        Chat
-      </button>
-      <button id="settings"
-              class="btn-sq"
-              style="background-image: url(/icons/config.svg)">
-        Settings
-      </button>
-    </div>
-
-    <button class="btn"
-            id="send">
-      I've Been Here!
-    </button>
-  </div>
-
-  <!-- The 1:1 chat page. -->
-
-  <div id="p-chat"
-       class="page">
-    <div id="u-header">
-      <a class="user-href">
-        <img id="chat-u-icon" />
-      </a>
-      <span id="chat-u-name">[?]</span>
-    </div>
-    <div id="messages"></div>
-    <div id="u-footer">
-      <div id="reply-text"
-           contenteditable></div>
-      <button id="reply-send"
-              class="btn-sq"
-              style="background-image: url(/icons/send.svg)">
-        Send
-      </button>
-    </div>
-  </div>
-
-  <!-- VFS explorer. -->
-
-  <div id="p-explorer"
-       class="page">
-    <div class="path">
-      <span class="vfs-path"></span>
-      <span class="controls"></span>
-    </div>
-    <div class="data"></div>
-  </div>
-
-  <!-- Feedback -->
-
-  <div id="p-feedback"
-       class="page">
-    <div class="text"
-         contenteditable></div>
-    <div class="footer">
-      <span class="status"></span>
-      <button id="send-feedback">
-        Send Feedback
-      </button>
-    </div>
-  </div>
+  <div id="page"></div>
 </body>
 
 </html>

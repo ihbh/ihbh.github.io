@@ -63,8 +63,19 @@ body.darkmode {
   outline: none;
 }
 
-.page {
-  display: none;
+#page {
+  width: 100%;
+  height: 100%;
+}
+
+#page:empty::before {
+  content: 'Loading';
+  text-align: center;
+  vertical-align: middle;
+}
+
+#page>* {
+  display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
@@ -160,17 +171,17 @@ body.debug #debug-toggle {
 
 /* OSM */
 
-body .page .ol-attribution {
+body #page .ol-attribution {
   bottom: 0;
   right: 0;
   font-size: 10pt;
 }
 
-body .page .ol-attribution * {
+body #page .ol-attribution * {
   font-size: 10pt;
 }
 
-/* ?page=profile */
+/* page=profile */
 
 #p-profile {
   flex-direction: column;
@@ -351,7 +362,7 @@ body .page .ol-attribution * {
   color: #000;
 }
 
-/* ?page=map */
+/* page=map */
 
 #map {
   width: 100%;
@@ -414,7 +425,7 @@ body .page .ol-attribution * {
   content: '+1';
 }
 
-/* ?page=places */
+/* page=places */
 
 #all-places {
   width: 100%;
@@ -426,7 +437,7 @@ body .page .ol-attribution * {
   z-index: 0;
 }
 
-/* ?page=nearby */
+/* page=nearby */
 
 #p-nearby {
   height: auto;
@@ -457,7 +468,7 @@ body .page .ol-attribution * {
   padding: 1em;
 }
 
-/* ?page=settings */
+/* page=settings */
 
 #p-settings .controls {
   display: grid;
@@ -466,7 +477,7 @@ body .page .ol-attribution * {
   margin: 0.5em;
 }
 
-/* ?page=unread */
+/* page=unread */
 
 .user-cards {
   display: grid;
@@ -506,7 +517,7 @@ body .page .ol-attribution * {
   word-break: break-all;
 }
 
-/* ?page=chat */
+/* page=chat */
 
 #u-header {
   display: flex;
@@ -600,7 +611,7 @@ body .page .ol-attribution * {
   border-color: #ccf;
 }
 
-/* ?page=explorer */
+/* page=explorer */
 
 #p-explorer * {
   font-size: 12pt;
@@ -704,7 +715,7 @@ body .page .ol-attribution * {
   color: #800 !important;
 }
 
-/* ?page=feedback */
+/* page=feedback */
 
 #p-feedback * {
   font-size: 0.75em;

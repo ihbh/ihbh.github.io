@@ -1,4 +1,7 @@
+import { TaggedLogger } from './log';
 import * as rsync from './rsync';
+
+const log = new TaggedLogger('startup');
 
 let callbacks = [];
 
@@ -9,6 +12,7 @@ function register(callback: () => void) {
 }
 
 export function run() {
+  log.i('Running the startup tasks:', callbacks.length);
   for (let callback of callbacks)
     callback();
 }

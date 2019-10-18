@@ -1,19 +1,33 @@
-define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./osm", "./qargs", "./react", "./rpc", "./timestr", "./ucache", "./user"], function (require, exports, conf, dom, gp, loc, log_1, osm_1, qargs, react_1, rpc, tts, ucache_1, user) {
+define(["require", "exports", "./page", "./config", "./dom", "./gp", "./loc", "./log", "./osm", "./qargs", "./react", "./rpc", "./timestr", "./ucache", "./user"], function (require, exports, page, conf, dom, gp, loc, log_1, osm_1, qargs, react_1, rpc, tts, ucache_1, user) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('nearby');
     let tskey = '';
     let allvisits;
+    async function render() {
+        return react_1.default.createElement("div", { id: "p-nearby", class: "page" },
+            react_1.default.createElement("div", { id: "vplace-map" }),
+            react_1.default.createElement("div", { id: "vtime-bar" },
+                "You've been here ",
+                react_1.default.createElement("span", { id: "vtime-label" }),
+                react_1.default.createElement("span", { id: "nvtimes" }),
+                "[",
+                react_1.default.createElement("span", { id: "unvisit" }, "unvisit"),
+                "]"),
+            react_1.default.createElement("div", { id: "nearby-status" }),
+            react_1.default.createElement("div", { id: "visitors", class: "user-cards" }));
+    }
+    exports.render = render;
     async function init() {
         log.i('init()');
         try {
             tskey = qargs.get('tskey');
             if (!tskey)
-                throw new Error('Missing ?tskey= URL param.');
+                throw new Error('Missing tskey URL param.');
             initUnvisitLink();
             let { lat, lon, time } = await loc.getPlace(tskey);
             if (!lat || !lon)
-                throw new Error(`No such visited place: ?tskey=` + tskey);
+                throw new Error(`No such visited place: tskey=` + tskey);
             dom.id.vtimeLabel.textContent =
                 tts.recentTimeToStr(new Date(time * 1000));
             setStatus('Checking who has been here before...');
@@ -98,7 +112,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./
         };
     }
     function makeUserCard(info) {
-        let href = '?page=chat&uid=' + info.uid;
+        let href = page.href('chat', { uid: info.uid });
         return react_1.default.createElement("a", { href: href },
             react_1.default.createElement("img", { src: info.photo || conf.NOUSERPIC }),
             react_1.default.createElement("span", null, info.name || info.uid));

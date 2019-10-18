@@ -3,16 +3,19 @@ define(["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CSS_DEBUG = 'debug';
     exports.id = {
-        get btnSeeChats() { return $('#see-chats'); },
-        get btnSettings() { return $('#settings'); },
+        get pageContainer() { return $('#page'); },
         get debugMenu() { return $('#debug'); },
         get btnDebugToggle() { return $('#debug-toggle'); },
-        get map() { return $('#map'); },
-        get mapAll() { return $('#all-places'); },
-        get sendLocation() { return $('#send'); },
+        get linkDarkMode() { return $('#darkmode'); },
         get logs() { return $('#logs'); },
         get gotoCommon() { return $('#gps-london'); },
         get showLogs() { return $('#show-logs'); },
+        // Main OSM Map
+        get btnSeeChats() { return $('#see-chats'); },
+        get btnSettings() { return $('#settings'); },
+        get map() { return $('#map'); },
+        get mapAll() { return $('#all-places'); },
+        get sendLocation() { return $('#send'); },
         get noGPS() { return $('#no-gps'); },
         // VFS explorer
         get pageExplorer() { return $('#p-explorer'); },

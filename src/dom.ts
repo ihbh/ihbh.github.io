@@ -1,16 +1,20 @@
 export const CSS_DEBUG = 'debug';
 
 export const id = {
-  get btnSeeChats() { return $('#see-chats') as HTMLButtonElement; },
-  get btnSettings() { return $('#settings') as HTMLButtonElement; },
+  get pageContainer() { return $('#page'); },
   get debugMenu() { return $('#debug'); },
   get btnDebugToggle() { return $('#debug-toggle') as HTMLButtonElement; },
-  get map() { return $('#map'); },
-  get mapAll() { return $('#all-places'); },
-  get sendLocation() { return $<HTMLButtonElement>('#send'); },
+  get linkDarkMode() { return $('#darkmode') as HTMLAnchorElement; },
   get logs() { return $('#logs'); },
   get gotoCommon() { return $('#gps-london'); },
   get showLogs() { return $('#show-logs'); },
+
+  // Main OSM Map
+  get btnSeeChats() { return $('#see-chats') as HTMLButtonElement; },
+  get btnSettings() { return $('#settings') as HTMLButtonElement; },
+  get map() { return $('#map'); },
+  get mapAll() { return $('#all-places'); },
+  get sendLocation() { return $<HTMLButtonElement>('#send'); },
   get noGPS() { return $('#no-gps'); },
 
   // VFS explorer

@@ -1,29 +1,32 @@
-define(["require", "exports", "./dbg", "./dom", "./log", "./page", "./pwa", "./usr"], function (require, exports, dbg, dom, log_1, page, pwa, usr_1) {
+define(["require", "exports", "./config", "./dom", "./log", "./page", "./usr"], function (require, exports, conf, dom, log_1, page, usr_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('index');
     dom.whenLoaded().then(async () => {
-        await dbg.init().catch(err => {
-            log.w('dbg.init() failed:', err);
-        });
-        await pwa.init();
-        let reg = await usr_1.isRegistered();
-        log.i('user registered?', reg);
-        if (!reg) {
-            if (page.get() == 'profile')
-                await page.init();
-            else
-                page.set('profile');
-        }
-        else if (!page.get()) {
-            page.set('map');
-        }
-        else {
-            log.i('Page explicitly selected:', page.get());
-            await page.init();
-        }
+        log.i('location.href:', location.href);
+        new Promise((resolve_1, reject_1) => { require(['./darkmode'], resolve_1, reject_1); }).then(dm => dm.init());
+        await page.init();
+        await showCorrectPage();
+        new Promise((resolve_2, reject_2) => { require(['./pwa'], resolve_2, reject_2); }).then(pwa => pwa.init());
+        conf.DEBUG && new Promise((resolve_3, reject_3) => { require(['./dbg'], resolve_3, reject_3); }).then(dbg => dbg.init());
+        new Promise((resolve_4, reject_4) => { require(['./startup'], resolve_4, reject_4); }).then(su => su.run());
     }).catch(err => {
         log.e('failed:', err);
+    }).then(() => {
+        log.i('Time:', Date.now() - window['gtime0'], 'ms');
     });
+    async function showCorrectPage() {
+        let registered = await usr_1.isRegistered();
+        log.i('user registered?', registered);
+        if (!registered) {
+            if (page.get() == 'profile')
+                await page.refresh();
+            else
+                await page.set('profile');
+        }
+        else {
+            await page.refresh();
+        }
+    }
 });
 //# sourceMappingURL=index.js.map

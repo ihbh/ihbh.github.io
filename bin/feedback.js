@@ -1,8 +1,16 @@
-define(["require", "exports", "./page", "./config", "./dom", "./gp", "./log", "./usr"], function (require, exports, page, conf, dom, gp, log_1, usr) {
+define(["require", "exports", "./config", "./dom", "./gp", "./log", "./page", "./react", "./usr"], function (require, exports, conf, dom, gp, log_1, page, react_1, usr) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('feedback');
     let timer = 0;
+    async function render() {
+        return react_1.default.createElement("div", { id: "p-feedback", class: "page" },
+            react_1.default.createElement("div", { class: "text", contenteditable: true }),
+            react_1.default.createElement("div", { class: "footer" },
+                react_1.default.createElement("span", { class: "status" }),
+                react_1.default.createElement("button", { id: "send-feedback" }, "Send Feedback")));
+    }
+    exports.render = render;
     async function init() {
         dom.id.sendFeedback.onclick = sendFeedback;
         dom.id.feedbackText.oninput = saveFeedback;

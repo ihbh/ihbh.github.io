@@ -10,6 +10,8 @@ define(["require", "exports"], function (require, exports) {
     exports.DBG_MAX_SHOW_LOGS = 500;
     exports.DBG_MAX_LOG_ARG_LEN = 100;
     exports.LOG_MAXLEN = 64;
+    exports.PAGE_DEFAULT = 'map';
+    exports.CONF_DARK_MODE = 'conf.ui.dark-mode';
     // https://en.wikipedia.org/wiki/Decimal_degrees#Precision
     // 1e-5 corresponds to 1m precision
     exports.MAP_1M = 1e-5;

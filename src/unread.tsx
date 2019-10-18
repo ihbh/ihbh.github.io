@@ -1,3 +1,4 @@
+import * as page from './page';
 import * as conf from './config';
 import * as dom from './dom';
 import { TaggedLogger } from './log';
@@ -8,6 +9,13 @@ import vfs from './vfs';
 
 const log = new TaggedLogger('unread');
 const cards = new Map<string, HTMLElement>();
+
+export async function render() {
+  return <div id="p-unread"
+    class="page">
+    <div class="user-cards"></div>
+  </div>;
+}
 
 export async function init() {
   log.i('init()');
@@ -51,7 +59,7 @@ export async function init() {
 }
 
 function renderUserCard(info: UserInfo) {
-  let href = '?page=chat&uid=' + info.uid;
+  let href = page.href('chat', { uid: info.uid });
   return <a href={href}>
     <img src={info.photo || conf.NOUSERPIC} />
     <span>{info.name || info.uid}</span>

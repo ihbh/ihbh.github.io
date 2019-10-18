@@ -1,9 +1,17 @@
-define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], function (require, exports, dom, log_1, qargs, react_1, vfs_1) {
+define(["require", "exports", "./page", "./dom", "./log", "./qargs", "./react", "./vfs"], function (require, exports, page, dom, log_1, qargs, react_1, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('explorer');
     const RMDIR_TIMEOUT = 5;
     const TAG_LINKS = 'links';
+    async function render() {
+        return react_1.default.createElement("div", { id: "p-explorer", class: "page" },
+            react_1.default.createElement("div", { class: "path" },
+                react_1.default.createElement("span", { class: "vfs-path" }),
+                react_1.default.createElement("span", { class: "controls" })),
+            react_1.default.createElement("div", { class: "data" }));
+    }
+    exports.render = render;
     async function init() {
         let path = getCurrentVfsPath();
         log.i('Path:', path);
@@ -123,11 +131,11 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./react", "./vfs"], 
         let tags = new Map();
         let ps = names.map(async (name) => {
             let path = dirPath + '/' + name;
-            let href = `/?page=explorer&path=${encodeURIComponent(path)}`;
-            if (sfc)
-                href += '&sfc=1';
-            if (idir)
-                href += '&idir=' + idir;
+            let href = page.href('explorer', {
+                path,
+                sfc: sfc ? 1 : null,
+                idir: idir ? 1 : null,
+            });
             let nameTag = react_1.default.createElement("a", { href: href }, decodeURIComponent(name));
             let dataTag = null;
             let infoTag = null;

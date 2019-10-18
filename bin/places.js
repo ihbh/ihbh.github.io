@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", "./qargs", "./gp"], function (require, exports, conf, dom, loc, log_1, osm_1, qargs, gp) {
+define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./osm", "./qargs", "./react"], function (require, exports, conf, dom, gp, loc, log_1, osm_1, qargs, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('places');
@@ -13,6 +13,11 @@ define(["require", "exports", "./config", "./dom", "./loc", "./log", "./osm", ".
         }
     }
     exports.init = init;
+    async function render() {
+        return react_1.default.createElement("div", { id: "p-places", class: "page" },
+            react_1.default.createElement("div", { id: "all-places" }));
+    }
+    exports.render = render;
     async function loadMap() {
         let places = await loc.getVisitedPlaces();
         log.i('Viisted places:', places.length, places);

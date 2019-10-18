@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "./react", "./ucache", "./user", "./vfs", "./timestr"], function (require, exports, conf, dom, gp, log_1, qargs, react_1, ucache, user, vfs_1, timestr_1) {
+define(["require", "exports", "./page", "./config", "./dom", "./gp", "./log", "./qargs", "./react", "./timestr", "./ucache", "./user", "./vfs"], function (require, exports, page, conf, dom, gp, log_1, qargs, react_1, timestr_1, ucache, user, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('chat');
@@ -17,6 +17,18 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
     });
     let remoteUid = ''; // remote user id
     let autoSavedText = '';
+    async function render() {
+        return react_1.default.createElement("div", { id: "p-chat", class: "page" },
+            react_1.default.createElement("div", { id: "u-header" },
+                react_1.default.createElement("a", { class: "user-href" },
+                    react_1.default.createElement("img", { id: "chat-u-icon" })),
+                react_1.default.createElement("span", { id: "chat-u-name" }, "[?]")),
+            react_1.default.createElement("div", { id: "messages" }),
+            react_1.default.createElement("div", { id: "u-footer" },
+                react_1.default.createElement("div", { id: "reply-text", contenteditable: true }),
+                react_1.default.createElement("button", { id: "reply-send", class: "btn-sq", style: "background-image: url(/icons/send.svg)" }, "Send")));
+    }
+    exports.render = render;
     async function init() {
         log.i('init()');
         remoteUid = qargs.get('uid');
@@ -79,7 +91,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./qargs", "
         input.textContent = autoSavedText;
     }
     async function getRemoteUserInfo() {
-        dom.id.chatUserHref.href = '?page=profile&uid=' + remoteUid;
+        dom.id.chatUserHref.href = page.href('profile', { uid: remoteUid });
         dom.id.chatUserName.textContent = remoteUid;
         dom.id.chatUserIcon.src = conf.NOUSERPIC;
         let info = await ucache.getUserInfo(remoteUid);

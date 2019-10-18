@@ -1,8 +1,13 @@
-define(["require", "exports", "./config", "./dom", "./log", "./react", "./ucache", "./user", "./vfs"], function (require, exports, conf, dom, log_1, react_1, ucache_1, user, vfs_1) {
+define(["require", "exports", "./page", "./config", "./dom", "./log", "./react", "./ucache", "./user", "./vfs"], function (require, exports, page, conf, dom, log_1, react_1, ucache_1, user, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('unread');
     const cards = new Map();
+    async function render() {
+        return react_1.default.createElement("div", { id: "p-unread", class: "page" },
+            react_1.default.createElement("div", { class: "user-cards" }));
+    }
+    exports.render = render;
     async function init() {
         log.i('init()');
         let infos;
@@ -44,7 +49,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./react", "./ucache
     }
     exports.init = init;
     function renderUserCard(info) {
-        let href = '?page=chat&uid=' + info.uid;
+        let href = page.href('chat', { uid: info.uid });
         return react_1.default.createElement("a", { href: href },
             react_1.default.createElement("img", { src: info.photo || conf.NOUSERPIC }),
             react_1.default.createElement("span", null, info.name || info.uid));

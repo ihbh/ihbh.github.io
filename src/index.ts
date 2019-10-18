@@ -1,33 +1,42 @@
-import * as dbg from './dbg';
+import * as conf from './config';
 import * as dom from './dom';
 import { TaggedLogger } from './log';
 import * as page from './page';
-import * as pwa from './pwa';
 import { isRegistered } from './usr';
 
 const log = new TaggedLogger('index');
 
 dom.whenLoaded().then(async () => {
-  await dbg.init().catch(err => {
-    log.w('dbg.init() failed:', err);
-  });
-  
-  await pwa.init();
+  log.i('location.href:', location.href);
+  import('./darkmode').then(dm => dm.init());
 
-  let reg = await isRegistered();
-  log.i('user registered?', reg);
+  await page.init();
+  await showCorrectPage();
 
-  if (!reg) {
-    if (page.get() == 'profile')
-      await page.init();
-    else
-      page.set('profile');
-  } else if (!page.get()) {
-    page.set('map');
-  } else {
-    log.i('Page explicitly selected:', page.get());
-    await page.init();
-  }
+  import('./pwa')
+    .then(pwa => pwa.init());
+
+  conf.DEBUG && import('./dbg')
+    .then(dbg => dbg.init());
+
+  import('./startup').then(su => su.run());
 }).catch(err => {
   log.e('failed:', err);
+}).then(() => {
+  log.i('Time:', Date.now() - window['gtime0'], 'ms');
 });
+
+
+async function showCorrectPage() {
+  let registered = await isRegistered();
+  log.i('user registered?', registered);
+
+  if (!registered) {
+    if (page.get() == 'profile')
+      await page.refresh();
+    else
+      await page.set('profile');
+  } else {
+    await page.refresh();
+  }
+}

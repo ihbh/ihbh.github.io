@@ -1,13 +1,28 @@
-import * as page from './page';
 import * as conf from './config';
 import * as dom from './dom';
 import * as gp from './gp';
 import { TaggedLogger } from "./log";
+import * as page from './page';
+import React from './react';
 import * as usr from './usr';
 
 const log = new TaggedLogger('feedback');
 
 let timer = 0;
+
+export async function render() {
+  return <div id="p-feedback"
+    class="page">
+    <div class="text"
+      contenteditable></div>
+    <div class="footer">
+      <span class="status"></span>
+      <button id="send-feedback">
+        Send Feedback
+      </button>
+    </div>
+  </div>;
+}
 
 export async function init() {
   dom.id.sendFeedback.onclick = sendFeedback;

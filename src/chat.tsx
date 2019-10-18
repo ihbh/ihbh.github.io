@@ -1,13 +1,14 @@
+import * as page from './page';
 import * as conf from './config';
 import * as dom from './dom';
 import * as gp from './gp';
 import { TaggedLogger } from './log';
 import * as qargs from './qargs';
 import React from './react';
+import { recentTimeToStr } from './timestr';
 import * as ucache from './ucache';
 import * as user from './user';
 import vfs from './vfs';
-import { recentTimeToStr } from './timestr';
 
 let log = new TaggedLogger('chat');
 
@@ -47,6 +48,27 @@ const rm2cm = (sender: string, remote: RemoteMessages) =>
 
 let remoteUid = ''; // remote user id
 let autoSavedText = '';
+
+export async function render() {
+  return <div id="p-chat"
+    class="page">
+    <div id="u-header">
+      <a class="user-href">
+        <img id="chat-u-icon" />
+      </a>
+      <span id="chat-u-name">[?]</span>
+    </div>
+    <div id="messages"></div>
+    <div id="u-footer">
+      <div id="reply-text"
+        contenteditable></div>
+      <button id="reply-send"
+        class="btn-sq"
+        style="background-image: url(/icons/send.svg)">Send
+    </button>
+    </div>
+  </div>;
+}
 
 export async function init() {
   log.i('init()');
@@ -118,7 +140,7 @@ async function setSendButtonHandler() {
 }
 
 async function getRemoteUserInfo() {
-  dom.id.chatUserHref.href = '?page=profile&uid=' + remoteUid;
+  dom.id.chatUserHref.href = page.href('profile', { uid: remoteUid });
   dom.id.chatUserName.textContent = remoteUid;
   dom.id.chatUserIcon.src = conf.NOUSERPIC;
 

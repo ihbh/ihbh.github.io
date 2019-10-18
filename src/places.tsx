@@ -1,10 +1,11 @@
 import * as conf from './config';
 import * as dom from './dom';
+import * as gp from './gp';
 import * as loc from './loc';
 import { TaggedLogger } from './log';
 import { BBox, OSM } from './osm';
 import * as qargs from './qargs';
-import * as gp from './gp';
+import React from './react';
 
 const log = new TaggedLogger('places');
 
@@ -17,6 +18,12 @@ export async function init() {
   } catch (err) {
     log.e(err);
   }
+}
+
+export async function render() {
+  return <div id="p-places" class="page">
+    <div id="all-places"></div>
+  </div>;
 }
 
 async function loadMap() {

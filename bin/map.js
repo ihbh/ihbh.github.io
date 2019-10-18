@@ -1,10 +1,22 @@
-define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./log", "./osm", "./page"], function (require, exports, conf, dom, gp, gps, log_1, osm_1, page) {
+define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./log", "./osm", "./page", "./react"], function (require, exports, conf, dom, gp, gps, log_1, osm_1, page, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('map');
     let osm;
     let bestPos;
     let watcher;
+    async function render() {
+        return react_1.default.createElement("div", { id: "p-map", class: "page" },
+            react_1.default.createElement("div", { id: "map" }),
+            react_1.default.createElement("span", { id: "no-gps" }),
+            react_1.default.createElement("div", { id: "controls" },
+                react_1.default.createElement("button", { id: "userpic", class: "btn-sq", style: "background-image: url()" }, "Profile"),
+                react_1.default.createElement("button", { id: "show-places", class: "btn-sq", style: "background-image: url(/icons/globe.png)" }, "Places"),
+                react_1.default.createElement("button", { id: "see-chats", class: "btn-sq", style: "background-image: url(/icons/chat.png)" }, "Chat"),
+                react_1.default.createElement("button", { id: "settings", class: "btn-sq", style: "background-image: url(/icons/config.svg)" }, "Settings")),
+            react_1.default.createElement("button", { class: "btn", id: "send" }, "I've Been Here!"));
+    }
+    exports.render = render;
     async function init() {
         initUserPic();
         initShowPlaces();
@@ -15,6 +27,11 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./log", "./
         showLastSeenPos();
     }
     exports.init = init;
+    function stop() {
+        watcher && watcher.stop();
+        watcher = null;
+    }
+    exports.stop = stop;
     function initSettingsButton() {
         dom.id.btnSettings.onclick = () => page.set('settings');
     }

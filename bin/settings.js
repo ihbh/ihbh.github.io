@@ -1,7 +1,17 @@
-define(["require", "exports", "./config", "./dom", "./idb", "./log", "./ls"], function (require, exports, conf, dom, idb, log_1, ls) {
+define(["require", "exports", "./page", "./config", "./dom", "./idb", "./log", "./ls", "./react"], function (require, exports, page, conf, dom, idb, log_1, ls, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('settings');
+    async function render() {
+        return react_1.default.createElement("div", { id: "p-settings", class: "page" },
+            react_1.default.createElement("div", { class: "controls" },
+                react_1.default.createElement("button", { id: "export-db", class: "btn-sq", style: "background-image: url(/icons/download.svg)" }, "Export"),
+                react_1.default.createElement("button", { id: "import-db", class: "btn-sq", style: "background-image: url(/icons/upload.svg)" }, "Import"),
+                react_1.default.createElement("button", { id: "vfs-explorer", class: "btn-sq", href: page.href('explorer'), style: "background-image: url(/icons/storage.svg)" }, "VFS"),
+                react_1.default.createElement("button", { id: "config", class: "btn-sq", href: page.href('explorer', { sfc: 1, idir: 1, path: '/conf' }), style: "background-image: url(/icons/config.svg)" }, "Config"),
+                react_1.default.createElement("button", { id: "feedback", class: "btn-sq", href: page.href('feedback'), style: "background-image: url(/icons/upvote.svg)" }, "Feedback")));
+    }
+    exports.render = render;
     async function init() {
         initExportButton();
         initImportButton();

@@ -1,3 +1,4 @@
+import * as page from './page';
 import * as conf from './config';
 import * as dom from './dom';
 import * as gp from './gp';
@@ -22,18 +23,33 @@ interface UserInfo {
 let tskey = '';
 let allvisits: string[];
 
+export async function render() {
+  return <div id="p-nearby"
+    class="page">
+    <div id="vplace-map"></div>
+    <div id="vtime-bar">
+      You've been here <span id="vtime-label"></span>
+      <span id="nvtimes"></span>
+      [<span id="unvisit">unvisit</span>]
+    </div>
+    <div id="nearby-status"></div>
+    <div id="visitors"
+      class="user-cards"></div>
+  </div>;
+}
+
 export async function init() {
   log.i('init()');
 
   try {
     tskey = qargs.get('tskey');
-    if (!tskey) throw new Error('Missing ?tskey= URL param.');
+    if (!tskey) throw new Error('Missing tskey URL param.');
 
     initUnvisitLink();
 
     let { lat, lon, time } = await loc.getPlace(tskey);
     if (!lat || !lon)
-      throw new Error(`No such visited place: ?tskey=` + tskey);
+      throw new Error(`No such visited place: tskey=` + tskey);
 
     dom.id.vtimeLabel.textContent =
       tts.recentTimeToStr(new Date(time * 1000));
@@ -128,7 +144,7 @@ function initUnvisitLink() {
 }
 
 function makeUserCard(info: UserInfo) {
-  let href = '?page=chat&uid=' + info.uid;
+  let href = page.href('chat', { uid: info.uid });
   return <a href={href}>
     <img src={info.photo || conf.NOUSERPIC} />
     <span>{info.name || info.uid}</span>

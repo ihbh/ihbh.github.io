@@ -13,10 +13,28 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
         addUnregTag();
     }
     exports.init = init;
+    async function render() {
+        return react_1.default.createElement("div", { id: "p-profile", class: "page" },
+            react_1.default.createElement("div", { class: "header" },
+                react_1.default.createElement("img", { id: "photo", src: "/icons/user.svg" }),
+                react_1.default.createElement("span", { id: "reg-name" }, "[?]"),
+                react_1.default.createElement("span", { class: "self-tag" }, "This is your profile")),
+            react_1.default.createElement("div", { class: "details" },
+                react_1.default.createElement("table", null,
+                    react_1.default.createElement("tbody", null))),
+            react_1.default.createElement("div", { class: "about" }),
+            react_1.default.createElement("div", { class: "reason", contenteditable: true }),
+            react_1.default.createElement("div", { class: "footer" },
+                react_1.default.createElement("span", { class: "status" }),
+                react_1.default.createElement("button", { id: "reg-done" }, "Done"),
+                react_1.default.createElement("button", { class: "report" }, "Report"),
+                react_1.default.createElement("button", { class: "send-report" }, "Send Report")));
+    }
+    exports.render = render;
     function initChatLink() {
         if (uid) {
             dom.id.regPhoto.onclick =
-                () => location.href = '?page=chat&uid=' + uid;
+                () => page.set('chat', { uid });
         }
     }
     async function addUnregTag() {
@@ -27,7 +45,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
     function addSelfTag() {
         if (uid)
             return;
-        let p = page.getPageElement();
+        let p = page.root();
         p.classList.add('self');
     }
     function makeEditable(el) {
@@ -60,7 +78,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
         if (uid) {
             dom.id.regReport.onclick = async () => {
                 log.i('Clicked Report.');
-                let p = page.getPageElement();
+                let p = page.root();
                 p.classList.add('report');
                 let reason = await usr.getAbuseReport(uid);
                 dom.id.regReason.textContent = reason || '';
@@ -79,7 +97,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
                     dom.id.regSendReport.disabled = true;
                     await usr.setAbuseReport(uid, reason);
                     dom.id.regStatus.textContent = 'Report has been recorded.';
-                    let p = page.getPageElement();
+                    let p = page.root();
                     p.classList.add('reported');
                 }
                 finally {
