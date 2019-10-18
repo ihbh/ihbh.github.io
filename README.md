@@ -6,12 +6,9 @@ This web app is meant to work as a Progressive Web App (PWA) to avoid hurdles wi
 
 # Contents
 
-|                                    |                               |
-| ---------------------------------- | ----------------------------- |
 | [Get started](/docs/get-started)   | [How-to guides](/docs/how-to) |
+| ---------------------------------- | ----------------------------- |
 | [How it works](/docs/how-it-works) | [Reference](/docs/reference)  |
-
-[Why is the documentation structured this way?](https://www.divio.com/blog/documentation/)
 
 # Credits
 
