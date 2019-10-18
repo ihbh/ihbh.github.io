@@ -71,6 +71,8 @@ export const root = new class RootFS implements VFS {
     let hroot = await hprop.get();
     if (hroot.rmdir)
       return hroot.rmdir(relpath);
+    if (hroot.invoke)
+      return hroot.invoke('rmdir', relpath);
     let paths = await this.find(path);
     let ps = paths.map(filepath => this.rm(filepath));
     await Promise.all(ps);

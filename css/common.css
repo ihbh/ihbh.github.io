@@ -627,7 +627,7 @@ body #page .ol-attribution * {
 }
 
 #p-explorer .path .controls * {
-  margin-right: 0.5em;
+  margin-left: 1em;
   cursor: pointer;
   width: 1em;
   height: 1em;
