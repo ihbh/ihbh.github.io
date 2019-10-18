@@ -13,6 +13,12 @@ define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./
         }
     }
     exports.init = init;
+    function stop() {
+        timer && clearTimeout(timer);
+        timer = 0;
+        lastClickedTskey = '';
+    }
+    exports.stop = stop;
     async function render() {
         return react_1.default.createElement("div", { id: "p-places", class: "page" },
             react_1.default.createElement("div", { id: "all-places" }));
@@ -61,6 +67,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./
         if (id > lastClickedTskey)
             lastClickedTskey = id;
         timer = timer || setTimeout(async () => {
+            timer = 0;
             log.i('Opening place:', lastClickedTskey);
             let page = await new Promise((resolve_2, reject_2) => { require(['./page'], resolve_2, reject_2); });
             page.set('nearby', { tskey: lastClickedTskey });

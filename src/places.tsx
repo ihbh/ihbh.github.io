@@ -20,6 +20,12 @@ export async function init() {
   }
 }
 
+export function stop() {
+  timer && clearTimeout(timer);
+  timer = 0;
+  lastClickedTskey = '';
+}
+
 export async function render() {
   return <div id="p-places" class="page">
     <div id="all-places"></div>
@@ -75,6 +81,7 @@ function handleClick(id) {
   if (id > lastClickedTskey)
     lastClickedTskey = id;
   timer = timer || setTimeout(async () => {
+    timer = 0;
     log.i('Opening place:', lastClickedTskey);
     let page = await import('./page');
     page.set('nearby', { tskey: lastClickedTskey });
