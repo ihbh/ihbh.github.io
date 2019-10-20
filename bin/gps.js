@@ -9,6 +9,8 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             timeout,
         };
         let sendUpdate = (pos) => {
+            if (!wid)
+                return;
             let { latitude, longitude, altitude, accuracy } = pos.coords;
             log.i(`update: lat=${latitude.toFixed(4)} lon=${longitude.toFixed(4)} ` +
                 `acc=${accuracy.toFixed(0)}m alt=${altitude || 0}m`);
