@@ -76,7 +76,7 @@ export function href<T extends PageId>(id: T, args?: PageArgs[T]) {
 }
 
 export function root() {
-  return dom.id.pageContainer.firstElementChild;
+  return dom.id.pageContainer.firstElementChild as HTMLElement;
 }
 
 function initLinks() {
