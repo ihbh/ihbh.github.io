@@ -37,6 +37,8 @@ define(["require", "exports"], function (require, exports) {
         get regReport() { return $('#p-profile .report'); },
         get regSendReport() { return $('#p-profile .send-report'); },
         get regDone() { return $('#reg-done'); },
+        get upcRotate() { return $('#p-profile .photo .rotate'); },
+        get upcFlip() { return $('#p-profile .photo .flip'); },
         // Main Map
         get userPic() { return $('#userpic'); },
         get showPlaces() { return $('#show-places'); },

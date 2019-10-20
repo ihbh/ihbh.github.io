@@ -39,6 +39,8 @@ export const id = {
   get regReport() { return $('#p-profile .report') as HTMLButtonElement; },
   get regSendReport() { return $('#p-profile .send-report') as HTMLButtonElement; },
   get regDone() { return $('#reg-done') as HTMLButtonElement; },
+  get upcRotate() { return $('#p-profile .photo .rotate'); },
+  get upcFlip() { return $('#p-profile .photo .flip'); },
 
   // Main Map
   get userPic() { return $<HTMLImageElement>('#userpic'); },

@@ -117,6 +117,37 @@ export function downsizePhoto(img: HTMLImageElement) {
   return dataurl;
 }
 
+export function rotatePhoto(img: HTMLImageElement) {
+  let s = img.naturalWidth;
+  let ctx = getSquareContext2d(img);
+  ctx.translate(s / 2, s / 2);
+  ctx.rotate(Math.PI / 2);
+  ctx.drawImage(img, -s / 2, -s / 2);
+  return ctx.canvas.toDataURL(conf.IMG_MIMETYPE);
+}
+
+export function flipPhoto(img: HTMLImageElement) {
+  let ctx = getSquareContext2d(img);
+  let s = img.naturalWidth;
+  ctx.translate(s, 0);
+  ctx.scale(-1, 1);
+  ctx.drawImage(img, 0, 0);
+  return ctx.canvas.toDataURL(conf.IMG_MIMETYPE);
+}
+
+function getContext2d(img: HTMLImageElement) {
+  let canvas = document.createElement('canvas');
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  return canvas.getContext('2d');
+}
+
+function getSquareContext2d(img: HTMLImageElement) {
+  if (img.naturalWidth != img.naturalHeight)
+    throw new Error('Square image expected.');
+  return getContext2d(img);
+}
+
 export async function saveUserInfo(
   { img, name, about }: SaveInfoArgs) {
 

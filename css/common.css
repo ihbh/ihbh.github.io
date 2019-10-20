@@ -197,12 +197,41 @@ body #page .ol-attribution * {
   border-bottom: 0.25em solid #8c8;
 }
 
+#p-profile .photo {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
 #p-profile #photo {
+  position: absolute;
   border-radius: 50%;
   width: 64px;
   height: 64px;
   object-fit: cover;
   cursor: pointer;
+}
+
+#p-profile .photo .ctrl {
+  display: none;
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  cursor: pointer;
+}
+
+#p-profile.self .photo .ctrl {
+  display: inherit;
+}
+
+#p-profile .rotate {
+  right: 0;
+  top: 0;
+}
+
+#p-profile .flip {
+  right: 0;
+  bottom: 0;
 }
 
 #p-profile #reg-name {

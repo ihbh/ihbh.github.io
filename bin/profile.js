@@ -11,12 +11,17 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
         showUserInfo();
         initChatLink();
         addUnregTag();
+        initRotateButton();
+        initFlipButton();
     }
     exports.init = init;
     async function render() {
         return react_1.default.createElement("div", { id: "p-profile", class: "page" },
             react_1.default.createElement("div", { class: "header" },
-                react_1.default.createElement("img", { id: "photo", src: "/icons/user.svg" }),
+                react_1.default.createElement("div", { class: "photo" },
+                    react_1.default.createElement("img", { id: "photo", src: "/icons/user.svg" }),
+                    react_1.default.createElement("img", { class: "ctrl rotate", title: "Rotate right", src: "/icons/rotate.svg" }),
+                    react_1.default.createElement("img", { class: "ctrl flip", title: "Flip horizontally", src: "/icons/flip.svg" })),
                 react_1.default.createElement("span", { id: "reg-name" }, "[?]"),
                 react_1.default.createElement("span", { class: "self-tag" }, "This is your profile")),
             react_1.default.createElement("div", { class: "details" },
@@ -31,6 +36,28 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
                 react_1.default.createElement("button", { class: "send-report" }, "Send Report")));
     }
     exports.render = render;
+    function initRotateButton() {
+        dom.id.upcRotate.onclick = async () => {
+            log.i('Rotating image.');
+            let time = Date.now();
+            let reg = await new Promise((resolve_1, reject_1) => { require(['./reg'], resolve_1, reject_1); });
+            let img = dom.id.regPhoto;
+            let url = reg.rotatePhoto(img);
+            img.src = url;
+            log.i('Done:', Date.now() - time, 'ms', url.length, 'bytes');
+        };
+    }
+    function initFlipButton() {
+        dom.id.upcFlip.onclick = async () => {
+            log.i('Flipping image.');
+            let time = Date.now();
+            let reg = await new Promise((resolve_2, reject_2) => { require(['./reg'], resolve_2, reject_2); });
+            let img = dom.id.regPhoto;
+            let url = reg.flipPhoto(img);
+            img.src = url;
+            log.i('Done:', Date.now() - time, 'ms', url.length, 'bytes');
+        };
+    }
     function initChatLink() {
         if (uid) {
             dom.id.regPhoto.onclick =
@@ -106,7 +133,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
             };
         }
         else {
-            let reg = await new Promise((resolve_1, reject_1) => { require(['./reg'], resolve_1, reject_1); });
+            let reg = await new Promise((resolve_3, reject_3) => { require(['./reg'], resolve_3, reject_3); });
             let resizing = false;
             dom.id.regPhoto.onclick = async () => {
                 if (resizing)

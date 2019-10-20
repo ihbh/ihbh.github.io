@@ -4,7 +4,6 @@ import * as page from './page';
 import * as qargs from './qargs';
 import React from './react';
 import * as usr from './usr';
-import { sleep } from './utils';
 
 const log = new TaggedLogger('reg');
 
@@ -19,13 +18,23 @@ export async function init() {
   showUserInfo();
   initChatLink();
   addUnregTag();
+  initRotateButton();
+  initFlipButton();
 }
 
 export async function render() {
   return <div id="p-profile" class="page">
     <div class="header">
-      <img id="photo"
-        src="/icons/user.svg" />
+      <div class="photo">
+        <img id="photo"
+          src="/icons/user.svg" />
+        <img class="ctrl rotate"
+          title="Rotate right"
+          src="/icons/rotate.svg" />
+        <img class="ctrl flip"
+          title="Flip horizontally"
+          src="/icons/flip.svg" />
+      </div>
       <span id="reg-name">[?]</span>
       <span class="self-tag">This is your profile</span>
     </div>
@@ -49,6 +58,32 @@ export async function render() {
       <button class="send-report">Send Report</button>
     </div>
   </div>;
+}
+
+function initRotateButton() {
+  dom.id.upcRotate.onclick = async () => {
+    log.i('Rotating image.');
+    let time = Date.now();
+    let reg = await import('./reg');
+    let img = dom.id.regPhoto;
+    let url = reg.rotatePhoto(img);
+    img.src = url;
+    log.i('Done:', Date.now() - time, 'ms',
+      url.length, 'bytes');
+  };
+}
+
+function initFlipButton() {
+  dom.id.upcFlip.onclick = async () => {
+    log.i('Flipping image.');
+    let time = Date.now();
+    let reg = await import('./reg');
+    let img = dom.id.regPhoto;
+    let url = reg.flipPhoto(img);
+    img.src = url;
+    log.i('Done:', Date.now() - time, 'ms',
+      url.length, 'bytes');
+  };
 }
 
 function initChatLink() {

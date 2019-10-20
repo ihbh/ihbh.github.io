@@ -91,6 +91,35 @@ define(["require", "exports", "./config", "./gp", "./log", "./buffer"], function
         return dataurl;
     }
     exports.downsizePhoto = downsizePhoto;
+    function rotatePhoto(img) {
+        let s = img.naturalWidth;
+        let ctx = getSquareContext2d(img);
+        ctx.translate(s / 2, s / 2);
+        ctx.rotate(Math.PI / 2);
+        ctx.drawImage(img, -s / 2, -s / 2);
+        return ctx.canvas.toDataURL(conf.IMG_MIMETYPE);
+    }
+    exports.rotatePhoto = rotatePhoto;
+    function flipPhoto(img) {
+        let ctx = getSquareContext2d(img);
+        let s = img.naturalWidth;
+        ctx.translate(s, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(img, 0, 0);
+        return ctx.canvas.toDataURL(conf.IMG_MIMETYPE);
+    }
+    exports.flipPhoto = flipPhoto;
+    function getContext2d(img) {
+        let canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        return canvas.getContext('2d');
+    }
+    function getSquareContext2d(img) {
+        if (img.naturalWidth != img.naturalHeight)
+            throw new Error('Square image expected.');
+        return getContext2d(img);
+    }
     async function saveUserInfo({ img, name, about }) {
         log.i('updating profile');
         let userinfo = (about.textContent || '').trim();
