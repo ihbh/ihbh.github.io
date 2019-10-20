@@ -8,18 +8,21 @@ const log = new TaggedLogger('index');
 
 dom.whenLoaded().then(async () => {
   log.i('location.href:', location.href);
-  import('./darkmode').then(dm => dm.init());
+
+  log.i('Debug mode?', conf.DEBUG);
+  conf.DEBUG && import('./dbg')
+    .then(dbg => dbg.init());
+
+  import('./darkmode')
+    .then(dm => dm.init());
 
   await page.init();
   await showCorrectPage();
 
   import('./pwa')
     .then(pwa => pwa.init());
-
-  conf.DEBUG && import('./dbg')
-    .then(dbg => dbg.init());
-
-  import('./startup').then(su => su.run());
+  import('./startup')
+    .then(su => su.run());
 }).catch(err => {
   log.e('failed:', err);
 }).then(() => {

@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <script>window.gtime0=Date.now()</script>
+  <title>I've Been Here</title>
 
   <meta http-equiv="Content-Type"
         content="text/html;charset=utf-8">
@@ -12,19 +12,18 @@
         content="#800">
   <meta name="viewport"
         content="width=device-width, initial-scale=1">
-
   <meta http-equiv="Content-Security-Policy"
         content="
       default-src 'self';
       connect-src 'self' blob: localhost:3921 https://data.ihbh.org:3921;
       img-src 'self' data: blob: *.tile.openstreetmap.org;
       media-src 'self' blob:;
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.rawgit.com;
+      script-src 'self' 'unsafe-eval' 'unsafe-inline' cdn.rawgit.com;
       worker-src 'self';
       style-src 'self' 'unsafe-inline' cdn.rawgit.com;
       upgrade-insecure-requests;">
 
-  <title>I've Been Here</title>
+  <script>window.gtime0 = Date.now()</script>
 
   <link rel="manifest"
         href="manifest.webmanifest">
@@ -42,17 +41,15 @@
 <body>
   <a id="darkmode"
      class="overlay-link">Dark mode</a>
-
   <a id="home-link"
      class="overlay-link"
      title="Go to the main map page"
      href="/">Home</a>
-
   <a id="debug-toggle"
      class="overlay-link">Debug</a>
-
   <div id="logs"
        style="display:none"></div>
+  <div id="errors"></div>
 
   <div id="debug"
        style="visibility: collapse">

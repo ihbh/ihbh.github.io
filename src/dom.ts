@@ -8,6 +8,7 @@ export const id = {
   get logs() { return $('#logs'); },
   get gotoCommon() { return $('#gps-london'); },
   get showLogs() { return $('#show-logs'); },
+  get errors() { return $('#errors'); },
 
   // Main OSM Map
   get btnSeeChats() { return $('#see-chats') as HTMLButtonElement; },

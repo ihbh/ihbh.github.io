@@ -108,6 +108,25 @@ body.unreg #darkmode {
   display: inherit;
 }
 
+/** The overlay with errors. */
+
+#errors {
+  position: fixed;
+  width: 100%;
+  font-size: 10pt;
+  bottom: 20%;
+  background: #800;
+  color: #fff;
+  padding: 0.5em;
+  white-space: pre-wrap;
+  word-break: break-all;
+  z-index: 3;
+}
+
+#errors:empty {
+  display: none;
+}
+
 /** The "back home" link. */
 
 #home-link {

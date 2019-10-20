@@ -14,29 +14,42 @@ function cleanup(x) {
   return x;
 }
 
-function log(sev: string, tag: string, args: any[]) {
-  args = args.map(cleanup);
-  console[cname[sev]](sev, '[' + tag + ']', ...args);
-  if (sev != 'D')
-    logdb.writeLog(sev, tag, args);
+class FLog {
+  onlog: FLog['log'];
+
+  log(sev: string, tag: string, args: any[]) {
+    this.onlog && this.onlog(sev, tag, args);
+    args = args.map(cleanup);
+    console[cname[sev]](sev, '[' + tag + ']', ...args);
+    if (sev != 'D')
+      logdb.writeLog(sev, tag, args);
+  }
+
+  withTag(tag: string) {
+    return new TaggedLogger(tag);
+  }
 }
+
+const flog = new FLog;
 
 export class TaggedLogger {
   constructor(public tag: string) { }
 
   d(...args) {
-    log('D', this.tag, args);
+    flog.log('D', this.tag, args);
   }
 
   i(...args) {
-    log('I', this.tag, args);
+    flog.log('I', this.tag, args);
   }
 
   w(...args) {
-    log('W', this.tag, args);
+    flog.log('W', this.tag, args);
   }
 
   e(...args) {
-    log('E', this.tag, args);
+    flog.log('E', this.tag, args);
   }
 }
+
+export default flog;
