@@ -1,4 +1,4 @@
-define(["require", "exports", "./page", "./config", "./dom", "./gp", "./log", "./qargs", "./react", "./timestr", "./ucache", "./user", "./vfs"], function (require, exports, page, conf, dom, gp, log_1, qargs, react_1, timestr_1, ucache, user, vfs_1) {
+define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page", "./qargs", "./react", "./timestr", "./ucache", "./user", "./vfs"], function (require, exports, chatman, conf, dom, log_1, page, qargs, react_1, timestr_1, ucache, user, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('chat');
@@ -16,7 +16,8 @@ define(["require", "exports", "./page", "./config", "./dom", "./gp", "./log", ".
         };
     });
     let remoteUid = ''; // remote user id
-    let autoSavedText = '';
+    let draft = chatman.makeSaveDraftProp(() => remoteUid);
+    let timer = 0;
     async function render() {
         return react_1.default.createElement("div", { id: "p-chat", class: "page" },
             react_1.default.createElement("div", { id: "u-header" },
@@ -35,9 +36,14 @@ define(["require", "exports", "./page", "./config", "./dom", "./gp", "./log", ".
         log.i('Remote user:', remoteUid);
         getRemoteUserInfo().catch(err => log.e('Failed to get user info:', err));
         fetchAndRenderMessages().catch(err => log.e('Failed to render messages:', err));
-        setSendButtonHandler();
+        await setSendButtonHandler();
+        await initDraftAutoSaving();
     }
     exports.init = init;
+    function stop() {
+        clearInterval(timer);
+    }
+    exports.stop = stop;
     async function setSendButtonHandler() {
         let input = dom.id.chatReplyText;
         dom.id.chatReplySend.addEventListener('click', async () => {
@@ -71,24 +77,14 @@ define(["require", "exports", "./page", "./config", "./dom", "./gp", "./log", ".
             let rsync = await new Promise((resolve_1, reject_1) => { require(['./rsync'], resolve_1, reject_1); });
             rsync.start();
         }
-        setInterval(async () => {
+    }
+    async function initDraftAutoSaving() {
+        let input = dom.id.chatReplyText;
+        timer = setInterval(async () => {
             let newText = input.textContent;
-            if (newText == autoSavedText)
-                return;
-            await gp.chats.modify(unsent => {
-                if (!newText)
-                    delete unsent[remoteUid];
-                else
-                    unsent[remoteUid] = newText;
-                autoSavedText = newText;
-                log.d('Text autosaved:', JSON.stringify(autoSavedText));
-                return unsent;
-            });
+            await draft.set(newText.trim());
         }, conf.CHAT_AUTOSAVE_INTERVAL * 1000);
-        let savedTexts = await gp.chats.get();
-        log.i('Saved texts:', savedTexts);
-        autoSavedText = savedTexts[remoteUid] || '';
-        input.textContent = autoSavedText;
+        input.textContent = await draft.get();
     }
     async function getRemoteUserInfo() {
         dom.id.chatUserHref.href = page.href('profile', { uid: remoteUid });

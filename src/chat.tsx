@@ -1,8 +1,8 @@
-import * as page from './page';
+import * as chatman from './chatman';
 import * as conf from './config';
 import * as dom from './dom';
-import * as gp from './gp';
 import { TaggedLogger } from './log';
+import * as page from './page';
 import * as qargs from './qargs';
 import React from './react';
 import { recentTimeToStr } from './timestr';
@@ -47,7 +47,8 @@ const rm2cm = (sender: string, remote: RemoteMessages) =>
   });
 
 let remoteUid = ''; // remote user id
-let autoSavedText = '';
+let draft = chatman.makeSaveDraftProp(() => remoteUid);
+let timer = 0;
 
 export async function render() {
   return <div id="p-chat"
@@ -78,7 +79,12 @@ export async function init() {
     log.e('Failed to get user info:', err));
   fetchAndRenderMessages().catch(err =>
     log.e('Failed to render messages:', err));
-  setSendButtonHandler();
+  await setSendButtonHandler();
+  await initDraftAutoSaving();
+}
+
+export function stop() {
+  clearInterval(timer);
 }
 
 async function setSendButtonHandler() {
@@ -117,26 +123,17 @@ async function setSendButtonHandler() {
     let rsync = await import('./rsync');
     rsync.start();
   }
+}
 
-  setInterval(async () => {
+async function initDraftAutoSaving() {
+  let input = dom.id.chatReplyText;
+
+  timer = setInterval(async () => {
     let newText = input.textContent;
-    if (newText == autoSavedText) return;
-
-    await gp.chats.modify(unsent => {
-      if (!newText)
-        delete unsent[remoteUid];
-      else
-        unsent[remoteUid] = newText;
-      autoSavedText = newText;
-      log.d('Text autosaved:', JSON.stringify(autoSavedText));
-      return unsent;
-    });
+    await draft.set(newText.trim());
   }, conf.CHAT_AUTOSAVE_INTERVAL * 1000);
 
-  let savedTexts = await gp.chats.get();
-  log.i('Saved texts:', savedTexts);
-  autoSavedText = savedTexts[remoteUid] || '';
-  input.textContent = autoSavedText;
+  input.textContent = await draft.get();
 }
 
 async function getRemoteUserInfo() {

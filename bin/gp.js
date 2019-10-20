@@ -16,7 +16,6 @@ define(["require", "exports", "./config", "./log", "./vfs-conf", "./vfs-prop"], 
     exports.hdimg = prop('local.profile.hdimg');
     exports.keyseed = prop('local.keys.keyseed');
     exports.privkey = prop('local.keys.privkey');
-    exports.chats = prop('local.chat.drafts', {});
     exports.lastgps = prop('local.lastgps');
     exports.feedback = prop('local.feedback');
     exports.darkmode = vfsconf.register({
