@@ -58,13 +58,13 @@ define(["require", "exports", "./config", "./gp", "./log", "./buffer"], function
         log.i('blob url:', blobUrl);
         return blobUrl;
     }
-    function getResizedPhoto(img, { mime = conf.IMG_MIMETYPE, quality = conf.IMG_MAXQUALITY, grayscale = false, } = {}) {
+    function getCroppedAndResizedPhoto(img, { mime = conf.IMG_MIMETYPE, quality = conf.IMG_MAXQUALITY, grayscale = false, } = {}) {
         if (!img.src)
             return null;
         let w = img.naturalWidth;
         let h = img.naturalHeight;
         let s = conf.IMG_SIZE;
-        log.i('resizing image:', w, 'x', h, '->', s, 'x', s, `q=${quality}`, `grayscale=${grayscale}`);
+        log.i('resizing image:', w, 'x', h, '->', s, 'x', s, `q=${quality}`, grayscale ? 'gray' : 'rgba');
         let canvas = document.createElement('canvas');
         canvas.width = s;
         canvas.height = s;
@@ -76,14 +76,13 @@ define(["require", "exports", "./config", "./gp", "./log", "./buffer"], function
         log.i('resized photo:', newDataUrl.length, 'bytes');
         return newDataUrl;
     }
-    exports.getResizedPhoto = getResizedPhoto;
     function downsizePhoto(img) {
         let qmax = conf.IMG_MAXQUALITY;
         let qmin = conf.IMG_MINQUALITY;
         let dataurl = '';
         loop: for (let grayscale of [false, true]) {
             for (let quality = qmax; quality >= qmin; quality -= 0.1) {
-                dataurl = getResizedPhoto(img, { quality, grayscale });
+                dataurl = getCroppedAndResizedPhoto(img, { quality, grayscale });
                 if (dataurl.length <= conf.IMG_MAXBYTES)
                     break loop;
             }
@@ -123,17 +122,17 @@ define(["require", "exports", "./config", "./gp", "./log", "./buffer"], function
     async function saveUserInfo({ img, name, about }) {
         log.i('updating profile');
         let userinfo = (about.textContent || '').trim();
+        await gp.userinfo.set(userinfo);
         let username = name.textContent || '';
         if (!username)
             throw new Error('Need to set user name.');
         if (!conf.RX_USERNAME.test(username))
             throw new Error(`Invalid username.`);
-        let imgurl = img.src; // as is, already downsized
+        await gp.username.set(username);
+        let imgurl = downsizePhoto(img);
         if (!imgurl)
             throw new Error('Need to set user photo.');
         await gp.userimg.set(imgurl);
-        await gp.username.set(username);
-        await gp.userinfo.set(userinfo);
     }
     exports.saveUserInfo = saveUserInfo;
 });

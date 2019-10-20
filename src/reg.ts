@@ -77,7 +77,7 @@ async function getJpegFromFile(file: File) {
   return blobUrl;
 }
 
-export function getResizedPhoto(img: HTMLImageElement, {
+function getCroppedAndResizedPhoto(img: HTMLImageElement, {
   mime = conf.IMG_MIMETYPE,
   quality = conf.IMG_MAXQUALITY,
   grayscale = false,
@@ -87,7 +87,7 @@ export function getResizedPhoto(img: HTMLImageElement, {
   let h = img.naturalHeight;
   let s = conf.IMG_SIZE;
   log.i('resizing image:', w, 'x', h, '->', s, 'x', s,
-    `q=${quality}`, `grayscale=${grayscale}`);
+    `q=${quality}`, grayscale ? 'gray' : 'rgba');
   let canvas = document.createElement('canvas');
   canvas.width = s;
   canvas.height = s;
@@ -108,7 +108,7 @@ export function downsizePhoto(img: HTMLImageElement) {
 
   loop: for (let grayscale of [false, true]) {
     for (let quality = qmax; quality >= qmin; quality -= 0.1) {
-      dataurl = getResizedPhoto(img, { quality, grayscale });
+      dataurl = getCroppedAndResizedPhoto(img, { quality, grayscale });
       if (dataurl.length <= conf.IMG_MAXBYTES)
         break loop;
     }
@@ -153,15 +153,15 @@ export async function saveUserInfo(
 
   log.i('updating profile');
   let userinfo = (about.textContent || '').trim();
+  await gp.userinfo.set(userinfo);
+
   let username = name.textContent || '';
   if (!username) throw new Error('Need to set user name.');
   if (!conf.RX_USERNAME.test(username))
     throw new Error(`Invalid username.`);
-
-  let imgurl = img.src; // as is, already downsized
-  if (!imgurl) throw new Error('Need to set user photo.');
-
-  await gp.userimg.set(imgurl);
   await gp.username.set(username);
-  await gp.userinfo.set(userinfo);
+
+  let imgurl = downsizePhoto(img);
+  if (!imgurl) throw new Error('Need to set user photo.');
+  await gp.userimg.set(imgurl);
 }
