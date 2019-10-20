@@ -226,17 +226,32 @@ export class DBTable {
     let s = t && t.objectStore(this.name);
 
     let ptss = this.pending;
-    this.log('exec:', ...ptss.map(t => t.name));
+    let txid = Math.random().toString(16).slice(2, 2 + 6);
+    let time = Date.now();
+    let txrem = ptss.length;
+    let txdec = this.logs && (() => {
+      if (!--txrem)
+        this.log(txid, 'done:', Date.now() - time, 'ms');
+    });
+
+    this.log(txid, 'exec:', ...ptss.map(t => '\n- ' + t.name));
 
     this.pending = [];
 
     for (let { name, fn, defval, resolve, reject } of ptss) {
       if (s) {
         let r = fn(s);
-        r.onerror = () => reject(new Error(`Transaction ${name} failed: ${r.error}`));
-        r.onsuccess = () => resolve(r.result);
+        r.onerror = () => {
+          reject(new Error(`idbtx ${name} failed: ${r.error}`));
+          this.logs && txdec();
+        };
+        r.onsuccess = () => {
+          resolve(r.result);
+          this.logs && txdec();
+        };
       } else {
         resolve(defval);
+        this.logs && txdec();
       }
     }
   }
