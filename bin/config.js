@@ -29,7 +29,7 @@ define(["require", "exports"], function (require, exports) {
     exports.IMG_MAXQUALITY = 1.0;
     exports.IMG_MINQUALITY = 0.1;
     exports.IMG_MAXBYTES = 2048; // must fit in one request
-    exports.MARKER_ICON_URL = '/icons/marker.png';
+    exports.MARKER_ICON_URL = '/icons/marker.png'; // must be PNG for OSM
     exports.MARKER_ICON_SIZE = 64;
     exports.DEFAULT_RPC_PORT = 3921;
     exports.RPC_BATCH_DELAY = 150; // ms

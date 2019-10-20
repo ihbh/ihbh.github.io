@@ -11,8 +11,8 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./log", "./
             react_1.default.createElement("span", { id: "no-gps" }),
             react_1.default.createElement("div", { id: "controls" },
                 react_1.default.createElement("button", { id: "userpic", class: "btn-sq", style: "background-image: url()" }, "Profile"),
-                react_1.default.createElement("button", { id: "show-places", class: "btn-sq", style: "background-image: url(/icons/globe.png)" }, "Places"),
-                react_1.default.createElement("button", { id: "see-chats", class: "btn-sq", style: "background-image: url(/icons/chat.png)" }, "Chat"),
+                react_1.default.createElement("button", { id: "show-places", class: "btn-sq", style: "background-image: url(/icons/globe.svg)" }, "Places"),
+                react_1.default.createElement("button", { id: "see-chats", class: "btn-sq", style: "background-image: url(/icons/chat.svg)" }, "Chat"),
                 react_1.default.createElement("button", { id: "settings", class: "btn-sq", style: "background-image: url(/icons/config.svg)" }, "Settings")),
             react_1.default.createElement("button", { class: "btn", id: "send" }, "I've Been Here!"));
     }

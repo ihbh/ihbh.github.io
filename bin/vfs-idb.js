@@ -56,7 +56,7 @@ define(["require", "exports", "./idb", "./log"], function (require, exports, idb
         return pfs;
     }
     async function createTableFS(dbname, tname) {
-        log.d('Creating a new table fs:', dbname + '/' + tname);
+        log.d('Creating a new jsonfs:', dbname + '/' + tname);
         let { default: JsonFS } = await new Promise((resolve_1, reject_1) => { require(['./json-fs'], resolve_1, reject_1); });
         let db = idb_1.DB.open(dbname);
         let t = db.open(tname);

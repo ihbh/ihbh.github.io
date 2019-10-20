@@ -29,12 +29,12 @@ export async function render() {
       </button>
       <button id="show-places"
         class="btn-sq"
-        style="background-image: url(/icons/globe.png)">
+        style="background-image: url(/icons/globe.svg)">
         Places
       </button>
       <button id="see-chats"
         class="btn-sq"
-        style="background-image: url(/icons/chat.png)">
+        style="background-image: url(/icons/chat.svg)">
         Chat
       </button>
       <button id="settings"

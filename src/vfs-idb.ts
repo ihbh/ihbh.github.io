@@ -66,7 +66,7 @@ async function getTableFS(dbname: string, tname: string) {
 }
 
 async function createTableFS(dbname: string, tname: string) {
-  log.d('Creating a new table fs:', dbname + '/' + tname);
+  log.d('Creating a new jsonfs:', dbname + '/' + tname);
   let { default: JsonFS } = await import('./json-fs');
   let db = DB.open(dbname);
   let t = db.open(tname);
