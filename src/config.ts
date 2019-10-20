@@ -20,13 +20,19 @@ export const OSM_LIB = `/build/ol.js`;
 export const OSM_CSS = `/css/ol.css`;
 export const RX_USERNAME = /^[a-z]{3,15}$/i;
 export const RX_USERID = /^[a-f\d]{16}$/i;
-export const PHOTO_SIZE = 64;
-export const PHOTO_QIALITY = 0.75;
+
+export const IMG_MIMETYPE = 'image/jpeg';
+export const IMG_MAXSIZE = 4096; // pixels
+export const IMG_SIZE = 64;
+export const IMG_MAXQUALITY = 1.0;
+export const IMG_MINQUALITY = 0.1;
+export const IMG_MAXBYTES = 2048; // must fit in one request
+
 export const MARKER_ICON_URL = '/icons/marker.png';
 export const MARKER_ICON_SIZE = 64;
 export const DEFAULT_RPC_PORT = 3921;
 export const RPC_BATCH_DELAY = 150; // ms
-export const RPC_MAX_BATCH_SIZE = 1024; // bytes
+export const RPC_MAX_BATCH_SIZE = 4096; // bytes
 export const CHAT_AUTOSAVE_INTERVAL = 1; // seconds
 export const LOG_IDB_NAME = 'logs';
 export const LOG_IDB_INTERVAL = 5; // ms

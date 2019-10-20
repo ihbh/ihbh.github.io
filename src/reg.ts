@@ -9,9 +9,7 @@ declare global {
   }
 }
 
-const IMG_MAXSIZE = 4096;
-const IMG_MIME = 'image/jpeg';
-const IMG_FILTER = 'grayscale(100%)';
+const GRAYSCALE_FILTER = 'grayscale(100%)';
 
 const log = new TaggedLogger('reg');
 
@@ -49,8 +47,9 @@ export async function selectPhoto(): Promise<string> {
 async function saveOriginalImage(file: File) {
   let buffer = await file.arrayBuffer();
   log.i('Saving original image:', buffer.byteLength, 'bytes');
-  let hex = new Buffer(buffer).toString('hex');
-  await gp.hdimg.set(hex);
+  let base64 = new Buffer(buffer).toString('base64');
+  let dataUrl = 'data:' + file.type + ';base64,' + base64;
+  await gp.hdimg.set(dataUrl);
 }
 
 async function getJpegFromFile(file: File) {
@@ -59,39 +58,63 @@ async function getJpegFromFile(file: File) {
   log.i('bitmap:', bitmap);
   let w = bitmap.width;
   let h = bitmap.height;
+  let s = Math.min(w, h, conf.IMG_MAXSIZE);
+  let x = (w - s) / 2;
+  let y = (h - s) / 2;
   let canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
+  canvas.width = s;
+  canvas.height = s;
   let context = canvas.getContext('2d');
-  let wh = Math.min(w, h, IMG_MAXSIZE);
-  let dx = (w - wh) / 2;
-  let dy = (h - wh) / 2;
-  log.i('cropped size:', wh, 'x', wh);
-  context.drawImage(bitmap, dx, dy, wh, wh);
+  log.i('cropped size:', s, 'x', s,
+    'at', 'dx=' + x, 'dy=' + y);
+  context.drawImage(bitmap,
+    x, y, s, s,
+    0, 0, s, s);
   let blob = await new Promise((resolve) =>
-    canvas.toBlob(resolve, 'image/jpeg'));
+    canvas.toBlob(resolve, conf.IMG_MIMETYPE));
   let blobUrl = URL.createObjectURL(blob);
   log.i('blob url:', blobUrl);
   return blobUrl;
 }
 
-export function getResizedPhoto(img: HTMLImageElement) {
+export function getResizedPhoto(img: HTMLImageElement, {
+  mime = conf.IMG_MIMETYPE,
+  quality = conf.IMG_MAXQUALITY,
+  grayscale = false,
+} = {}) {
   if (!img.src) return null;
   let w = img.naturalWidth;
   let h = img.naturalHeight;
-  let s = conf.PHOTO_SIZE;
-  log.i('resizing image:', w, 'x', h, '->', s, 'x', s);
+  let s = conf.IMG_SIZE;
+  log.i('resizing image:', w, 'x', h, '->', s, 'x', s,
+    `q=${quality}`, `grayscale=${grayscale}`);
   let canvas = document.createElement('canvas');
   canvas.width = s;
   canvas.height = s;
   let context = canvas.getContext('2d');
-  context.filter = IMG_FILTER;
+  if (grayscale) context.filter = GRAYSCALE_FILTER;
   context.drawImage(img,
     0, 0, w, h,
     0, 0, s, s);
-  let newDataUrl = canvas.toDataURL(IMG_MIME, conf.PHOTO_QIALITY);
-  log.i('resized photo:', newDataUrl);
+  let newDataUrl = canvas.toDataURL(mime, quality);
+  log.i('resized photo:', newDataUrl.length, 'bytes');
   return newDataUrl;
+}
+
+export function downsizePhoto(img: HTMLImageElement) {
+  let qmax = conf.IMG_MAXQUALITY;
+  let qmin = conf.IMG_MINQUALITY;
+  let dataurl = '';
+
+  loop: for (let grayscale of [false, true]) {
+    for (let quality = qmax; quality >= qmin; quality -= 0.1) {
+      dataurl = getResizedPhoto(img, { quality, grayscale });
+      if (dataurl.length <= conf.IMG_MAXBYTES)
+        break loop;
+    }
+  }
+
+  return dataurl;
 }
 
 export async function saveUserInfo(
@@ -104,7 +127,7 @@ export async function saveUserInfo(
   if (!conf.RX_USERNAME.test(username))
     throw new Error(`Invalid username.`);
 
-  let imgurl = getResizedPhoto(img);
+  let imgurl = img.src; // as is, already downsized
   if (!imgurl) throw new Error('Need to set user photo.');
 
   await gp.userimg.set(imgurl);

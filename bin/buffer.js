@@ -17,6 +17,13 @@ define(["require", "exports"], function (require, exports) {
             }
             return new Buffer(bytes);
         },
+        base64(base64) {
+            let binstr = atob(base64);
+            let bytes = new Uint8Array(binstr.length);
+            for (let i = 0; i < bytes.length; i++)
+                bytes[i] = binstr.charCodeAt(i);
+            return new Buffer(bytes);
+        },
         utf8(text) {
             let bytes = new TextEncoder().encode(text);
             return new Buffer(bytes);
@@ -29,6 +36,13 @@ define(["require", "exports"], function (require, exports) {
             for (let i = 0; i < bytes.length; i++)
                 text += (0x100 + bytes[i]).toString(16).slice(-2);
             return text;
+        },
+        base64(data) {
+            let bytes = new Uint8Array(data);
+            let binstr = '';
+            for (let i = 0; i < bytes.byteLength; i++)
+                binstr += String.fromCharCode(bytes[i]);
+            return btoa(binstr);
         },
         utf8(data) {
             return new TextDecoder().decode(data);

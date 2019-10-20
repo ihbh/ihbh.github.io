@@ -107,10 +107,23 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
         }
         else {
             let reg = await new Promise((resolve_1, reject_1) => { require(['./reg'], resolve_1, reject_1); });
+            let resizing = false;
             dom.id.regPhoto.onclick = async () => {
-                log.i('Clicked the self img.');
-                let url = await reg.selectPhoto();
-                dom.id.regPhoto.src = url;
+                if (resizing)
+                    return;
+                try {
+                    log.i('Clicked the self img.');
+                    resizing = true;
+                    let url = await reg.selectPhoto();
+                    dom.id.regPhoto.src = url;
+                    await waitImg(dom.id.regPhoto);
+                    log.i('Downsizing the image.');
+                    let url2 = reg.downsizePhoto(dom.id.regPhoto);
+                    dom.id.regPhoto.src = url2;
+                }
+                finally {
+                    resizing = false;
+                }
             };
             dom.id.regDone.onclick = async () => {
                 log.i('Clicked done.');
@@ -122,6 +135,12 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
                 await page.set('map');
             };
         }
+    }
+    function waitImg(img) {
+        return new Promise((resolve, reject) => {
+            img.onerror = () => reject(new Error('img.onerror'));
+            img.onload = () => resolve();
+        });
     }
 });
 //# sourceMappingURL=profile.js.map

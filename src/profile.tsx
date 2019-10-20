@@ -4,6 +4,7 @@ import * as page from './page';
 import * as qargs from './qargs';
 import React from './react';
 import * as usr from './usr';
+import { sleep } from './utils';
 
 const log = new TaggedLogger('reg');
 
@@ -133,11 +134,24 @@ async function addEventListeners() {
     };
   } else {
     let reg = await import('./reg');
+    let resizing = false;
 
     dom.id.regPhoto.onclick = async () => {
-      log.i('Clicked the self img.');
-      let url = await reg.selectPhoto();
-      dom.id.regPhoto.src = url;
+      if (resizing) return;
+
+      try {
+        log.i('Clicked the self img.');
+        resizing = true;
+        let url = await reg.selectPhoto();
+        dom.id.regPhoto.src = url;
+        await waitImg(dom.id.regPhoto);
+
+        log.i('Downsizing the image.');
+        let url2 = reg.downsizePhoto(dom.id.regPhoto);
+        dom.id.regPhoto.src = url2;
+      } finally {
+        resizing = false;
+      }
     };
 
     dom.id.regDone.onclick = async () => {
@@ -150,4 +164,11 @@ async function addEventListeners() {
       await page.set('map');
     };
   }
+}
+
+function waitImg(img: HTMLImageElement) {
+  return new Promise((resolve, reject) => {
+    img.onerror = () => reject(new Error('img.onerror'));
+    img.onload = () => resolve();
+  });
 }

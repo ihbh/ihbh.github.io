@@ -1,5 +1,3 @@
-type Encoding = 'hex' | 'utf8';
-
 interface TypedArray<T> {
   new(buffer: ArrayBuffer): T;
 }
@@ -23,6 +21,13 @@ let decoders = {
     }
     return new Buffer(bytes);
   },
+  base64(base64: string) {
+    let binstr = atob(base64);
+    let bytes = new Uint8Array(binstr.length);
+    for (let i = 0; i < bytes.length; i++)
+      bytes[i] = binstr.charCodeAt(i);
+    return new Buffer(bytes);
+  },
   utf8(text: string): Buffer {
     let bytes = new TextEncoder().encode(text);
     return new Buffer(bytes);
@@ -37,13 +42,20 @@ let encoders = {
       text += (0x100 + bytes[i]).toString(16).slice(-2);
     return text;
   },
+  base64(data: ArrayBuffer) {
+    let bytes = new Uint8Array(data);
+    let binstr = '';
+    for (let i = 0; i < bytes.byteLength; i++)
+      binstr += String.fromCharCode(bytes[i]);
+    return btoa(binstr);
+  },
   utf8(data: ArrayBuffer): string {
     return new TextDecoder().decode(data);
   },
 };
 
 export default class Buffer {
-  static from(data: string, enc: Encoding): Buffer {
+  static from(data: string, enc: keyof typeof decoders): Buffer {
     return decoders[enc](data);
   }
 
@@ -54,7 +66,7 @@ export default class Buffer {
       ? data : data.buffer;
   }
 
-  toString(enc: Encoding) {
+  toString(enc: keyof typeof encoders) {
     return encoders[enc](this.buffer);
   }
 
