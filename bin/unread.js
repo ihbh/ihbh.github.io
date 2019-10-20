@@ -46,6 +46,8 @@ define(["require", "exports", "./page", "./config", "./dom", "./log", "./react",
             card.classList.add('unread');
             container.insertBefore(card, container.firstChild);
         }
+        if (!infos.length && !uids.length)
+            container.textContent = 'No chats yet. Find someone on the map.';
     }
     exports.init = init;
     function renderUserCard(info) {

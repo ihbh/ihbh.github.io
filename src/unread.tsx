@@ -56,6 +56,9 @@ export async function init() {
     card.classList.add('unread');
     container.insertBefore(card, container.firstChild);
   }
+
+  if (!infos.length && !uids.length)
+    container.textContent = 'No chats yet. Find someone on the map.';
 }
 
 function renderUserCard(info: UserInfo) {
