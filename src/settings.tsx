@@ -5,6 +5,7 @@ import * as idb from './idb';
 import { TaggedLogger } from './log';
 import * as ls from './ls';
 import React from './react';
+import sleep from './sleep';
 
 const log = new TaggedLogger('settings');
 
@@ -94,6 +95,7 @@ function initImportButton() {
       });
 
       log.i('selected file:', file.type, file.size, 'bytes');
+      let time = Date.now();
       let res = await fetch(URL.createObjectURL(file));
       let json = await res.json();
       log.i('importing json:', json);
@@ -102,10 +104,13 @@ function initImportButton() {
       await ls.clear();
       await idb.clear();
 
+      log.i('Waiting for IDB connection to close.');
+      await sleep(1500);
+
       json.ls && await ls.load(json.ls);
       json.idb && await idb.load(json.idb);
 
-      log.i('Data imported.');
+      log.i('Data imported:', Date.now() - time, 'ms');
     } catch (err) {
       log.e('Failed to import data:', err);
     }

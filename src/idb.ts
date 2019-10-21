@@ -1,4 +1,5 @@
 import { TaggedLogger } from "./log";
+import sleep from "./sleep";
 
 declare global {
   interface IDBFactory {
@@ -35,8 +36,8 @@ export class DB {
     for (let { name } of idbs) {
       log.i('Deleting db:', name);
       DB.close(name);
-      let r = indexedDB.deleteDatabase(name);
       await new Promise<void>((resolve, reject) => {
+        let r = indexedDB.deleteDatabase(name);
         r.onerror = () => reject(new Error(`Failed to delete db: ${name}`));
         r.onsuccess = () => resolve();
       });
@@ -201,9 +202,14 @@ export class DBTable {
 
     return new Promise((resolve, reject) => {
       this.pending.push({ name, fn, mode, defval, resolve, reject });
-      this.timer = this.timer || setTimeout(() => {
+      this.timer = this.timer || setTimeout(async () => {
         this.timer = 0;
-        this.execPendingTransactions();
+        try {
+          await this.execPendingTransactions();
+        } catch (err) {
+          for (let { name, reject } of this.pending.splice(0))
+            reject(new Error(`idbtx ${name} failed: ${err.message}`));
+        }
       });
     });
   }
@@ -330,7 +336,7 @@ export function save(filter: (dbname: string) => boolean) {
   return DB.save(filter);
 }
 
-export function load(json) {
+export async function load(json) {
   log.i('load');
-  DB.load(json);
+  await DB.load(json);
 }

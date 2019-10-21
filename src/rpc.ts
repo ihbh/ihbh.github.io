@@ -134,6 +134,8 @@ async function invokeInternal(name: string, args, reqid: string) {
     'Content-Length': body.length + '',
   };
 
+  log.d(name, body.length, 'bytes');
+
   try {
     let res = await fetch(url, {
       method: 'POST',
@@ -204,14 +206,14 @@ function getBatchWithinMaxSize() {
   pending.sort((p, q) =>
     p.json.length - q.json.length);
 
-  let batchSize = 0;
+  let batchSize = 2; // [{},{},...]
   let batch: PendingRpc[] = [];
 
   do {
     let req = pending[0];
-    let size = req.json.length;
+    let size = req.json.length + 1;
     let canAppend = !batch.length ||
-      batchSize + size <= conf.RPC_MAX_BATCH_SIZE;
+      batchSize + size < conf.RPC_MAX_BATCH_SIZE;
     if (!canAppend) break;
     batchSize += size;
     batch.push(req);
@@ -219,7 +221,7 @@ function getBatchWithinMaxSize() {
   } while (pending.length > 0);
 
   log.d('RPC batch:', batch.length, 'RPCs',
-    (batchSize / 1024).toFixed(1), 'KB',
+    batchSize, 'bytes',
     pending.length, 'left');
   return batch;
 }

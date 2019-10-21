@@ -1,4 +1,4 @@
-define(["require", "exports", "./page", "./config", "./dom", "./idb", "./log", "./ls", "./react"], function (require, exports, page, conf, dom, idb, log_1, ls, react_1) {
+define(["require", "exports", "./page", "./config", "./dom", "./idb", "./log", "./ls", "./react", "./sleep"], function (require, exports, page, conf, dom, idb, log_1, ls, react_1, sleep_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('settings');
@@ -55,15 +55,18 @@ define(["require", "exports", "./page", "./config", "./dom", "./idb", "./log", "
                     };
                 });
                 log.i('selected file:', file.type, file.size, 'bytes');
+                let time = Date.now();
                 let res = await fetch(URL.createObjectURL(file));
                 let json = await res.json();
                 log.i('importing json:', json);
                 log.i('Deleting the old data...');
                 await ls.clear();
                 await idb.clear();
+                log.i('Waiting for IDB connection to close.');
+                await sleep_1.default(1500);
                 json.ls && await ls.load(json.ls);
                 json.idb && await idb.load(json.idb);
-                log.i('Data imported.');
+                log.i('Data imported:', Date.now() - time, 'ms');
             }
             catch (err) {
                 log.e('Failed to import data:', err);

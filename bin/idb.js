@@ -28,8 +28,8 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             for (let { name } of idbs) {
                 log.i('Deleting db:', name);
                 DB.close(name);
-                let r = indexedDB.deleteDatabase(name);
                 await new Promise((resolve, reject) => {
+                    let r = indexedDB.deleteDatabase(name);
                     r.onerror = () => reject(new Error(`Failed to delete db: ${name}`));
                     r.onsuccess = () => resolve();
                 });
@@ -165,9 +165,15 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         schedule(name, mode, fn, defval) {
             return new Promise((resolve, reject) => {
                 this.pending.push({ name, fn, mode, defval, resolve, reject });
-                this.timer = this.timer || setTimeout(() => {
+                this.timer = this.timer || setTimeout(async () => {
                     this.timer = 0;
-                    this.execPendingTransactions();
+                    try {
+                        await this.execPendingTransactions();
+                    }
+                    catch (err) {
+                        for (let { name, reject } of this.pending.splice(0))
+                            reject(new Error(`idbtx ${name} failed: ${err.message}`));
+                    }
                 });
             });
         }
@@ -259,9 +265,9 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         return DB.save(filter);
     }
     exports.save = save;
-    function load(json) {
+    async function load(json) {
         log.i('load');
-        DB.load(json);
+        await DB.load(json);
     }
     exports.load = load;
 });

@@ -33,6 +33,7 @@ define(["require", "exports", "./config", "./log", "./prop", "./qargs"], functio
             'Content-Type': 'application/json',
             'Content-Length': body.length + '',
         };
+        log.d(name, body.length, 'bytes');
         try {
             let res = await fetch(url, {
                 method: 'POST',
@@ -94,20 +95,20 @@ define(["require", "exports", "./config", "./log", "./prop", "./qargs"], functio
     function getBatchWithinMaxSize() {
         // Smaller RPCs first.
         pending.sort((p, q) => p.json.length - q.json.length);
-        let batchSize = 0;
+        let batchSize = 2; // [{},{},...]
         let batch = [];
         do {
             let req = pending[0];
-            let size = req.json.length;
+            let size = req.json.length + 1;
             let canAppend = !batch.length ||
-                batchSize + size <= conf.RPC_MAX_BATCH_SIZE;
+                batchSize + size < conf.RPC_MAX_BATCH_SIZE;
             if (!canAppend)
                 break;
             batchSize += size;
             batch.push(req);
             pending.splice(0, 1);
         } while (pending.length > 0);
-        log.d('RPC batch:', batch.length, 'RPCs', (batchSize / 1024).toFixed(1), 'KB', pending.length, 'left');
+        log.d('RPC batch:', batch.length, 'RPCs', batchSize, 'bytes', pending.length, 'left');
         return batch;
     }
     async function sendBatch() {
