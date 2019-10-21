@@ -63,6 +63,7 @@ define(["require", "exports", "./idb", "./log"], function (require, exports, idb
         return new JsonFS({
             keys: () => t.keys(),
             read: key => t.get(key),
+            clear: () => t.clear(),
             remove: key => t.remove(key),
             write: (key, data) => t.set(key, data),
         });

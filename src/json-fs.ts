@@ -35,8 +35,10 @@ export default class JsonFS implements VFS {
   }
 
   private clearKeys() {
-    log.d('clear cached keys');
-    this.cachedKeys = null;
+    if (this.cachedKeys) {
+      log.d('clear cached keys');
+      this.cachedKeys = null;
+    }
   }
 
   async invoke(fsop: keyof VFS, path: string, ...args) {
@@ -111,11 +113,21 @@ export default class JsonFS implements VFS {
 
   async rmdir(path: string) {
     log.d('rmdir()', path);
-    if (!this.args.clear)
-      throw new Error('This is a read only json fs.');
-    if (path != '/')
-      throw new Error('Bad path: ' + path);
-    this.clearKeys();
-    return this.args.clear();
+    if (!path || path == '/') {
+      if (!this.args.clear)
+        throw new Error('This is a read only json fs.');
+      if (path != '/')
+        throw new Error('Bad path: ' + path);
+      this.clearKeys();
+      return this.args.clear();
+    } else {
+      if (!this.args.remove)
+        throw new Error('This is a read only json fs.');
+      if (path.endsWith('/'))
+        throw new Error('Bad path: ' + path);
+      let subpaths = await this.find(path);
+      let ps = subpaths.map(sp => this.rm(sp));
+      await Promise.all(ps);
+    }
   }
 };

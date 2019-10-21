@@ -278,6 +278,13 @@ export class DBTable {
       s => s.add(value, key));
   }
 
+  clear(): Promise<void> {
+    return this.schedule(
+      `${this.name}.clear()`,
+      'readwrite',
+      s => s.clear());
+  }
+
   remove(key: string): Promise<void> {
     return this.schedule(
       `${this.name}.remove(${key})`,

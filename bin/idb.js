@@ -221,6 +221,9 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         add(key, value) {
             return this.schedule(`${this.name}.add(${key})`, 'readwrite', s => s.add(value, key));
         }
+        clear() {
+            return this.schedule(`${this.name}.clear()`, 'readwrite', s => s.clear());
+        }
         remove(key) {
             return this.schedule(`${this.name}.remove(${key})`, 'readwrite', s => s.delete(key));
         }

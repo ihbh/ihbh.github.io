@@ -74,6 +74,7 @@ async function createTableFS(dbname: string, tname: string) {
   return new JsonFS({
     keys: () => t.keys(),
     read: key => t.get(key),
+    clear: () => t.clear(),
     remove: key => t.remove(key),
     write: (key, data) => t.set(key, data),
   });

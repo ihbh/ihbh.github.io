@@ -14,8 +14,10 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             return this.cachedKeys;
         }
         clearKeys() {
-            log.d('clear cached keys');
-            this.cachedKeys = null;
+            if (this.cachedKeys) {
+                log.d('clear cached keys');
+                this.cachedKeys = null;
+            }
         }
         async invoke(fsop, path, ...args) {
             if (!this[fsop])
@@ -83,12 +85,23 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         }
         async rmdir(path) {
             log.d('rmdir()', path);
-            if (!this.args.clear)
-                throw new Error('This is a read only json fs.');
-            if (path != '/')
-                throw new Error('Bad path: ' + path);
-            this.clearKeys();
-            return this.args.clear();
+            if (!path || path == '/') {
+                if (!this.args.clear)
+                    throw new Error('This is a read only json fs.');
+                if (path != '/')
+                    throw new Error('Bad path: ' + path);
+                this.clearKeys();
+                return this.args.clear();
+            }
+            else {
+                if (!this.args.remove)
+                    throw new Error('This is a read only json fs.');
+                if (path.endsWith('/'))
+                    throw new Error('Bad path: ' + path);
+                let subpaths = await this.find(path);
+                let ps = subpaths.map(sp => this.rm(sp));
+                await Promise.all(ps);
+            }
         }
     }
     exports.default = JsonFS;
