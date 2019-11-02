@@ -67,7 +67,7 @@ export const root = new class RootFS implements VFS {
 
   async rmdir(path: string) {
     log.i('rmdir', path);
-    let [hprop, relpath, rootdir] = parsePath(path);
+    let [hprop, relpath] = parsePath(path);
     let hroot = await hprop.get();
     if (hroot.rmdir)
       return hroot.rmdir(relpath);

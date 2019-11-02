@@ -6,7 +6,7 @@ import vfsprop from './vfs-prop';
 const log = new TaggedLogger('gp');
 
 function prop<T>(path: string, defval: T = null) {
-  let fspath = conf.USERDATA_DIR + '/' +
+  let fspath = '~/' +
     path.split('.').join('/');
   log.d(path, '->', fspath);
   return vfsprop(fspath, defval);

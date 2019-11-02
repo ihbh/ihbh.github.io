@@ -12,6 +12,11 @@ let syncing = false;
 const encodePath = encodeURIComponent;
 const decodePath = decodeURIComponent;
 
+export function owns(path: string) {
+  return abspath(path).startsWith(
+    abspath(conf.RSYNC_DIR) + '/');
+}
+
 export async function rhash(bytes: ArrayBuffer) {
   let h = await crypto.subtle.digest(conf.RSYNC_HASH, bytes);
   let p = h.slice(0, conf.RSYNC_HASHLEN);
@@ -22,10 +27,12 @@ export async function reset(path?: string) {
   if (!path) {
     await vfs.rm(conf.RSYNC_SYNCED);
     await vfs.rm(conf.RSYNC_FAILED);
-  } else {
+  } else if (owns(path)) {
     let key = encodePath(path);
     await vfs.rm(conf.RSYNC_SYNCED + '/' + key);
     await vfs.rm(conf.RSYNC_FAILED + '/' + key);
+  } else {
+    log.w('rsync doesnt own this path:', path);
   }
 }
 
@@ -67,11 +74,16 @@ export async function start() {
   }
 }
 
+function getRelPath(path: string) {
+  if (!owns(path))
+    throw new Error('rsync doesnt own this path: ' + path);
+  return abspath(path).replace(
+    abspath(conf.RSYNC_DIR), '');
+}
+
 async function syncFile(path: string, data = null) {
   let remove = data === null;
-  let relpath = path.slice(conf.RSYNC_SHARED.length);
-  if (relpath[0] != '/')
-    throw new Error('Bad rel path: ' + relpath);
+  let relpath = getRelPath(path);
 
   let res, err;
 
@@ -107,7 +119,7 @@ async function getUnsyncedPaths() {
     let [synced, failed, local] = await Promise.all([
       vfs.dir(conf.RSYNC_SYNCED),
       vfs.dir(conf.RSYNC_FAILED),
-      vfs.find(conf.RSYNC_SHARED),
+      vfs.find(conf.RSYNC_DIR),
     ]);
 
     // newPaths = local - (synced + failed)

@@ -19,7 +19,7 @@ const PROPS = {
 export async function getUserInfo(uid: string) {
   log.i('Getting user info:', uid);
   let dirRemote = `/users/${uid}/profile`;
-  let dirCached = `${conf.USERDATA_DIR}/users/${uid}`;
+  let dirCached = `~/users/${uid}`;
   let info = await getCachedInfo(uid);
 
   try {
@@ -38,7 +38,7 @@ export async function getUserInfo(uid: string) {
 
 async function getCachedInfo(uid: string) {
   let { default: vfs } = await import('./vfs');
-  let dir = `${conf.USERDATA_DIR}/users/${uid}`;
+  let dir = `~/users/${uid}`;
   let info: UserInfo = { uid };
   let fnames = Object.keys(PROPS);
 

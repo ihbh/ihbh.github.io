@@ -1,9 +1,9 @@
-define(["require", "exports", "./config", "./log", "./vfs-conf", "./vfs-prop"], function (require, exports, conf, log_1, vfsconf, vfs_prop_1) {
+define(["require", "exports", "./log", "./vfs-conf", "./vfs-prop"], function (require, exports, log_1, vfsconf, vfs_prop_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('gp');
     function prop(path, defval = null) {
-        let fspath = conf.USERDATA_DIR + '/' +
+        let fspath = '~/' +
             path.split('.').join('/');
         log.d(path, '->', fspath);
         return vfs_prop_1.default(fspath, defval);

@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./log"], function (require, exports, conf, log_1) {
+define(["require", "exports", "./log"], function (require, exports, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('ucache');
@@ -10,7 +10,7 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
     async function getUserInfo(uid) {
         log.i('Getting user info:', uid);
         let dirRemote = `/users/${uid}/profile`;
-        let dirCached = `${conf.USERDATA_DIR}/users/${uid}`;
+        let dirCached = `~/users/${uid}`;
         let info = await getCachedInfo(uid);
         try {
             let ps = syncFiles(dirCached, dirRemote);
@@ -27,7 +27,7 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
     exports.getUserInfo = getUserInfo;
     async function getCachedInfo(uid) {
         let { default: vfs } = await new Promise((resolve_1, reject_1) => { require(['./vfs'], resolve_1, reject_1); });
-        let dir = `${conf.USERDATA_DIR}/users/${uid}`;
+        let dir = `~/users/${uid}`;
         let info = { uid };
         let fnames = Object.keys(PROPS);
         await Promise.all(fnames.map(async (fname) => info[PROPS[fname]] = await vfs.get(dir + '/' + fname)));

@@ -5,6 +5,10 @@ define(["require", "exports", "./buffer", "./config", "./error", "./log", "./rpc
     let syncing = false;
     const encodePath = encodeURIComponent;
     const decodePath = decodeURIComponent;
+    function owns(path) {
+        return vfs_1.abspath(path).startsWith(vfs_1.abspath(conf.RSYNC_DIR) + '/');
+    }
+    exports.owns = owns;
     async function rhash(bytes) {
         let h = await crypto.subtle.digest(conf.RSYNC_HASH, bytes);
         let p = h.slice(0, conf.RSYNC_HASHLEN);
@@ -16,10 +20,13 @@ define(["require", "exports", "./buffer", "./config", "./error", "./log", "./rpc
             await vfs_1.default.rm(conf.RSYNC_SYNCED);
             await vfs_1.default.rm(conf.RSYNC_FAILED);
         }
-        else {
+        else if (owns(path)) {
             let key = encodePath(path);
             await vfs_1.default.rm(conf.RSYNC_SYNCED + '/' + key);
             await vfs_1.default.rm(conf.RSYNC_FAILED + '/' + key);
+        }
+        else {
+            log.w('rsync doesnt own this path:', path);
         }
     }
     exports.reset = reset;
@@ -52,11 +59,14 @@ define(["require", "exports", "./buffer", "./config", "./error", "./log", "./rpc
         }
     }
     exports.start = start;
+    function getRelPath(path) {
+        if (!owns(path))
+            throw new Error('rsync doesnt own this path: ' + path);
+        return vfs_1.abspath(path).replace(vfs_1.abspath(conf.RSYNC_DIR), '');
+    }
     async function syncFile(path, data = null) {
         let remove = data === null;
-        let relpath = path.slice(conf.RSYNC_SHARED.length);
-        if (relpath[0] != '/')
-            throw new Error('Bad rel path: ' + relpath);
+        let relpath = getRelPath(path);
         let res, err;
         try {
             if (!remove) {
@@ -92,7 +102,7 @@ define(["require", "exports", "./buffer", "./config", "./error", "./log", "./rpc
             let [synced, failed, local] = await Promise.all([
                 vfs_1.default.dir(conf.RSYNC_SYNCED),
                 vfs_1.default.dir(conf.RSYNC_FAILED),
-                vfs_1.default.find(conf.RSYNC_SHARED),
+                vfs_1.default.find(conf.RSYNC_DIR),
             ]);
             // newPaths = local - (synced + failed)
             let newPaths = new Set(local);

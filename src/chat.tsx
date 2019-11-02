@@ -208,13 +208,13 @@ function selectLastMessage() {
 
 async function cachedIncomingMessages(messages: RemoteMessages) {
   log.i('Saving new incoming messages to cache.');
-  let dir = `${conf.USERDATA_DIR}/chats/${remoteUid}`;
+  let dir = `~/chats/${remoteUid}`;
   await addMessageTexts(dir, messages);
 }
 
 async function getCachedIncomingMessages() {
   log.i('Getting cached incoming messages.');
-  let dir = `${conf.USERDATA_DIR}/chats/${remoteUid}`;
+  let dir = `~/chats/${remoteUid}`;
   return getMessageTexts(dir);
 }
 
@@ -223,7 +223,7 @@ async function getNewIncomingMessages() {
   let uid = await user.uid.get();
   let dir = `/srv/users/${remoteUid}/chats/${uid}`;
   let tsids = (await vfs.dir(dir)) || [];
-  let dirCached = `${conf.USERDATA_DIR}/chats/${remoteUid}`;
+  let dirCached = `~/chats/${remoteUid}`;
   let tsidsCached = (await vfs.dir(dirCached)) || [];
   let tsidsNew = diff(tsids, tsidsCached);
   return getMessageTexts(dir, tsidsNew);
@@ -237,7 +237,7 @@ async function getOutgoingMessages() {
 
 async function setOutgoingMessagesTag() {
   log.i('Adding a tag to remember this chat.');
-  let path = `${conf.USERDATA_DIR}/chats/${remoteUid}/time`;
+  let path = `~/chats/${remoteUid}/time`;
   let time = new Date().toJSON();
   await vfs.set(path, time);
 }

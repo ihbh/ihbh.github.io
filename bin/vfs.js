@@ -53,7 +53,7 @@ define(["require", "exports", "./config", "./error", "./log", "./vfs-roots"], fu
         }
         async rmdir(path) {
             log.i('rmdir', path);
-            let [hprop, relpath, rootdir] = parsePath(path);
+            let [hprop, relpath] = parsePath(path);
             let hroot = await hprop.get();
             if (hroot.rmdir)
                 return hroot.rmdir(relpath);
