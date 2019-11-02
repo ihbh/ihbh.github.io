@@ -11,8 +11,14 @@ const PATH_REGEX = /^(\/[\w-_%.]+)+\/?$/;
 const ROOT_REGEX = /^\/[\w-]+/;
 const STAT_REGEX = /^\w+$/;
 
-export const abspath = (path: string) =>
-  path.replace(/^~/, conf.USERDATA_DIR);
+export function abspath(path: string) {
+  if (!path.startsWith('~/'))
+    return path;
+  let ukey = localStorage.getItem(conf.LS_USERID_KEY)
+    || conf.DEFAULT_USERID_KEY;
+  let dir = conf.USERDATA_DIR + '/' + ukey + '/';
+  return path.replace('~/', dir);
+}
 
 export const root = new class RootFS implements VFS {
   async find(path: string): Promise<string[]> {

@@ -43,10 +43,11 @@ export const NULL_IMG = 'data:image/jpeg;base64,';
 export const NOUSERPIC = '/icons/user.svg';
 export const UCACHE_TIMEOUT = 250;
 
+export const LS_USERID_KEY = 'userid'; // localStorage
+export const DEFAULT_USERID_KEY = 'user';
+export const USERDATA_DIR = '/idb';
 export const CONF_SDIR = '/ls/conf';
 export const CONF_VDIR = '/conf';
-
-export const USERDATA_DIR = '/idb/user';
 export const LOCAL_DIR = `~/local`;
 export const SHARED_DIR = `~/shared`;
 export const VPLACES_DIR = `${SHARED_DIR}/places`;

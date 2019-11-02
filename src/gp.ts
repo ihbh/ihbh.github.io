@@ -1,4 +1,3 @@
-import * as conf from './config';
 import { TaggedLogger } from './log';
 import * as vfsconf from './vfs-conf';
 import vfsprop from './vfs-prop';

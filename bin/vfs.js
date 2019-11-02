@@ -5,7 +5,15 @@ define(["require", "exports", "./config", "./error", "./log", "./vfs-roots"], fu
     const PATH_REGEX = /^(\/[\w-_%.]+)+\/?$/;
     const ROOT_REGEX = /^\/[\w-]+/;
     const STAT_REGEX = /^\w+$/;
-    exports.abspath = (path) => path.replace(/^~/, conf.USERDATA_DIR);
+    function abspath(path) {
+        if (!path.startsWith('~/'))
+            return path;
+        let ukey = localStorage.getItem(conf.LS_USERID_KEY)
+            || conf.DEFAULT_USERID_KEY;
+        let dir = conf.USERDATA_DIR + '/' + ukey + '/';
+        return path.replace('~/', dir);
+    }
+    exports.abspath = abspath;
     exports.root = new class RootFS {
         async find(path) {
             if (path == '/') {
@@ -18,7 +26,7 @@ define(["require", "exports", "./config", "./error", "./log", "./vfs-roots"], fu
                 }
                 return res;
             }
-            path = exports.abspath(path);
+            path = abspath(path);
             let relpaths = await this.invoke('find', path);
             let prefix = ROOT_REGEX.exec(path);
             return relpaths.map(rel => prefix + rel);
@@ -95,7 +103,7 @@ define(["require", "exports", "./config", "./error", "./log", "./vfs-roots"], fu
         }
     };
     function parsePath(path) {
-        path = exports.abspath(path);
+        path = abspath(path);
         if (!PATH_REGEX.test(path))
             throw new SyntaxError('Invalid vfs path: ' + path);
         let i = path.indexOf('/', 1);
