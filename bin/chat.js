@@ -67,7 +67,7 @@ define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page
                 date: new Date,
             };
             let tsid = date2tsid(message.date);
-            await vfs_1.default.set(`~/chats/${remoteUid}/${tsid}/text`, text);
+            await vfs_1.default.set(`${conf.SHARED_DIR}/chats/${remoteUid}/${tsid}/text`, text);
             log.i('Message saved.');
             let container = dom.id.chatMessages;
             let div = renderMessage(message);
@@ -163,7 +163,7 @@ define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page
     }
     async function getOutgoingMessages() {
         log.i('Getting outgoing messages.');
-        let dir = `~/chats/${remoteUid}`;
+        let dir = `${conf.SHARED_DIR}/chats/${remoteUid}`;
         return await getMessageTexts(dir);
     }
     async function setOutgoingMessagesTag() {

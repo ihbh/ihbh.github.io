@@ -111,7 +111,7 @@ async function setSendButtonHandler() {
     };
 
     let tsid = date2tsid(message.date);
-    await vfs.set(`~/chats/${remoteUid}/${tsid}/text`, text);
+    await vfs.set(`${conf.SHARED_DIR}/chats/${remoteUid}/${tsid}/text`, text);
     log.i('Message saved.');
 
     let container = dom.id.chatMessages;
@@ -231,7 +231,7 @@ async function getNewIncomingMessages() {
 
 async function getOutgoingMessages() {
   log.i('Getting outgoing messages.');
-  let dir = `~/chats/${remoteUid}`;
+  let dir = `${conf.SHARED_DIR}/chats/${remoteUid}`;
   return await getMessageTexts(dir);
 }
 

@@ -12,7 +12,7 @@ const ROOT_REGEX = /^\/[\w-]+/;
 const STAT_REGEX = /^\w+$/;
 
 export const abspath = (path: string) =>
-  path.replace(/^~/, conf.SHARED_DIR);
+  path.replace(/^~/, conf.USERDATA_DIR);
 
 export const root = new class RootFS implements VFS {
   async find(path: string): Promise<string[]> {

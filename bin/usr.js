@@ -11,7 +11,7 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
         let time = new Date().toJSON()
             .replace(/\..+$/, '')
             .replace(/[^\d]/g, '-');
-        let path = `~/feedbacks/${time}`;
+        let path = `${conf.SHARED_DIR}/feedbacks/${time}`;
         let vfs = await new Promise((resolve_1, reject_1) => { require(['./vfs'], resolve_1, reject_1); });
         await vfs.root.set(path, text);
         log.i('Feedback recorded.');

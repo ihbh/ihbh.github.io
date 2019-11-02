@@ -39,6 +39,9 @@ define(["require", "exports"], function (require, exports) {
     exports.LOG_IDB_INTERVAL = 5; // ms
     exports.FS_SLOW_THRS = 10; // ms
     exports.FEEDBACK_SAVE_TIMEOUT = 500;
+    exports.NULL_IMG = 'data:image/jpeg;base64,';
+    exports.NOUSERPIC = '/icons/user.svg';
+    exports.UCACHE_TIMEOUT = 250;
     exports.CONF_SDIR = '/ls/conf';
     exports.CONF_VDIR = '/conf';
     exports.USERDATA_DIR = '/idb/user';
@@ -52,8 +55,5 @@ define(["require", "exports"], function (require, exports) {
     exports.RSYNC_HASH = 'SHA-256';
     exports.RSYNC_HASHLEN = 4; // bytes
     exports.LASTGPS_DIR = `${exports.LOCAL_DIR}/lastgps`;
-    exports.NULL_IMG = 'data:image/jpeg;base64,';
-    exports.NOUSERPIC = '/icons/user.svg';
-    exports.UCACHE_TIMEOUT = 250;
 });
 //# sourceMappingURL=config.js.map

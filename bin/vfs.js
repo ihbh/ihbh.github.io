@@ -5,7 +5,7 @@ define(["require", "exports", "./config", "./error", "./log", "./vfs-roots"], fu
     const PATH_REGEX = /^(\/[\w-_%.]+)+\/?$/;
     const ROOT_REGEX = /^\/[\w-]+/;
     const STAT_REGEX = /^\w+$/;
-    exports.abspath = (path) => path.replace(/^~/, conf.SHARED_DIR);
+    exports.abspath = (path) => path.replace(/^~/, conf.USERDATA_DIR);
     exports.root = new class RootFS {
         async find(path) {
             if (path == '/') {

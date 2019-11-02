@@ -13,7 +13,7 @@ export async function sendFeedback(text: string) {
   let time = new Date().toJSON()
     .replace(/\..+$/, '')
     .replace(/[^\d]/g, '-');
-  let path = `~/feedbacks/${time}`;
+  let path = `${conf.SHARED_DIR}/feedbacks/${time}`;
   let vfs = await import('./vfs');
   await vfs.root.set(path, text);
   log.i('Feedback recorded.');

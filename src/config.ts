@@ -39,6 +39,9 @@ export const LOG_IDB_INTERVAL = 5; // ms
 export const FS_SLOW_THRS = 10; // ms
 
 export const FEEDBACK_SAVE_TIMEOUT = 500;
+export const NULL_IMG = 'data:image/jpeg;base64,';
+export const NOUSERPIC = '/icons/user.svg';
+export const UCACHE_TIMEOUT = 250;
 
 export const CONF_SDIR = '/ls/conf';
 export const CONF_VDIR = '/conf';
@@ -54,6 +57,3 @@ export const RSYNC_FAILED = `${USERDATA_DIR}/rsync/failed`;
 export const RSYNC_HASH = 'SHA-256';
 export const RSYNC_HASHLEN = 4; // bytes
 export const LASTGPS_DIR = `${LOCAL_DIR}/lastgps`;
-export const NULL_IMG = 'data:image/jpeg;base64,';
-export const NOUSERPIC = '/icons/user.svg';
-export const UCACHE_TIMEOUT = 250;

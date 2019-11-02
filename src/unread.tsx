@@ -71,7 +71,7 @@ function renderUserCard(info: UserInfo) {
 
 async function getActiveChats(): Promise<UserInfo[]> {
   log.i('Getting the list of chats.');
-  let uids1 = await vfs.dir('~/chats');
+  let uids1 = await vfs.dir(`${conf.SHARED_DIR}/chats`);
   let uids2 = await vfs.dir(`${conf.USERDATA_DIR}/chats`);
   let uids = [...new Set([...uids1, ...uids2])];
   if (!uids || !uids.length) return [];

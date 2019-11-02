@@ -58,7 +58,7 @@ define(["require", "exports", "./page", "./config", "./dom", "./log", "./react",
     }
     async function getActiveChats() {
         log.i('Getting the list of chats.');
-        let uids1 = await vfs_1.default.dir('~/chats');
+        let uids1 = await vfs_1.default.dir(`${conf.SHARED_DIR}/chats`);
         let uids2 = await vfs_1.default.dir(`${conf.USERDATA_DIR}/chats`);
         let uids = [...new Set([...uids1, ...uids2])];
         if (!uids || !uids.length)
