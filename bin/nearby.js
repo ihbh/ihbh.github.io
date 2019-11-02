@@ -8,12 +8,10 @@ define(["require", "exports", "./page", "./config", "./dom", "./gp", "./loc", ".
         return react_1.default.createElement("div", { id: "p-nearby", class: "page" },
             react_1.default.createElement("div", { id: "vplace-map" }),
             react_1.default.createElement("div", { id: "vtime-bar" },
-                "You've been here ",
+                "You've been here",
                 react_1.default.createElement("span", { id: "vtime-label" }),
                 react_1.default.createElement("span", { id: "nvtimes" }),
-                "[",
-                react_1.default.createElement("span", { id: "unvisit" }, "unvisit"),
-                "]"),
+                react_1.default.createElement("span", { id: "unvisit" }, "[unvisit]")),
             react_1.default.createElement("div", { id: "nearby-status" }),
             react_1.default.createElement("div", { id: "visitors", class: "user-cards" }));
     }

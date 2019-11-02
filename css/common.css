@@ -506,8 +506,12 @@ body #page .ol-attribution * {
   font-size: 0.5rem;
 }
 
+#vtime-bar > span::before {
+  content: ' ';
+}
+
 #unvisit {
-  text-decoration: underline;
+  font-weight: bold;
   cursor: pointer;
 }
 

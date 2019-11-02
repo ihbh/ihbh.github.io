@@ -28,9 +28,10 @@ export async function render() {
     class="page">
     <div id="vplace-map"></div>
     <div id="vtime-bar">
-      You've been here <span id="vtime-label"></span>
+      You've been here
+      <span id="vtime-label"></span>
       <span id="nvtimes"></span>
-      [<span id="unvisit">unvisit</span>]
+      <span id="unvisit">[unvisit]</span>
     </div>
     <div id="nearby-status"></div>
     <div id="visitors"
