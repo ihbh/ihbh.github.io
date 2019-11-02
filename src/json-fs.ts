@@ -96,6 +96,7 @@ export default class JsonFS implements VFS {
       throw new Error('Bad path: ' + path);
     if (data === null)
       throw new Error('jsonfs.set(null)');
+    this.clearKeys();
     let key = this.args.key(path);
     await this.args.write(key, data);
   }
