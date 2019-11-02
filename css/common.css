@@ -216,6 +216,15 @@ body #page .ol-attribution * {
   border-bottom: 0.25em solid #8c8;
 }
 
+#p-profile .hard-exif {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 8pt;
+  opacity: 0.05;
+  text-decoration: line-through;
+}
+
 #p-profile .photo {
   position: relative;
   width: 64px;

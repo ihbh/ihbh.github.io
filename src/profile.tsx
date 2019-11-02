@@ -25,6 +25,7 @@ export async function init() {
 export async function render() {
   return <div id="p-profile" class="page">
     <div class="header">
+      <div class="hard-exif">EXIF is hard</div>
       <div class="photo">
         <img id="photo"
           src="/icons/user.svg" />

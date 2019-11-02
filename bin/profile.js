@@ -18,6 +18,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
     async function render() {
         return react_1.default.createElement("div", { id: "p-profile", class: "page" },
             react_1.default.createElement("div", { class: "header" },
+                react_1.default.createElement("div", { class: "hard-exif" }, "EXIF is hard"),
                 react_1.default.createElement("div", { class: "photo" },
                     react_1.default.createElement("img", { id: "photo", src: "/icons/user.svg" }),
                     react_1.default.createElement("img", { class: "ctrl rotate", title: "Rotate right", src: "/icons/rotate.svg" }),
