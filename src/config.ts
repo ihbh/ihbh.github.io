@@ -18,7 +18,7 @@ export const GPS_DIGITS = 7;
 export const PLACE_CLICK_TIMEOUT = 150; // ms
 export const OSM_LIB = `/build/ol.js`;
 export const OSM_CSS = `/css/ol.css`;
-export const RX_USERNAME = /^[a-z]{3,15}$/i;
+export const RX_USERNAME = /^\w{3,15}$/i;
 export const RX_USERID = /^[a-f\d]{16}$/i;
 
 export const IMG_MIMETYPE = 'image/jpeg';

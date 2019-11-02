@@ -124,10 +124,8 @@ define(["require", "exports", "./config", "./gp", "./log", "./buffer"], function
         let userinfo = (about.textContent || '').trim();
         await gp.userinfo.set(userinfo);
         let username = name.textContent || '';
-        if (!username)
-            throw new Error('Need to set user name.');
         if (!conf.RX_USERNAME.test(username))
-            throw new Error(`Invalid username.`);
+            throw new Error(`Invalid username: ` + conf.RX_USERNAME);
         await gp.username.set(username);
         let imgurl = downsizePhoto(img);
         if (!imgurl)

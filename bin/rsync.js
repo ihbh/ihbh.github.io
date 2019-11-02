@@ -21,7 +21,7 @@ define(["require", "exports", "./buffer", "./config", "./error", "./log", "./rpc
             await vfs_1.default.rm(conf.RSYNC_FAILED);
         }
         else if (owns(path)) {
-            let key = encodePath(path);
+            let key = encodePath(vfs_1.abspath(path));
             await vfs_1.default.rm(conf.RSYNC_SYNCED + '/' + key);
             await vfs_1.default.rm(conf.RSYNC_FAILED + '/' + key);
         }

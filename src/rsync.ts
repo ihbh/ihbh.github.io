@@ -28,7 +28,7 @@ export async function reset(path?: string) {
     await vfs.rm(conf.RSYNC_SYNCED);
     await vfs.rm(conf.RSYNC_FAILED);
   } else if (owns(path)) {
-    let key = encodePath(path);
+    let key = encodePath(abspath(path));
     await vfs.rm(conf.RSYNC_SYNCED + '/' + key);
     await vfs.rm(conf.RSYNC_FAILED + '/' + key);
   } else {

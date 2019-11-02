@@ -21,7 +21,7 @@ define(["require", "exports"], function (require, exports) {
     exports.PLACE_CLICK_TIMEOUT = 150; // ms
     exports.OSM_LIB = `/build/ol.js`;
     exports.OSM_CSS = `/css/ol.css`;
-    exports.RX_USERNAME = /^[a-z]{3,15}$/i;
+    exports.RX_USERNAME = /^\w{3,15}$/i;
     exports.RX_USERID = /^[a-f\d]{16}$/i;
     exports.IMG_MIMETYPE = 'image/jpeg';
     exports.IMG_MAXSIZE = 4096; // pixels
