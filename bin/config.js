@@ -42,7 +42,7 @@ define(["require", "exports"], function (require, exports) {
     exports.NULL_IMG = 'data:image/jpeg;base64,';
     exports.NOUSERPIC = '/icons/user.svg';
     exports.UCACHE_TIMEOUT = 250;
-    exports.LS_USERID_KEY = 'userid'; // localStorage
+    exports.LS_USERID_KEY = 'userid'; // = /ls/conf/userid
     exports.DEFAULT_USERID_KEY = 'user';
     exports.USERDATA_DIR = '/idb';
     exports.CONF_SDIR = '/ls/conf';

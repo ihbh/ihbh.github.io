@@ -8,9 +8,11 @@ define(["require", "exports", "./config", "./error", "./log", "./vfs-roots"], fu
     function abspath(path) {
         if (!path.startsWith('~/'))
             return path;
-        let ukey = localStorage.getItem(conf.LS_USERID_KEY)
-            || conf.DEFAULT_USERID_KEY;
-        let dir = conf.USERDATA_DIR + '/' + ukey + '/';
+        let lskey = 'conf.' + conf.LS_USERID_KEY;
+        let ukey = localStorage.getItem(lskey)
+            || JSON.stringify(conf.DEFAULT_USERID_KEY);
+        let dir = conf.USERDATA_DIR + '/'
+            + JSON.parse(ukey) + '/';
         return path.replace('~/', dir);
     }
     exports.abspath = abspath;

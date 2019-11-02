@@ -1,3 +1,4 @@
+import * as conf from './config';
 import { TaggedLogger } from './log';
 import * as vfsconf from './vfs-conf';
 import vfsprop from './vfs-prop';
@@ -22,6 +23,17 @@ export const keyseed = prop<string>('local.keys.keyseed');
 export const privkey = prop<string>('local.keys.privkey');
 export const lastgps = prop<{ lat: number, lon: number }>('local.lastgps');
 export const feedback = prop<string>('local.feedback');
+
+export const userid = vfsconf.register({
+  value: conf.DEFAULT_USERID_KEY,
+  test: x => !x || x.startsWith('u') && x.length > 1,
+  path: '/userid',
+  description: [
+    'The current user profile. For example, if this key',
+    'is set to u25, then the current profile will be read',
+    'from /idb/u25, where /idb is an alias for indexedDB.',
+  ].join(' '),
+});
 
 export const darkmode = vfsconf.register({
   value: 0,

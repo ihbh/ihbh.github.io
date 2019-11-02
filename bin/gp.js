@@ -1,4 +1,4 @@
-define(["require", "exports", "./log", "./vfs-conf", "./vfs-prop"], function (require, exports, log_1, vfsconf, vfs_prop_1) {
+define(["require", "exports", "./config", "./log", "./vfs-conf", "./vfs-prop"], function (require, exports, conf, log_1, vfsconf, vfs_prop_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('gp');
@@ -18,6 +18,16 @@ define(["require", "exports", "./log", "./vfs-conf", "./vfs-prop"], function (re
     exports.privkey = prop('local.keys.privkey');
     exports.lastgps = prop('local.lastgps');
     exports.feedback = prop('local.feedback');
+    exports.userid = vfsconf.register({
+        value: conf.DEFAULT_USERID_KEY,
+        test: x => !x || x.startsWith('u') && x.length > 1,
+        path: '/userid',
+        description: [
+            'The current user profile. For example, if this key',
+            'is set to u25, then the current profile will be read',
+            'from /idb/u25, where /idb is an alias for indexedDB.',
+        ].join(' '),
+    });
     exports.darkmode = vfsconf.register({
         value: 0,
         test: x => x === 0 || x === 1,

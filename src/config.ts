@@ -43,7 +43,7 @@ export const NULL_IMG = 'data:image/jpeg;base64,';
 export const NOUSERPIC = '/icons/user.svg';
 export const UCACHE_TIMEOUT = 250;
 
-export const LS_USERID_KEY = 'userid'; // localStorage
+export const LS_USERID_KEY = 'userid'; // = /ls/conf/userid
 export const DEFAULT_USERID_KEY = 'user';
 export const USERDATA_DIR = '/idb';
 export const CONF_SDIR = '/ls/conf';
