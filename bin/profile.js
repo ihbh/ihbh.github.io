@@ -13,6 +13,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
         addUnregTag();
         initRotateButton();
         initFlipButton();
+        initImportButton();
     }
     exports.init = init;
     async function render() {
@@ -32,16 +33,24 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
             react_1.default.createElement("div", { class: "reason", contenteditable: true }),
             react_1.default.createElement("div", { class: "footer" },
                 react_1.default.createElement("span", { class: "status" }),
+                react_1.default.createElement("button", { class: "import" }, "Import"),
                 react_1.default.createElement("button", { id: "reg-done" }, "Done"),
                 react_1.default.createElement("button", { class: "report" }, "Report"),
                 react_1.default.createElement("button", { class: "send-report" }, "Send Report")));
     }
     exports.render = render;
+    function initImportButton() {
+        dom.id.regImport.onclick = async () => {
+            let { importData } = await new Promise((resolve_1, reject_1) => { require(['./impexp'], resolve_1, reject_1); });
+            await importData();
+            location.reload();
+        };
+    }
     function initRotateButton() {
         dom.id.upcRotate.onclick = async () => {
             log.i('Rotating image.');
             let time = Date.now();
-            let reg = await new Promise((resolve_1, reject_1) => { require(['./reg'], resolve_1, reject_1); });
+            let reg = await new Promise((resolve_2, reject_2) => { require(['./reg'], resolve_2, reject_2); });
             let img = dom.id.regPhoto;
             let url = reg.rotatePhoto(img);
             img.src = url;
@@ -52,7 +61,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
         dom.id.upcFlip.onclick = async () => {
             log.i('Flipping image.');
             let time = Date.now();
-            let reg = await new Promise((resolve_2, reject_2) => { require(['./reg'], resolve_2, reject_2); });
+            let reg = await new Promise((resolve_3, reject_3) => { require(['./reg'], resolve_3, reject_3); });
             let img = dom.id.regPhoto;
             let url = reg.flipPhoto(img);
             img.src = url;
@@ -134,7 +143,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
             };
         }
         else {
-            let reg = await new Promise((resolve_3, reject_3) => { require(['./reg'], resolve_3, reject_3); });
+            let reg = await new Promise((resolve_4, reject_4) => { require(['./reg'], resolve_4, reject_4); });
             let resizing = false;
             dom.id.regPhoto.onclick = async () => {
                 if (resizing)

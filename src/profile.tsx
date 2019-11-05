@@ -20,6 +20,7 @@ export async function init() {
   addUnregTag();
   initRotateButton();
   initFlipButton();
+  initImportButton();
 }
 
 export async function render() {
@@ -54,11 +55,20 @@ export async function render() {
 
     <div class="footer">
       <span class="status"></span>
+      <button class="import">Import</button>
       <button id="reg-done">Done</button>
       <button class="report">Report</button>
       <button class="send-report">Send Report</button>
     </div>
   </div>;
+}
+
+function initImportButton() {
+  dom.id.regImport.onclick = async () => {
+    let { importData } = await import('./impexp');
+    await importData();
+    location.reload();
+  };
 }
 
 function initRotateButton() {

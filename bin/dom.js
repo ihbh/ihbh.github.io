@@ -36,6 +36,7 @@ define(["require", "exports"], function (require, exports) {
         get regPhoto() { return $('#photo'); },
         get regName() { return $('#reg-name'); },
         get regReport() { return $('#p-profile .report'); },
+        get regImport() { return $('#p-profile .import'); },
         get regSendReport() { return $('#p-profile .send-report'); },
         get regDone() { return $('#reg-done'); },
         get upcRotate() { return $('#p-profile .photo .rotate'); },

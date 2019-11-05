@@ -301,6 +301,16 @@ body #page .ol-attribution * {
   cursor: pointer;
 }
 
+#p-profile .import {
+  display: none;
+  background: #840;
+  cursor: pointer;
+}
+
+#p-profile.self .import {
+  display: inherit;
+}
+
 #p-profile .send-report {
   display: none;
   background: #840;

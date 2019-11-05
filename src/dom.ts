@@ -38,6 +38,7 @@ export const id = {
   get regPhoto() { return $('#photo') as HTMLImageElement; },
   get regName() { return $('#reg-name') as HTMLSpanElement; },
   get regReport() { return $('#p-profile .report') as HTMLButtonElement; },
+  get regImport() { return $('#p-profile .import') as HTMLButtonElement; },
   get regSendReport() { return $('#p-profile .send-report') as HTMLButtonElement; },
   get regDone() { return $('#reg-done') as HTMLButtonElement; },
   get upcRotate() { return $('#p-profile .photo .rotate'); },

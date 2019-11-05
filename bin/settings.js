@@ -1,7 +1,6 @@
-define(["require", "exports", "./page", "./config", "./dom", "./idb", "./log", "./ls", "./react", "./sleep"], function (require, exports, page, conf, dom, idb, log_1, ls, react_1, sleep_1) {
+define(["require", "exports", "./dom", "./page", "./react"], function (require, exports, dom, page, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const log = new log_1.TaggedLogger('settings');
     async function render() {
         return react_1.default.createElement("div", { id: "p-settings", class: "page" },
             react_1.default.createElement("div", { class: "controls" },
@@ -13,65 +12,15 @@ define(["require", "exports", "./page", "./config", "./dom", "./idb", "./log", "
     }
     exports.render = render;
     async function init() {
-        initExportButton();
-        initImportButton();
+        dom.id.exportDB.addEventListener('click', async () => {
+            let { exportData } = await new Promise((resolve_1, reject_1) => { require(['./impexp'], resolve_1, reject_1); });
+            await exportData();
+        });
+        dom.id.importDB.addEventListener('click', async () => {
+            let { importData } = await new Promise((resolve_2, reject_2) => { require(['./impexp'], resolve_2, reject_2); });
+            await importData();
+        });
     }
     exports.init = init;
-    function initExportButton() {
-        dom.id.exportDB.addEventListener('click', async () => {
-            log.i('Exporting data...');
-            try {
-                let json = {
-                    ls: await ls.save(),
-                    idb: await idb.save(name => name != conf.LOG_IDB_NAME),
-                };
-                let blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' });
-                let a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = conf.DBG_DATA_FILENAME;
-                a.click();
-                log.i('Data exported.');
-            }
-            catch (err) {
-                log.e('Failed to export data:', err);
-            }
-        });
-    }
-    function initImportButton() {
-        dom.id.importDB.addEventListener('click', async () => {
-            log.i('Importing data...');
-            try {
-                let input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'application/json';
-                input.click();
-                log.i('Waiting for input.onchange...');
-                let file = await new Promise((resolve, reject) => {
-                    input.onchange = () => {
-                        if (input.files.length == 1)
-                            resolve(input.files[0]);
-                        else
-                            reject(new Error('One file must have been selected.'));
-                    };
-                });
-                log.i('selected file:', file.type, file.size, 'bytes');
-                let time = Date.now();
-                let res = await fetch(URL.createObjectURL(file));
-                let json = await res.json();
-                log.i('importing json:', json);
-                log.i('Deleting the old data...');
-                await ls.clear();
-                await idb.clear();
-                log.i('Waiting for IDB connection to close.');
-                await sleep_1.default(1500);
-                json.ls && await ls.load(json.ls);
-                json.idb && await idb.load(json.idb);
-                log.i('Data imported:', Date.now() - time, 'ms');
-            }
-            catch (err) {
-                log.e('Failed to import data:', err);
-            }
-        });
-    }
 });
 //# sourceMappingURL=settings.js.map
