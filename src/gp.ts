@@ -95,13 +95,13 @@ export const mapPoorAccOpacity = vfsconf.register({
 });
 
 export const commonPlaceLat = vfsconf.register({
-  value: 49.246292,
+  value: 49.2421,
   test: x => Number.isFinite(x) && x > -90 && x < 90,
   path: '/osm/common/lat',
 });
 
 export const commonPlaceLon = vfsconf.register({
-  value: -123.116226,
+  value: -123.1138,
   test: x => Number.isFinite(x) && x > -180 && x < 180,
   path: '/osm/common/lon',
 });
