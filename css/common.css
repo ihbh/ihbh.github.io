@@ -504,6 +504,17 @@ body #page .ol-attribution * {
   z-index: 0;
 }
 
+#all-places > .none {
+  font-size: 0.75em;
+  padding: 1em;
+}
+
+#all-places > .none a {
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* page=nearby */
 
 #p-nearby {
@@ -635,6 +646,7 @@ body #page .ol-attribution * {
 #messages .mt {
   font-size: 0.5em;
   display: flex;
+  word-break: break-word;
 }
 
 #messages .ts {

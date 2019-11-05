@@ -62,6 +62,16 @@ export async function shareLocation({ lat, lon }: GpsCoords) {
   return tskey;
 }
 
+export async function gotoCommonPlace() {
+  let gp = await import('./gp');
+  let lat = await gp.commonPlaceLat.get();
+  let lon = await gp.commonPlaceLon.get();
+  let loc = await import('./loc');
+  let tskey = await loc.shareLocation({ lat, lon });
+  let page = await import('./page');
+  page.set('nearby', { tskey });  
+}
+
 export async function getVisitedPlaces(): Promise<Place[]> {
   let tskeys = await vfs.dir(conf.VPLACES_DIR);
   let ps = tskeys.map(getPlace);

@@ -93,3 +93,15 @@ export const mapPoorAccOpacity = vfsconf.register({
   path: '/osm/poor-accuracy-opacity',
   description: `Opacity of the marker when GPS accuracy is poor.`,
 });
+
+export const commonPlaceLat = vfsconf.register({
+  value: 49.246292,
+  test: x => Number.isFinite(x) && x > -90 && x < 90,
+  path: '/osm/common/lat',
+});
+
+export const commonPlaceLon = vfsconf.register({
+  value: -123.116226,
+  test: x => Number.isFinite(x) && x > -180 && x < 180,
+  path: '/osm/common/lon',
+});

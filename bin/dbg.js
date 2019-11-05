@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./log", "./logdb", "./qargs"], function (require, exports, conf, dom, log_1, logdb, qargs) {
+define(["require", "exports", "./config", "./dom", "./log", "./logdb", "./qargs", "./loc"], function (require, exports, conf, dom, log_1, logdb, qargs, loc_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = log_1.default.withTag('dbg');
@@ -10,16 +10,8 @@ define(["require", "exports", "./config", "./dom", "./log", "./logdb", "./qargs"
             style.visibility = style.visibility != 'collapse' ?
                 'collapse' : 'visible';
         };
-        dom.id.gotoCommon.onclick = async () => {
-            let d = 1e-4; // 10 meters
-            let x = (2 * Math.random() - 1) * d; // +/- 10 meters
-            let lat = 49.246292 + x;
-            let lon = -123.116226 + x;
-            let loc = await new Promise((resolve_1, reject_1) => { require(['./loc'], resolve_1, reject_1); });
-            let tskey = await loc.shareLocation({ lat, lon });
-            let page = await new Promise((resolve_2, reject_2) => { require(['./page'], resolve_2, reject_2); });
-            page.set('nearby', { tskey });
-        };
+        dom.id.gotoCommon.onclick =
+            () => loc_1.gotoCommonPlace();
         dom.id.showLogs.addEventListener('click', async () => {
             let div = dom.id.logs;
             if (!div.style.display) {
@@ -89,7 +81,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./logdb", "./qargs"
     }
     exports.getDebugPeopleNearby = getDebugPeopleNearby;
     async function getTestUserDetails(uid) {
-        let { default: text } = await new Promise((resolve_3, reject_3) => { require(['./lorem'], resolve_3, reject_3); });
+        let { default: text } = await new Promise((resolve_1, reject_1) => { require(['./lorem'], resolve_1, reject_1); });
         return {
             photo: conf.DBG_TEST_USER_PHOTO,
             name: uid.slice(0, 8),

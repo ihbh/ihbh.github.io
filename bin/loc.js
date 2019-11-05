@@ -39,6 +39,16 @@ define(["require", "exports", "./config", "./vfs"], function (require, exports, 
         return tskey;
     }
     exports.shareLocation = shareLocation;
+    async function gotoCommonPlace() {
+        let gp = await new Promise((resolve_1, reject_1) => { require(['./gp'], resolve_1, reject_1); });
+        let lat = await gp.commonPlaceLat.get();
+        let lon = await gp.commonPlaceLon.get();
+        let loc = await new Promise((resolve_2, reject_2) => { require(['./loc'], resolve_2, reject_2); });
+        let tskey = await loc.shareLocation({ lat, lon });
+        let page = await new Promise((resolve_3, reject_3) => { require(['./page'], resolve_3, reject_3); });
+        page.set('nearby', { tskey });
+    }
+    exports.gotoCommonPlace = gotoCommonPlace;
     async function getVisitedPlaces() {
         let tskeys = await vfs_1.default.dir(conf.VPLACES_DIR);
         let ps = tskeys.map(getPlace);

@@ -3,6 +3,7 @@ import * as dom from './dom';
 import flog from './log';
 import * as logdb from './logdb';
 import * as qargs from './qargs';
+import { gotoCommonPlace } from './loc';
 
 const log = flog.withTag('dbg');
 
@@ -16,16 +17,8 @@ export async function init() {
       'collapse' : 'visible';
   };
 
-  dom.id.gotoCommon.onclick = async () => {
-    let d = 1e-4; // 10 meters
-    let x = (2 * Math.random() - 1) * d; // +/- 10 meters
-    let lat = 49.246292 + x;
-    let lon = -123.116226 + x;
-    let loc = await import('./loc');
-    let tskey = await loc.shareLocation({ lat, lon });
-    let page = await import('./page');
-    page.set('nearby', { tskey });
-  };
+  dom.id.gotoCommon.onclick =
+    () => gotoCommonPlace();
 
   dom.id.showLogs.addEventListener('click', async () => {
     let div = dom.id.logs;

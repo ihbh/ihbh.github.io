@@ -49,8 +49,12 @@ async function loadMap() {
 
   if (!places.length) {
     log.i('Nothing to render: no places visited.');
-    let page = await import('./page');
-    dom.id.mapAll.textContent = 'No visited places yet.';
+    let link = <a>Vancouver</a>;
+    link.onclick = () => loc.gotoCommonPlace();
+    dom.id.mapAll.appendChild(
+      <div class="none">Nobody has been here before.
+        However you can visit {link} and see who's been
+        there.</div>);
     return;
   }
 

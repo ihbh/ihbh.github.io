@@ -79,5 +79,15 @@ define(["require", "exports", "./config", "./log", "./vfs-conf", "./vfs-prop"], 
         path: '/osm/poor-accuracy-opacity',
         description: `Opacity of the marker when GPS accuracy is poor.`,
     });
+    exports.commonPlaceLat = vfsconf.register({
+        value: 49.246292,
+        test: x => Number.isFinite(x) && x > -90 && x < 90,
+        path: '/osm/common/lat',
+    });
+    exports.commonPlaceLon = vfsconf.register({
+        value: -123.116226,
+        test: x => Number.isFinite(x) && x > -180 && x < 180,
+        path: '/osm/common/lon',
+    });
 });
 //# sourceMappingURL=gp.js.map
