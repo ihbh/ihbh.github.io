@@ -38,7 +38,7 @@ define(["require", "exports"], function (require, exports) {
     exports.LOG_IDB_NAME = 'logs';
     exports.LOG_IDB_INTERVAL = 5; // ms
     exports.FS_SLOW_THRS = 10; // ms
-    exports.FEEDBACK_SAVE_TIMEOUT = 500;
+    exports.EDITSAVE_TIMEOUT = 500;
     exports.NULL_IMG = 'data:image/jpeg;base64,';
     exports.NOUSERPIC = '/icons/user.svg';
     exports.UCACHE_TIMEOUT = 250;
@@ -49,6 +49,7 @@ define(["require", "exports"], function (require, exports) {
     exports.CONF_VDIR = '/conf';
     exports.LOCAL_DIR = `~/local`;
     exports.LAST_GPS_DIR = exports.LOCAL_DIR + '/lastgps';
+    exports.LOCAL_PLACES_DIR = `${exports.LOCAL_DIR}/places`;
     exports.SHARED_DIR = `~/shared`;
     exports.VPLACES_DIR = `${exports.SHARED_DIR}/places`;
     exports.REPORTS_DIR = `${exports.SHARED_DIR}/reports`;

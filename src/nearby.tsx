@@ -6,11 +6,12 @@ import * as loc from './loc';
 import { TaggedLogger } from './log';
 import { OSM } from './osm';
 import * as qargs from './qargs';
-import React from './react';
+import React, { getUXComp } from './react';
 import * as rpc from './rpc';
 import * as tts from './timestr';
 import { getUserInfo } from './ucache';
 import * as user from './user';
+import FsEdit from './fsedit';
 
 const log = new TaggedLogger('nearby');
 
@@ -21,9 +22,13 @@ interface UserInfo {
 }
 
 let tskey = '';
+let fsedit: HTMLElement;
 let allvisits: string[];
 
 export async function render() {
+  fsedit = <FsEdit
+    filepath={getNoteFilePath}>
+  </FsEdit>;
   return <div id="p-nearby"
     class="page">
     <div id="vplace-map"></div>
@@ -33,6 +38,7 @@ export async function render() {
       <span id="nvtimes"></span>
       <span id="unvisit">[unvisit]</span>
     </div>
+    {fsedit}
     <div id="nearby-status"></div>
     <div id="visitors"
       class="user-cards"></div>
@@ -47,6 +53,7 @@ export async function init() {
     if (!tskey) throw new Error('Missing tskey URL param.');
 
     initUnvisitLink();
+    initNote();
 
     let { lat, lon, time } = await loc.getPlace(tskey);
     if (!lat || !lon)
@@ -83,9 +90,17 @@ export async function init() {
   }
 }
 
+function getNoteFilePath() {
+  return tskey && `${conf.LOCAL_PLACES_DIR}/${tskey}/note`;
+}
+
 function setStatus(text: string) {
   let div = dom.id.nearbyStatus;
   div.textContent = text || '';
+}
+
+function initNote() {
+  getUXComp(fsedit).start();
 }
 
 async function initVisitCount({ lat, lon }) {

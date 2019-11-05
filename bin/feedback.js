@@ -28,7 +28,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./log", "./page", ".
             let prev = await gp.feedback.get();
             if (prev != text)
                 await gp.feedback.set(text.trim() || null);
-        }, conf.FEEDBACK_SAVE_TIMEOUT);
+        }, conf.EDITSAVE_TIMEOUT);
     }
     async function sendFeedback() {
         let text = dom.id.feedbackText.textContent || '';

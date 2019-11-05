@@ -39,7 +39,7 @@ export const LOG_IDB_NAME = 'logs';
 export const LOG_IDB_INTERVAL = 5; // ms
 export const FS_SLOW_THRS = 10; // ms
 
-export const FEEDBACK_SAVE_TIMEOUT = 500;
+export const EDITSAVE_TIMEOUT = 500;
 export const NULL_IMG = 'data:image/jpeg;base64,';
 export const NOUSERPIC = '/icons/user.svg';
 export const UCACHE_TIMEOUT = 250;
@@ -51,6 +51,7 @@ export const CONF_SDIR = '/ls/conf';
 export const CONF_VDIR = '/conf';
 export const LOCAL_DIR = `~/local`;
 export const LAST_GPS_DIR = LOCAL_DIR + '/lastgps';
+export const LOCAL_PLACES_DIR = `${LOCAL_DIR}/places`;
 export const SHARED_DIR = `~/shared`;
 export const VPLACES_DIR = `${SHARED_DIR}/places`;
 export const REPORTS_DIR = `${SHARED_DIR}/reports`;

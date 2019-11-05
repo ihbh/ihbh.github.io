@@ -43,7 +43,7 @@ async function saveFeedback() {
     let prev = await gp.feedback.get();
     if (prev != text)
       await gp.feedback.set(text.trim() || null);
-  }, conf.FEEDBACK_SAVE_TIMEOUT);
+  }, conf.EDITSAVE_TIMEOUT);
 }
 
 async function sendFeedback() {

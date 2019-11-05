@@ -550,6 +550,12 @@ body #page .ol-attribution * {
   padding: 1em;
 }
 
+#p-nearby .fs-edit:empty::before {
+  content: 'Add a note for this place?';
+  color: #888;
+  font-style: italic;
+}
+
 /* page=settings */
 
 #p-settings .controls {
@@ -832,4 +838,16 @@ body #page .ol-attribution * {
 
 #p-feedback .status {
   flex: 1;
+}
+
+/** comp=fs-edit */
+
+.fs-edit {
+  color: #444;
+  font-size: 0.5em;
+  padding: 1em;
+}
+
+.fs-edit:focus {
+  outline: none;
 }

@@ -1,10 +1,12 @@
-define(["require", "exports", "./page", "./config", "./dom", "./gp", "./loc", "./log", "./osm", "./qargs", "./react", "./rpc", "./timestr", "./ucache", "./user"], function (require, exports, page, conf, dom, gp, loc, log_1, osm_1, qargs, react_1, rpc, tts, ucache_1, user) {
+define(["require", "exports", "./page", "./config", "./dom", "./gp", "./loc", "./log", "./osm", "./qargs", "./react", "./rpc", "./timestr", "./ucache", "./user", "./fsedit"], function (require, exports, page, conf, dom, gp, loc, log_1, osm_1, qargs, react_1, rpc, tts, ucache_1, user, fsedit_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('nearby');
     let tskey = '';
+    let fsedit;
     let allvisits;
     async function render() {
+        fsedit = react_1.default.createElement(fsedit_1.default, { filepath: getNoteFilePath });
         return react_1.default.createElement("div", { id: "p-nearby", class: "page" },
             react_1.default.createElement("div", { id: "vplace-map" }),
             react_1.default.createElement("div", { id: "vtime-bar" },
@@ -12,6 +14,7 @@ define(["require", "exports", "./page", "./config", "./dom", "./gp", "./loc", ".
                 react_1.default.createElement("span", { id: "vtime-label" }),
                 react_1.default.createElement("span", { id: "nvtimes" }),
                 react_1.default.createElement("span", { id: "unvisit" }, "[unvisit]")),
+            fsedit,
             react_1.default.createElement("div", { id: "nearby-status" }),
             react_1.default.createElement("div", { id: "visitors", class: "user-cards" }));
     }
@@ -23,6 +26,7 @@ define(["require", "exports", "./page", "./config", "./dom", "./gp", "./loc", ".
             if (!tskey)
                 throw new Error('Missing tskey URL param.');
             initUnvisitLink();
+            initNote();
             let { lat, lon, time } = await loc.getPlace(tskey);
             if (!lat || !lon)
                 throw new Error(`No such visited place: tskey=` + tskey);
@@ -57,9 +61,15 @@ define(["require", "exports", "./page", "./config", "./dom", "./gp", "./loc", ".
         }
     }
     exports.init = init;
+    function getNoteFilePath() {
+        return tskey && `${conf.LOCAL_PLACES_DIR}/${tskey}/note`;
+    }
     function setStatus(text) {
         let div = dom.id.nearbyStatus;
         div.textContent = text || '';
+    }
+    function initNote() {
+        react_1.getUXComp(fsedit).start();
     }
     async function initVisitCount({ lat, lon }) {
         let places = await loc.getVisitedPlaces();
