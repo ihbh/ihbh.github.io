@@ -13,7 +13,7 @@ export function watch(listener: (pos: Coordinates) => void, timeout: number): Wa
     timeout,
   };
 
-  let sendUpdate = (pos: Position) => {
+  let sendUpdate = async (pos: Position) => {
     if (!wid) return;
     let { latitude, longitude, altitude, accuracy } = pos.coords;
     log.i(`update: lat=${latitude.toFixed(4)} lon=${longitude.toFixed(4)} ` +

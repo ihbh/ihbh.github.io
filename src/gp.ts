@@ -21,7 +21,6 @@ export const pubkey = prop<string>('shared.profile.pubkey');
 export const hdimg = prop<string>('local.profile.hdimg');
 export const keyseed = prop<string>('local.keys.keyseed');
 export const privkey = prop<string>('local.keys.privkey');
-export const lastgps = prop<{ lat: number, lon: number }>('local.lastgps');
 export const feedback = prop<string>('local.feedback');
 
 export const userid = vfsconf.register({
@@ -78,4 +77,19 @@ export const mapMarkerSize = vfsconf.register({
   units: 'px',
   test: x => Number.isFinite(x) && x > 0,
   path: '/osm/marker-size',
+});
+
+export const mapGoodAcc = vfsconf.register({
+  value: 10,
+  units: 'm',
+  test: x => Number.isFinite(x) && x > 0,
+  path: '/osm/good-accuracy',
+  description: `GPS accuracy that's considered to be good enough.`,
+});
+
+export const mapPoorAccOpacity = vfsconf.register({
+  value: 0.5,
+  test: x => Number.isFinite(x) && x >+ 0 && x <= 1,
+  path: '/osm/poor-accuracy-opacity',
+  description: `Opacity of the marker when GPS accuracy is poor.`,
 });

@@ -16,7 +16,6 @@ define(["require", "exports", "./config", "./log", "./vfs-conf", "./vfs-prop"], 
     exports.hdimg = prop('local.profile.hdimg');
     exports.keyseed = prop('local.keys.keyseed');
     exports.privkey = prop('local.keys.privkey');
-    exports.lastgps = prop('local.lastgps');
     exports.feedback = prop('local.feedback');
     exports.userid = vfsconf.register({
         value: conf.DEFAULT_USERID_KEY,
@@ -66,6 +65,19 @@ define(["require", "exports", "./config", "./log", "./vfs-conf", "./vfs-prop"], 
         units: 'px',
         test: x => Number.isFinite(x) && x > 0,
         path: '/osm/marker-size',
+    });
+    exports.mapGoodAcc = vfsconf.register({
+        value: 10,
+        units: 'm',
+        test: x => Number.isFinite(x) && x > 0,
+        path: '/osm/good-accuracy',
+        description: `GPS accuracy that's considered to be good enough.`,
+    });
+    exports.mapPoorAccOpacity = vfsconf.register({
+        value: 0.5,
+        test: x => Number.isFinite(x) && x > +0 && x <= 1,
+        path: '/osm/poor-accuracy-opacity',
+        description: `Opacity of the marker when GPS accuracy is poor.`,
     });
 });
 //# sourceMappingURL=gp.js.map

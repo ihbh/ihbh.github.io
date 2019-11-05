@@ -2,12 +2,20 @@ import * as conf from './config';
 import * as dom from './dom';
 import * as gp from './gp';
 import * as gps from './gps';
+import * as vfs from './vfs';
 import { TaggedLogger } from './log';
 import { OSM } from './osm';
 import * as page from './page';
 import React from './react';
 
 declare const PositionError;
+
+interface LastGps {
+  lat: number;
+  lon: number;
+  alt: number;
+  acc: number;
+}
 
 const log = new TaggedLogger('map');
 
@@ -138,12 +146,15 @@ function onGpsUpdated(pos: Coordinates) {
 
   bestPos = pos;
   dom.id.sendLocation.disabled = false;
-  let { latitude: lat, longitude: lon } = pos;
-  setLastGps({ lat, lon });
-  updateMap({ lat, lon });
+  let lat = pos.latitude;
+  let lon = pos.longitude;
+  let acc = pos.accuracy || 0;
+  let alt = pos.altitude || 0;
+  setLastGps({ lat, lon, alt, acc });
+  updateMap({ lat, lon, alt, acc });
 }
 
-async function updateMap({ lat, lon }) {
+async function updateMap({ lat, lon, alt, acc }) {
   try {
     let s = conf.MAP_1M * await gp.mapBoxSize.get();
     log.i('Updating OSM view box:', s, { lat, lon });
@@ -153,8 +164,10 @@ async function updateMap({ lat, lon }) {
     });
 
     log.i('Updating OSM markers.');
+    let opacity = acc < (await gp.mapGoodAcc.get()) ? 1
+      : (await gp.mapPoorAccOpacity.get());
     osm.clearMarkers();
-    osm.addMarker({ lat, lon });
+    osm.addMarker({ lat, lon, opacity });
   } catch (err) {
     log.e('Failed to refresh GPS coords:', err);
   }
@@ -167,14 +180,23 @@ async function showLastSeenPos() {
   await updateMap(pos);
 }
 
-async function setLastGps({ lat, lon }) {
-  let gp = await import('./gp');
-  await gp.lastgps.set({ lat, lon });
+async function setLastGps(pos: LastGps) {
+  let ps = Object.keys(pos).map(
+    key => vfs.root.set(
+      conf.LASTGPS_DIR + '/' + key, pos[key]));
+  await Promise.all(ps);
 }
 
-async function getLastGps() {
-  let gp = await import('./gp');
-  return gp.lastgps.get();
+async function getLastGps(): Promise<LastGps> {
+  let pos: LastGps = { lat: 0, lon: 0, acc: 0, alt: 0 };
+  let ps = Object.keys(pos).map(
+    async key => {
+      let val = await vfs.root.get(
+        conf.LASTGPS_DIR + '/' + key);
+      pos[key] = val || 0;
+    });
+  await Promise.all(ps);
+  return pos;
 }
 
 async function initSendButton() {

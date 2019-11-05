@@ -8,7 +8,7 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             maximumAge: 0,
             timeout,
         };
-        let sendUpdate = (pos) => {
+        let sendUpdate = async (pos) => {
             if (!wid)
                 return;
             let { latitude, longitude, altitude, accuracy } = pos.coords;

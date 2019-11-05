@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./log", "./osm", "./page", "./react"], function (require, exports, conf, dom, gp, gps, log_1, osm_1, page, react_1) {
+define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./vfs", "./log", "./osm", "./page", "./react"], function (require, exports, conf, dom, gp, gps, vfs, log_1, osm_1, page, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('map');
@@ -97,11 +97,14 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./log", "./
         }
         bestPos = pos;
         dom.id.sendLocation.disabled = false;
-        let { latitude: lat, longitude: lon } = pos;
-        setLastGps({ lat, lon });
-        updateMap({ lat, lon });
+        let lat = pos.latitude;
+        let lon = pos.longitude;
+        let acc = pos.accuracy || 0;
+        let alt = pos.altitude || 0;
+        setLastGps({ lat, lon, alt, acc });
+        updateMap({ lat, lon, alt, acc });
     }
-    async function updateMap({ lat, lon }) {
+    async function updateMap({ lat, lon, alt, acc }) {
         try {
             let s = conf.MAP_1M * await gp.mapBoxSize.get();
             log.i('Updating OSM view box:', s, { lat, lon });
@@ -110,8 +113,10 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./log", "./
                 max: { lat: lat + s, lon: lon + s },
             });
             log.i('Updating OSM markers.');
+            let opacity = acc < (await gp.mapGoodAcc.get()) ? 1
+                : (await gp.mapPoorAccOpacity.get());
             osm.clearMarkers();
-            osm.addMarker({ lat, lon });
+            osm.addMarker({ lat, lon, opacity });
         }
         catch (err) {
             log.e('Failed to refresh GPS coords:', err);
@@ -124,20 +129,25 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./log", "./
         log.i('Last seen pos:', pos);
         await updateMap(pos);
     }
-    async function setLastGps({ lat, lon }) {
-        let gp = await new Promise((resolve_3, reject_3) => { require(['./gp'], resolve_3, reject_3); });
-        await gp.lastgps.set({ lat, lon });
+    async function setLastGps(pos) {
+        let ps = Object.keys(pos).map(key => vfs.root.set(conf.LASTGPS_DIR + '/' + key, pos[key]));
+        await Promise.all(ps);
     }
     async function getLastGps() {
-        let gp = await new Promise((resolve_4, reject_4) => { require(['./gp'], resolve_4, reject_4); });
-        return gp.lastgps.get();
+        let pos = { lat: 0, lon: 0, acc: 0, alt: 0 };
+        let ps = Object.keys(pos).map(async (key) => {
+            let val = await vfs.root.get(conf.LASTGPS_DIR + '/' + key);
+            pos[key] = val || 0;
+        });
+        await Promise.all(ps);
+        return pos;
     }
     async function initSendButton() {
         let button = dom.id.sendLocation;
         button.disabled = true;
         button.onclick = async () => {
             log.i('#send:click');
-            let pwa = await new Promise((resolve_5, reject_5) => { require(['./pwa'], resolve_5, reject_5); });
+            let pwa = await new Promise((resolve_3, reject_3) => { require(['./pwa'], resolve_3, reject_3); });
             pwa.showInstallPrompt();
             button.disabled = true;
             let tskey = null;
@@ -156,7 +166,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./log", "./
     async function shareDisplayedLocation() {
         if (!bestPos)
             throw new Error('GPS not ready.');
-        let loc = await new Promise((resolve_6, reject_6) => { require(['./loc'], resolve_6, reject_6); });
+        let loc = await new Promise((resolve_4, reject_4) => { require(['./loc'], resolve_4, reject_4); });
         let { latitude: lat, longitude: lng } = bestPos;
         return loc.shareLocation({ lat, lon: lng });
     }

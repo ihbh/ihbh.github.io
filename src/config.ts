@@ -6,6 +6,7 @@ export const DBG_TEST_USER_PHOTO = '/icons/test.jpeg';
 export const DBG_DATA_FILENAME = 'ihbh.json';
 export const DBG_MAX_SHOW_LOGS = 500;
 export const DBG_MAX_LOG_ARG_LEN = 100;
+
 export const LOG_MAXLEN = 64;
 export const PAGE_DEFAULT = 'map';
 export const CONF_DARK_MODE = 'conf.ui.dark-mode';
@@ -49,6 +50,7 @@ export const USERDATA_DIR = '/idb';
 export const CONF_SDIR = '/ls/conf';
 export const CONF_VDIR = '/conf';
 export const LOCAL_DIR = `~/local`;
+export const LAST_GPS_DIR = LOCAL_DIR + '/lastgps';
 export const SHARED_DIR = `~/shared`;
 export const VPLACES_DIR = `${SHARED_DIR}/places`;
 export const REPORTS_DIR = `${SHARED_DIR}/reports`;

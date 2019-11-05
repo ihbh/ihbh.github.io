@@ -48,6 +48,7 @@ define(["require", "exports"], function (require, exports) {
     exports.CONF_SDIR = '/ls/conf';
     exports.CONF_VDIR = '/conf';
     exports.LOCAL_DIR = `~/local`;
+    exports.LAST_GPS_DIR = exports.LOCAL_DIR + '/lastgps';
     exports.SHARED_DIR = `~/shared`;
     exports.VPLACES_DIR = `${exports.SHARED_DIR}/places`;
     exports.REPORTS_DIR = `${exports.SHARED_DIR}/reports`;
