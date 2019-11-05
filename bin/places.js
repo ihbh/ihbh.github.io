@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./osm", "./qargs", "./react"], function (require, exports, conf, dom, gp, loc, log_1, osm_1, qargs, react_1) {
+define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./osm", "./react"], function (require, exports, conf, dom, gp, loc, log_1, osm_1, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('places');
@@ -27,16 +27,6 @@ define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./
     async function loadMap() {
         let places = await loc.getVisitedPlaces();
         log.i('Viisted places:', places.length, places);
-        switch (qargs.get('vpt')) {
-            case 'b':
-                log.i('Using big test visited places.');
-                places = loc.getTestVisitedPlacesBig();
-                break;
-            case 's':
-                log.i('Using small test visited places.');
-                places = loc.getTestVisitedPlacesSmall();
-                break;
-        }
         if (!places.length) {
             log.i('Nothing to render: no places visited.');
             let link = react_1.default.createElement("a", null, "Vancouver");
@@ -51,7 +41,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./
         log.i('Map bounding box:', bbox);
         let osm = new osm_1.OSM(dom.id.mapAll.id);
         if (conf.DEBUG)
-            osm.onaddmarker = pos => addMarkerAt(pos);
+            osm.onaddmarker = pos => addDebugMarkerAt(pos);
         await osm.render(bbox);
         let psorted = places.sort((p1, p2) => +p1.time - +p2.time);
         let tmin = +psorted[0].time;
@@ -95,10 +85,10 @@ define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./
         bbox.max.lon += size;
         return bbox;
     }
-    async function addMarkerAt({ lat, lon }) {
+    async function addDebugMarkerAt({ lat, lon }) {
         log.i(`Creating a marker at lat=${lat} lon=${lon}`);
         let loc = await new Promise((resolve_2, reject_2) => { require(['./loc'], resolve_2, reject_2); });
-        let tskey = await loc.shareLocation({ lat, lon });
+        let tskey = await loc.shareLocation({ lat, lon, alt: 0 });
         let page = await new Promise((resolve_3, reject_3) => { require(['./page'], resolve_3, reject_3); });
         page.set('nearby', { tskey });
     }

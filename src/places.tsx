@@ -36,17 +36,6 @@ async function loadMap() {
   let places = await loc.getVisitedPlaces();
   log.i('Viisted places:', places.length, places);
 
-  switch (qargs.get('vpt')) {
-    case 'b':
-      log.i('Using big test visited places.');
-      places = loc.getTestVisitedPlacesBig();
-      break;
-    case 's':
-      log.i('Using small test visited places.');
-      places = loc.getTestVisitedPlacesSmall();
-      break;
-  }
-
   if (!places.length) {
     log.i('Nothing to render: no places visited.');
     let link = <a>Vancouver</a>;
@@ -62,7 +51,7 @@ async function loadMap() {
   log.i('Map bounding box:', bbox);
   let osm = new OSM(dom.id.mapAll.id);
   if (conf.DEBUG)
-    osm.onaddmarker = pos => addMarkerAt(pos);
+    osm.onaddmarker = pos => addDebugMarkerAt(pos);
   await osm.render(bbox);
 
   let psorted = places.sort((p1, p2) => +p1.time - +p2.time);
@@ -115,10 +104,10 @@ async function getBBox(places: loc.Place[]) {
   return bbox;
 }
 
-async function addMarkerAt({ lat, lon }) {
+async function addDebugMarkerAt({ lat, lon }) {
   log.i(`Creating a marker at lat=${lat} lon=${lon}`);
   let loc = await import('./loc');
-  let tskey = await loc.shareLocation({ lat, lon });
+  let tskey = await loc.shareLocation({ lat, lon, alt: 0 });
   let page = await import('./page');
   page.set('nearby', { tskey });
 }

@@ -225,6 +225,10 @@ async function initSendButton() {
 async function shareDisplayedLocation() {
   if (!bestPos) throw new Error('GPS not ready.');
   let loc = await import('./loc');
-  let { latitude: lat, longitude: lng } = bestPos;
-  return loc.shareLocation({ lat, lon: lng });
+  let {
+    latitude: lat,
+    longitude: lon,
+    altitude: alt,
+  } = bestPos;
+  return loc.shareLocation({ lat, lon, alt });
 }

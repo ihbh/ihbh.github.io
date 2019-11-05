@@ -91,7 +91,7 @@ function setStatus(text: string) {
 async function initVisitCount({ lat, lon }) {
   let places = await loc.getVisitedPlaces();
   let nearby = places.filter(p => {
-    let dist = loc.dist(p, { lat, lon });
+    let dist = loc.dist(p, { lat, lon, alt: 0 });
     log.d('Place tskey:', loc.deriveTsKey(p.time), 'dist:', dist);
     return dist < conf.MAP_NEARBY;
   });
