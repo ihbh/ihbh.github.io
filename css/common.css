@@ -630,6 +630,7 @@ body #page .ol-attribution * {
   border-radius: 0.25rem;
   padding: 0.25rem;
   width: 80%;
+  position: relative;
 }
 
 #messages .y {
@@ -652,8 +653,11 @@ body #page .ol-attribution * {
 #messages .ts {
   color: #444;
   display: flex;
-  font-size: 0.3em;
+  font-size: 0.2em;
   justify-content: flex-end;
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
 
 #messages .synced .ts {
