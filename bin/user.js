@@ -1,27 +1,15 @@
 define(["require", "exports", "./buffer", "./log", "./gp", "./prop"], function (require, exports, buffer_1, log_1, gp, prop_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const WASM_LIB = './supercop/index';
-    const WASM_POLL_INTERVAL = 250; // ms
+    const WASM_LIB = './ed25519/index';
     const UID_HASH = 'SHA-256';
     const UID_SIZE = 64; // bits
     const log = new log_1.TaggedLogger('user');
     let wasmlib = new prop_1.AsyncProp(async () => {
         let sc = await new Promise((resolve_1, reject_1) => { require([WASM_LIB], resolve_1, reject_1); });
         log.i('Waiting for the wasm lib to intialize.');
-        sc.ready(() => log.i('The wasm lib is ready.'));
-        await new Promise((resolve) => {
-            let timer = setInterval(() => {
-                try {
-                    sc.createSeed();
-                    clearInterval(timer);
-                    resolve();
-                }
-                catch (err) {
-                    // Not ready yet.
-                }
-            }, WASM_POLL_INTERVAL);
-        });
+        await sc.init();
+        log.i('The wasm lib is ready.');
         return sc;
     });
     // 256 bits = 32 bytes.
@@ -44,7 +32,7 @@ define(["require", "exports", "./buffer", "./log", "./gp", "./prop"], function (
             let seed = buffer_1.default.from(hex, 'hex').toArray(Uint8Array);
             let sc = await wasmlib.get();
             log.i('Generating a ed25519 key pair.');
-            let keys = sc.createKeyPair(seed);
+            let keys = sc.createKeypair(seed);
             pubkey = new buffer_1.default(keys.publicKey).toString('hex');
             privkey = new buffer_1.default(keys.secretKey).toString('hex');
             await gp.pubkey.set(pubkey);
@@ -73,19 +61,25 @@ define(["require", "exports", "./buffer", "./log", "./gp", "./prop"], function (
         return id;
     });
     // 512 bits = 64 bytes.
-    async function sign(data) {
+    async function sign(text) {
         let sc = await wasmlib.get();
         let keys = await keypair.get();
-        let bytes = buffer_1.default.from(data, 'utf8').toArray(Uint8Array);
+        let bytes = await mhash(text);
         let signature = sc.sign(bytes, buffer_1.default.from(keys.pubkey, 'hex').toArray(Uint8Array), buffer_1.default.from(keys.privkey, 'hex').toArray(Uint8Array));
         return new buffer_1.default(signature).toString('hex');
     }
     exports.sign = sign;
-    async function verify(data, signature) {
+    async function verify(text, signature) {
         let sc = await wasmlib.get();
         let keys = await keypair.get();
-        return sc.verify(buffer_1.default.from(signature, 'hex').toArray(Uint8Array), buffer_1.default.from(data, 'hex').toArray(Uint8Array), buffer_1.default.from(keys.pubkey, 'hex').toArray(Uint8Array));
+        let bytes = await mhash(text);
+        return sc.verify(buffer_1.default.from(signature, 'hex').toArray(Uint8Array), bytes, buffer_1.default.from(keys.pubkey, 'hex').toArray(Uint8Array));
     }
     exports.verify = verify;
+    async function mhash(text) {
+        let data = buffer_1.default.from(text, 'utf8').toArray(Uint8Array);
+        let hash = await crypto.subtle.digest('SHA-512', data);
+        return new buffer_1.default(hash).toArray(Uint8Array);
+    }
 });
 //# sourceMappingURL=user.js.map

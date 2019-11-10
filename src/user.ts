@@ -3,41 +3,30 @@ import { TaggedLogger } from "./log";
 import * as gp from './gp';
 import { AsyncProp } from "./prop";
 
-const WASM_LIB = './supercop/index';
-const WASM_POLL_INTERVAL = 250; // ms
+const WASM_LIB = './ed25519/index';
 const UID_HASH = 'SHA-256';
 const UID_SIZE = 64; // bits
 
-interface Supercop {
-  ready(callback: Function): void;
+interface Ed25519 {
+  init(): Promise<void>;
   createSeed(): Uint8Array;
-  createKeyPair(seed: Uint8Array): ScKeyPair;
+  createKeypair(seed: Uint8Array): EdKeyPair;
   sign(message: Uint8Array, publicKey: Uint8Array, secretKey: Uint8Array): Uint8Array;
   verify(signature: Uint8Array, message: Uint8Array, publicKey: Uint8Array): boolean;
 }
 
-interface ScKeyPair {
+interface EdKeyPair {
   publicKey: Uint8Array; // 32 bytes
   secretKey: Uint8Array; // 64 bytes
 }
 
 const log = new TaggedLogger('user');
 
-let wasmlib = new AsyncProp<Supercop>(async () => {
-  let sc = await import(WASM_LIB);
+let wasmlib = new AsyncProp<Ed25519>(async () => {
+  let sc: Ed25519 = await import(WASM_LIB);
   log.i('Waiting for the wasm lib to intialize.');
-  sc.ready(() => log.i('The wasm lib is ready.'));
-  await new Promise((resolve) => {
-    let timer = setInterval(() => {
-      try {
-        sc.createSeed();
-        clearInterval(timer);
-        resolve();
-      } catch (err) {
-        // Not ready yet.
-      }
-    }, WASM_POLL_INTERVAL);
-  });
+  await sc.init();
+  log.i('The wasm lib is ready.');
   return sc;
 });
 
@@ -64,7 +53,7 @@ let keypair = new AsyncProp(async () => {
     let seed = Buffer.from(hex, 'hex').toArray(Uint8Array);
     let sc = await wasmlib.get();
     log.i('Generating a ed25519 key pair.');
-    let keys = sc.createKeyPair(seed);
+    let keys = sc.createKeypair(seed);
     pubkey = new Buffer(keys.publicKey).toString('hex');
     privkey = new Buffer(keys.secretKey).toString('hex');
     await gp.pubkey.set(pubkey);
@@ -97,21 +86,28 @@ export let uid = new AsyncProp<string>(async () => {
 });
 
 // 512 bits = 64 bytes.
-export async function sign(data: string): Promise<string> {
+export async function sign(text: string): Promise<string> {
   let sc = await wasmlib.get();
   let keys = await keypair.get();
-  let bytes = Buffer.from(data, 'utf8').toArray(Uint8Array);
+  let bytes = await mhash(text);
   let signature = sc.sign(bytes,
     Buffer.from(keys.pubkey, 'hex').toArray(Uint8Array),
     Buffer.from(keys.privkey, 'hex').toArray(Uint8Array));
   return new Buffer(signature).toString('hex');
 }
 
-export async function verify(data: string, signature: string) {
+export async function verify(text: string, signature: string) {
   let sc = await wasmlib.get();
   let keys = await keypair.get();
+  let bytes = await mhash(text);
   return sc.verify(
     Buffer.from(signature, 'hex').toArray(Uint8Array),
-    Buffer.from(data, 'hex').toArray(Uint8Array),
+    bytes,
     Buffer.from(keys.pubkey, 'hex').toArray(Uint8Array));
+}
+
+async function mhash(text: string) {
+  let data = Buffer.from(text, 'utf8').toArray(Uint8Array);
+  let hash = await crypto.subtle.digest('SHA-512', data);
+  return new Buffer(hash).toArray(Uint8Array);
 }

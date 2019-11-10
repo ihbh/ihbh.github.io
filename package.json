@@ -1,18 +1,16 @@
 {
   "scripts": {
     "build": "npm run cp-libs && tsc && npm run cp-sw",
-    "cp-libs": "npm run cp-sha1 && npm run cp-scop",
-    "cp-sha1": "cp node_modules/js-sha1/src/*.js bin",
-    "cp-scop": "rsync -avc node_modules/supercop.wasm/src/* bin/supercop",
+    "cp-libs": "npm run cp-scop",
+    "cp-scop": "mkdir -p bin/ed25519; rsync -avc node_modules/ed25519.wasm/* bin/ed25519",
     "cp-sw": "cp -f bin/sw.js sw.js",
     "webfsd": "killall -q webfsd; webfsd -F -l - -p 8080 -r . -f index.html"
   },
   "devDependencies": {
     "@types/ol": "5.3.5",
-    "js-sha1": "0.6.0",
     "typescript": "3.5.3"
   },
   "dependencies": {
-    "supercop.wasm": "5.0.1"
+    "ed25519.wasm": "1.0.3"
   }
 }

@@ -1,0 +1,45 @@
+{
+  "_from": "ed25519.wasm@1.0.3",
+  "_id": "ed25519.wasm@1.0.3",
+  "_inBundle": false,
+  "_integrity": "sha512-CWMAZFrAZDnPOVxAd7+ZVY3kFWK7ne6uOr0MuybyQzhcDgfRl5iobXoZ82qTMs06jHpf08JwXZK/fyUaxfa0dw==",
+  "_location": "/ed25519.wasm",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "ed25519.wasm@1.0.3",
+    "name": "ed25519.wasm",
+    "escapedName": "ed25519.wasm",
+    "rawSpec": "1.0.3",
+    "saveSpec": null,
+    "fetchSpec": "1.0.3"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/ed25519.wasm/-/ed25519.wasm-1.0.3.tgz",
+  "_shasum": "5dd8f5b8a94a240571deb2d1a9d77ad4fc1be22d",
+  "_spec": "ed25519.wasm@1.0.3",
+  "_where": "/home/user1/data/src/ihbh/pwa",
+  "bugs": {
+    "url": "https://github.com/ihbh/ed25519/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "A wasm build of orlp/ed25519",
+  "files": [
+    "dist/"
+  ],
+  "homepage": "https://github.com/ihbh/ed25519#readme",
+  "main": "index.js",
+  "name": "ed25519.wasm",
+  "repository": {
+    "url": "git+https://github.com/ihbh/ed25519.git"
+  },
+  "scripts": {
+    "build": "./build.sh",
+    "test": "npm run build && node test"
+  },
+  "version": "1.0.3"
+}
