@@ -89,5 +89,11 @@ define(["require", "exports", "./config", "./log", "./vfs-conf", "./vfs-prop"], 
         test: x => Number.isFinite(x) && x > -180 && x < 180,
         path: '/osm/common/lon',
     });
+    exports.chatEncrypt = vfsconf.register({
+        value: true,
+        test: x => !!x === x,
+        path: '/chat/encrypt',
+        description: `Encrypts sent chat messages (AES256+X25519).`,
+    });
 });
 //# sourceMappingURL=gp.js.map

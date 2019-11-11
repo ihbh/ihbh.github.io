@@ -2,16 +2,11 @@ define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('chat');
-    const date2tsid = (date) => date.toJSON()
-        .replace(/[^\d]/g, '-')
-        .slice(0, 19);
-    const tsid2date = (tsid) => new Date(tsid.slice(0, 10) + 'T' +
-        tsid.slice(11).replace(/-/g, ':') + 'Z');
     const rm2cm = (sender, remote) => Object.keys(remote).map(tsid => {
         return {
             user: sender,
             text: remote[tsid].text,
-            date: tsid2date(tsid),
+            date: chatman.tsid2date(tsid),
             status: remote[tsid].status,
         };
     });
@@ -59,23 +54,11 @@ define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page
             }
         });
         async function sendMessage(text) {
-            log.i('Sending message:', text);
-            let uid = await user.uid.get();
-            let message = {
-                user: uid,
-                text: text,
-                date: new Date,
-            };
-            let tsid = date2tsid(message.date);
-            await vfs_1.default.set(`${conf.SHARED_DIR}/chats/${remoteUid}/${tsid}/text`, text);
-            log.i('Message saved.');
+            let message = await chatman.sendMessage(remoteUid, text);
             let container = dom.id.chatMessages;
             let div = renderMessage(message);
             container.append(div);
             div.scrollIntoView();
-            log.i('Sending the message to the server.');
-            let rsync = await new Promise((resolve_1, reject_1) => { require(['./rsync'], resolve_1, reject_1); });
-            rsync.start();
         }
     }
     async function initDraftAutoSaving() {
@@ -179,7 +162,7 @@ define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page
     }
     async function getMessageTexts(dir, tsids) {
         try {
-            let rsync = await new Promise((resolve_2, reject_2) => { require(['./rsync'], resolve_2, reject_2); });
+            let rsync = await new Promise((resolve_1, reject_1) => { require(['./rsync'], resolve_1, reject_1); });
             let messages = {};
             if (!tsids)
                 tsids = (await vfs_1.default.dir(dir)) || [];

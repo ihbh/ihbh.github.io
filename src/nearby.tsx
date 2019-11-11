@@ -176,6 +176,6 @@ async function getPeopleNearby({ lat, lon }): Promise<UserInfo[]> {
   let uid = await user.uid.get();
   ids = ids.filter(vuid => vuid != uid);
   log.i('People nearby:', ids);
-  let ps = ids.map(getUserInfo);
+  let ps = ids.map(uid => getUserInfo(uid));
   return Promise.all(ps);
 }

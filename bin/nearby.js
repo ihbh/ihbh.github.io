@@ -131,7 +131,7 @@ define(["require", "exports", "./page", "./config", "./dom", "./gp", "./loc", ".
         let uid = await user.uid.get();
         ids = ids.filter(vuid => vuid != uid);
         log.i('People nearby:', ids);
-        let ps = ids.map(ucache_1.getUserInfo);
+        let ps = ids.map(uid => ucache_1.getUserInfo(uid));
         return Promise.all(ps);
     }
 });

@@ -8,22 +8,27 @@ export interface UserInfo {
   name?: string;
   photo?: string;
   about?: string;
+  pubkey?: string;
 }
 
 const PROPS = {
   info: 'about',
   name: 'name',
   img: 'photo',
+  pubkey: 'pubkey',
 };
 
-export async function getUserInfo(uid: string) {
+type PropName = keyof typeof PROPS;
+
+export async function getUserInfo(uid: string, props?: PropName[]) {
   log.i('Getting user info:', uid);
   let dirRemote = `/users/${uid}/profile`;
   let dirCached = `~/users/${uid}`;
   let info = await getCachedInfo(uid);
 
   try {
-    let ps = syncFiles(dirCached, dirRemote);
+    let ps = syncFiles(dirCached, dirRemote,
+      props || Object.keys(PROPS));
 
     if (!info.name) {
       await ps;
@@ -49,9 +54,8 @@ async function getCachedInfo(uid: string) {
   return info;
 }
 
-async function syncFiles(dirCached: string, dirRemote: string) {
+async function syncFiles(dirCached: string, dirRemote: string, fnames: string[]) {
   try {
-    let fnames = Object.keys(PROPS);
     let ps = fnames.map(
       fname => syncFile(
         dirCached + '/' + fname,

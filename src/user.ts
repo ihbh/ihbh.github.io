@@ -13,6 +13,7 @@ interface Ed25519 {
   createKeypair(seed: Uint8Array): EdKeyPair;
   sign(message: Uint8Array, publicKey: Uint8Array, secretKey: Uint8Array): Uint8Array;
   verify(signature: Uint8Array, message: Uint8Array, publicKey: Uint8Array): boolean;
+  keyExchange(pubKey: Uint8Array, secKey: Uint8Array): Uint8Array;
 }
 
 interface EdKeyPair {
@@ -70,6 +71,12 @@ export let pubkey = new AsyncProp<string>(async () => {
   return keys.pubkey;
 });
 
+// 512 bits = 64 bytes.
+export let privkey = new AsyncProp<string>(async () => {
+  let keys = await keypair.get();
+  return keys.privkey;
+});
+
 // First 64 bits of sha256(pubkey).
 export let uid = new AsyncProp<string>(async () => {
   let id = await gp.uid.get();
@@ -104,6 +111,16 @@ export async function verify(text: string, signature: string) {
     Buffer.from(signature, 'hex').toArray(Uint8Array),
     bytes,
     Buffer.from(keys.pubkey, 'hex').toArray(Uint8Array));
+}
+
+// 256 bits = 32 bytes.
+export async function deriveSharedSecret(remoteUserPubKey: string) {
+  let sc = await wasmlib.get();
+  let keys = await keypair.get();
+  let secret = sc.keyExchange(
+    Buffer.from(remoteUserPubKey, 'hex').toArray(Uint8Array),
+    Buffer.from(keys.privkey, 'hex').toArray(Uint8Array));
+  return new Buffer(secret).toString('hex');
 }
 
 async function mhash(text: string) {

@@ -6,14 +6,15 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         info: 'about',
         name: 'name',
         img: 'photo',
+        pubkey: 'pubkey',
     };
-    async function getUserInfo(uid) {
+    async function getUserInfo(uid, props) {
         log.i('Getting user info:', uid);
         let dirRemote = `/users/${uid}/profile`;
         let dirCached = `~/users/${uid}`;
         let info = await getCachedInfo(uid);
         try {
-            let ps = syncFiles(dirCached, dirRemote);
+            let ps = syncFiles(dirCached, dirRemote, props || Object.keys(PROPS));
             if (!info.name) {
                 await ps;
                 info = await getCachedInfo(uid);
@@ -33,9 +34,8 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         await Promise.all(fnames.map(async (fname) => info[PROPS[fname]] = await vfs.get(dir + '/' + fname)));
         return info;
     }
-    async function syncFiles(dirCached, dirRemote) {
+    async function syncFiles(dirCached, dirRemote, fnames) {
         try {
-            let fnames = Object.keys(PROPS);
             let ps = fnames.map(fname => syncFile(dirCached + '/' + fname, dirRemote + '/' + fname));
             await Promise.all(ps);
             log.d('Synced user info:', dirRemote);

@@ -64,7 +64,7 @@ define(["require", "exports", "./page", "./config", "./dom", "./log", "./react",
         if (!uids || !uids.length)
             return [];
         log.i('Getting user details:', uids.length);
-        let ps = uids.map(ucache_1.getUserInfo);
+        let ps = uids.map(uid => ucache_1.getUserInfo(uid));
         return Promise.all(ps);
     }
     async function getUnreadChats() {

@@ -12,13 +12,6 @@ import vfs from './vfs';
 
 let log = new TaggedLogger('chat');
 
-interface ChatMessage {
-  status?: 'synced' | 'failed';
-  user: string;
-  text: string;
-  date: Date;
-}
-
 interface RemoteMessages {
   [tsid: string]: {
     text: string;
@@ -26,22 +19,12 @@ interface RemoteMessages {
   };
 }
 
-const date2tsid = (date: Date) =>
-  date.toJSON()
-    .replace(/[^\d]/g, '-')
-    .slice(0, 19);
-
-const tsid2date = (tsid: string) =>
-  new Date(
-    tsid.slice(0, 10) + 'T' +
-    tsid.slice(11).replace(/-/g, ':') + 'Z');
-
 const rm2cm = (sender: string, remote: RemoteMessages) =>
   Object.keys(remote).map(tsid => {
     return {
       user: sender,
       text: remote[tsid].text,
-      date: tsid2date(tsid),
+      date: chatman.tsid2date(tsid),
       status: remote[tsid].status,
     };
   });
@@ -102,26 +85,11 @@ async function setSendButtonHandler() {
   });
 
   async function sendMessage(text: string) {
-    log.i('Sending message:', text);
-    let uid = await user.uid.get();
-    let message: ChatMessage = {
-      user: uid,
-      text: text,
-      date: new Date,
-    };
-
-    let tsid = date2tsid(message.date);
-    await vfs.set(`${conf.SHARED_DIR}/chats/${remoteUid}/${tsid}/text`, text);
-    log.i('Message saved.');
-
+    let message = await chatman.sendMessage(remoteUid, text);
     let container = dom.id.chatMessages;
     let div = renderMessage(message);
     container.append(div);
     div.scrollIntoView();
-
-    log.i('Sending the message to the server.');
-    let rsync = await import('./rsync');
-    rsync.start();
   }
 }
 
@@ -173,7 +141,7 @@ async function fetchAndRenderMessages() {
   await clearUnreadMark();
 }
 
-function addMessagesToDOM(messages: ChatMessage[]) {
+function addMessagesToDOM(messages: chatman.ChatMessage[]) {
   if (!messages.length) return;
   log.i('Adding new messages to DOM:', messages.length);
   let container = dom.id.chatMessages;
@@ -285,7 +253,7 @@ async function addMessageTexts(dir: string, messages: RemoteMessages) {
   }
 }
 
-function renderMessage(message: ChatMessage): HTMLDivElement {
+function renderMessage(message: chatman.ChatMessage): HTMLDivElement {
   let cs = message.user == remoteUid ? 'm t' : 'm y';
   if (message.status) cs += ' ' + message.status;
   let lts = recentTimeToStr(message.date, true);

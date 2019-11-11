@@ -77,7 +77,7 @@ async function getActiveChats(): Promise<UserInfo[]> {
   if (!uids || !uids.length) return [];
 
   log.i('Getting user details:', uids.length);
-  let ps = uids.map(getUserInfo);
+  let ps = uids.map(uid => getUserInfo(uid));
   return Promise.all(ps);
 }
 
