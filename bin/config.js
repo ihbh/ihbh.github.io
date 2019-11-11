@@ -29,12 +29,13 @@ define(["require", "exports"], function (require, exports) {
     exports.IMG_MAXQUALITY = 1.0;
     exports.IMG_MINQUALITY = 0.1;
     exports.IMG_MAXBYTES = 2048; // must fit in one request
+    exports.CHAT_AUTOSAVE_INTERVAL = 1; // seconds
+    exports.CHAT_AES_NAME = 'aes256';
     exports.MARKER_ICON_URL = '/icons/marker.png'; // must be PNG for OSM
     exports.MARKER_ICON_SIZE = 64;
     exports.DEFAULT_RPC_PORT = 3921;
     exports.RPC_BATCH_DELAY = 150; // ms
     exports.RPC_MAX_BATCH_SIZE = 4096; // bytes
-    exports.CHAT_AUTOSAVE_INTERVAL = 1; // seconds
     exports.LOG_IDB_NAME = 'logs';
     exports.LOG_IDB_INTERVAL = 5; // ms
     exports.FS_SLOW_THRS = 10; // ms

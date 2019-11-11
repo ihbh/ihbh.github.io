@@ -29,12 +29,14 @@ export const IMG_MAXQUALITY = 1.0;
 export const IMG_MINQUALITY = 0.1;
 export const IMG_MAXBYTES = 2048; // must fit in one request
 
+export const CHAT_AUTOSAVE_INTERVAL = 1; // seconds
+export const CHAT_AES_NAME = 'aes256';
+
 export const MARKER_ICON_URL = '/icons/marker.png'; // must be PNG for OSM
 export const MARKER_ICON_SIZE = 64;
 export const DEFAULT_RPC_PORT = 3921;
 export const RPC_BATCH_DELAY = 150; // ms
 export const RPC_MAX_BATCH_SIZE = 4096; // bytes
-export const CHAT_AUTOSAVE_INTERVAL = 1; // seconds
 export const LOG_IDB_NAME = 'logs';
 export const LOG_IDB_INTERVAL = 5; // ms
 export const FS_SLOW_THRS = 10; // ms

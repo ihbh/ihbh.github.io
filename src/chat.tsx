@@ -12,14 +12,7 @@ import vfs from './vfs';
 
 let log = new TaggedLogger('chat');
 
-interface RemoteMessages {
-  [tsid: string]: {
-    text: string;
-    status?: 'synced' | 'failed';
-  };
-}
-
-const rm2cm = (sender: string, remote: RemoteMessages) =>
+const rm2cm = (sender: string, remote: chatman.RemoteMessages) =>
   Object.keys(remote).map(tsid => {
     return {
       user: sender,
@@ -120,8 +113,8 @@ async function fetchAndRenderMessages() {
   let time = Date.now();
   let uid = await user.uid.get();
 
-  let cached = await getCachedIncomingMessages();
-  addMessagesToDOM(rm2cm(remoteUid, cached));
+  let cachedIncoming = await getCachedIncomingMessages();
+  addMessagesToDOM(rm2cm(remoteUid, cachedIncoming));
   selectLastMessage();
 
   let outgoing = await getOutgoingMessages();
@@ -174,7 +167,7 @@ function selectLastMessage() {
   lastDiv && lastDiv.scrollIntoView();
 }
 
-async function cachedIncomingMessages(messages: RemoteMessages) {
+async function cachedIncomingMessages(messages: chatman.RemoteMessages) {
   log.i('Saving new incoming messages to cache.');
   let dir = `~/chats/${remoteUid}`;
   await addMessageTexts(dir, messages);
@@ -183,7 +176,7 @@ async function cachedIncomingMessages(messages: RemoteMessages) {
 async function getCachedIncomingMessages() {
   log.i('Getting cached incoming messages.');
   let dir = `~/chats/${remoteUid}`;
-  return getMessageTexts(dir);
+  return chatman.getMessageTexts(dir);
 }
 
 async function getNewIncomingMessages() {
@@ -194,13 +187,20 @@ async function getNewIncomingMessages() {
   let dirCached = `~/chats/${remoteUid}`;
   let tsidsCached = (await vfs.dir(dirCached)) || [];
   let tsidsNew = diff(tsids, tsidsCached);
-  return getMessageTexts(dir, tsidsNew);
+  return chatman.getMessageTexts(dir, tsidsNew, remoteUid);
 }
 
 async function getOutgoingMessages() {
   log.i('Getting outgoing messages.');
   let dir = `${conf.SHARED_DIR}/chats/${remoteUid}`;
-  return await getMessageTexts(dir);
+  let messages = await chatman.getMessageTexts(dir);
+
+  let dir2 = `${conf.LOCAL_DIR}/chats/${remoteUid}`;
+  let tsids2 = (await vfs.dir(dir2)) || [];
+  let messages2 = await chatman.getMessageTexts(dir2,
+    diff(tsids2, Object.keys(messages)));
+
+  return { ...messages, ...messages2 };
 }
 
 async function setOutgoingMessagesTag() {
@@ -216,29 +216,7 @@ async function clearUnreadMark() {
   await vfs.set(`/srv/users/${uid}/unread/${remoteUid}`, null);
 }
 
-async function getMessageTexts(dir: string, tsids?: string[]) {
-  try {
-    let rsync = await import('./rsync');
-    let messages: RemoteMessages = {};
-    if (!tsids) tsids = (await vfs.dir(dir)) || [];
-    log.i(`Getting ${tsids.length} messages from ${dir}/*/text`);
-    let ps = tsids.map(async tsid => {
-      let path = `${dir}/${tsid}/text`;
-      let [text, status] = await Promise.all([
-        vfs.get(path),
-        rsync.getSyncStatus(path),
-      ]);
-      if (text) messages[tsid] = { text, status };
-    });
-    await Promise.all(ps);
-    return messages;
-  } catch (err) {
-    log.w('Failed to get message texts:', dir, err);
-    return {};
-  }
-}
-
-async function addMessageTexts(dir: string, messages: RemoteMessages) {
+async function addMessageTexts(dir: string, messages: chatman.RemoteMessages) {
   try {
     let tsids = Object.keys(messages);
     let ps = tsids.map(async tsid => {

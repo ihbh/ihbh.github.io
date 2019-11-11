@@ -81,8 +81,8 @@ define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page
         log.i('Syncing chat messages.');
         let time = Date.now();
         let uid = await user.uid.get();
-        let cached = await getCachedIncomingMessages();
-        addMessagesToDOM(rm2cm(remoteUid, cached));
+        let cachedIncoming = await getCachedIncomingMessages();
+        addMessagesToDOM(rm2cm(remoteUid, cachedIncoming));
         selectLastMessage();
         let outgoing = await getOutgoingMessages();
         addMessagesToDOM(rm2cm(uid, outgoing));
@@ -132,7 +132,7 @@ define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page
     async function getCachedIncomingMessages() {
         log.i('Getting cached incoming messages.');
         let dir = `~/chats/${remoteUid}`;
-        return getMessageTexts(dir);
+        return chatman.getMessageTexts(dir);
     }
     async function getNewIncomingMessages() {
         log.i('Getting new incoming messages.');
@@ -142,12 +142,16 @@ define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page
         let dirCached = `~/chats/${remoteUid}`;
         let tsidsCached = (await vfs_1.default.dir(dirCached)) || [];
         let tsidsNew = diff(tsids, tsidsCached);
-        return getMessageTexts(dir, tsidsNew);
+        return chatman.getMessageTexts(dir, tsidsNew, remoteUid);
     }
     async function getOutgoingMessages() {
         log.i('Getting outgoing messages.');
         let dir = `${conf.SHARED_DIR}/chats/${remoteUid}`;
-        return await getMessageTexts(dir);
+        let messages = await chatman.getMessageTexts(dir);
+        let dir2 = `${conf.LOCAL_DIR}/chats/${remoteUid}`;
+        let tsids2 = (await vfs_1.default.dir(dir2)) || [];
+        let messages2 = await chatman.getMessageTexts(dir2, diff(tsids2, Object.keys(messages)));
+        return Object.assign({}, messages, messages2);
     }
     async function setOutgoingMessagesTag() {
         log.i('Adding a tag to remember this chat.');
@@ -159,30 +163,6 @@ define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page
         log.i('Marking all messages as read.');
         let uid = await user.uid.get();
         await vfs_1.default.set(`/srv/users/${uid}/unread/${remoteUid}`, null);
-    }
-    async function getMessageTexts(dir, tsids) {
-        try {
-            let rsync = await new Promise((resolve_1, reject_1) => { require(['./rsync'], resolve_1, reject_1); });
-            let messages = {};
-            if (!tsids)
-                tsids = (await vfs_1.default.dir(dir)) || [];
-            log.i(`Getting ${tsids.length} messages from ${dir}/*/text`);
-            let ps = tsids.map(async (tsid) => {
-                let path = `${dir}/${tsid}/text`;
-                let [text, status] = await Promise.all([
-                    vfs_1.default.get(path),
-                    rsync.getSyncStatus(path),
-                ]);
-                if (text)
-                    messages[tsid] = { text, status };
-            });
-            await Promise.all(ps);
-            return messages;
-        }
-        catch (err) {
-            log.w('Failed to get message texts:', dir, err);
-            return {};
-        }
     }
     async function addMessageTexts(dir, messages) {
         try {
