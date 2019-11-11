@@ -1,4 +1,4 @@
-// The chat encryption model:
+// The chat encryption model is X25519+AES256:
 //
 //    suid = self (local) user id
 //    ruid = remote user id
