@@ -21,7 +21,7 @@ define(["require", "exports", "./config", "./log", "./prop", "./qargs"], functio
     }
     exports.invoke = invoke;
     async function invokeInternal(name, args, reqid) {
-        log.i(reqid, name, args);
+        log.i(reqid, name, JSON.stringify(args));
         let user = await new Promise((resolve_1, reject_1) => { require(['./user'], resolve_1, reject_1); });
         let path = '/rpc/' + name;
         let url = (await rpcurl.get()) + path;

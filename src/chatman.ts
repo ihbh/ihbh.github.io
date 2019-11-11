@@ -30,6 +30,7 @@ import { TaggedLogger } from './log';
 import { AsyncProp } from './prop';
 
 const log = new TaggedLogger('chatman');
+const aeskeys = new Map<string, AsyncProp<Uint8Array>>();
 
 export interface ChatMessage {
   status?: 'synced' | 'failed';
@@ -99,8 +100,9 @@ export function makeSaveDraftProp(uid: () => string) {
 
 export async function getMessageTexts(dir: string, tsids?: string[], ruid?: string) {
   try {
+    if (tsids && !tsids.length)
+      return {};
     let vfs = await import('./vfs');
-    let rsync = await import('./rsync');
     let messages: RemoteMessages = {};
     if (!tsids) tsids = (await vfs.root.dir(dir)) || [];
     log.i(`Getting ${tsids.length} messages from ${dir}/*/text`);
@@ -135,11 +137,15 @@ async function getMessageText(dir: string, tsid: string, ruid: string | null): P
     }
 
     try {
+      let time = Date.now();
       text = await decryptMessage(ruid, textEnc, tsid);
-      if (text) log.d('Decrypted message:', JSON.stringify(text));
+      if (text) {
+        log.i('Message decrypted from', ruid, 'in', Date.now() - time, 'ms');
+        log.d('Decrypted message:', JSON.stringify(text));
+      }
     } catch (err) {
-      // Wrong AES CBC IV?
-      log.w('Failed to decrypt message:', tsid, err);
+      log.w('Failed to decrypt message (wrong AES CBC IV?):', tsid, err);
+      text = 'Failed to decrypt: ' + textEnc;
     }
   }
 
@@ -172,7 +178,9 @@ export async function sendMessage(ruid: string, text: string) {
   let encrypted = false;
 
   try {
+    let time = Date.now();
     encrypted = await encryptMessage(ruid, text, tsid);
+    log.i('Message encrypted for', ruid, 'in', Date.now() - time, 'ms');
   } catch (err) {
     log.w('Failed to encrypt the message:', err.message);
   }
@@ -225,6 +233,13 @@ async function isEncEnabled() {
 }
 
 async function getAesKey(ruid: string) {
+  let p = aeskeys.get(ruid) ||
+    new AsyncProp(() => deriveSharedKey(ruid));
+  aeskeys.set(ruid, p);
+  return p.get();
+}
+
+async function deriveSharedKey(ruid: string) {
   log.d('Getting pubkey from', ruid);
   let ucache = await import('./ucache');
   let remote = await ucache.getUserInfo(ruid, ['pubkey']);

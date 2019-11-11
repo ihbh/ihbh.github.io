@@ -1,5 +1,6 @@
 import * as logdb from './logdb';
 import * as conf from './config';
+import Buffer from './buffer';
 
 const cname = {
   D: 'debug',
@@ -11,6 +12,8 @@ const cname = {
 function cleanup(x) {
   if (typeof x == 'string' && x.length > conf.LOG_MAXLEN)
     return x.slice(0, conf.LOG_MAXLEN) + '...(' + x.length + ' chars)';
+  if (x instanceof Uint8Array)
+    return 'ui8:' + x.length + ':' + new Buffer(x).toString('hex');
   return x;
 }
 

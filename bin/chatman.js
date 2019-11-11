@@ -26,6 +26,7 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('chatman');
+    const aeskeys = new Map();
     exports.date2tsid = (date) => date.toJSON()
         .replace(/[^\d]/g, '-')
         .slice(0, 19);
@@ -69,8 +70,9 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
     exports.makeSaveDraftProp = makeSaveDraftProp;
     async function getMessageTexts(dir, tsids, ruid) {
         try {
+            if (tsids && !tsids.length)
+                return {};
             let vfs = await new Promise((resolve_5, reject_5) => { require(['./vfs'], resolve_5, reject_5); });
-            let rsync = await new Promise((resolve_6, reject_6) => { require(['./rsync'], resolve_6, reject_6); });
             let messages = {};
             if (!tsids)
                 tsids = (await vfs.root.dir(dir)) || [];
@@ -90,8 +92,8 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
     }
     exports.getMessageTexts = getMessageTexts;
     async function getMessageText(dir, tsid, ruid) {
-        let vfs = await new Promise((resolve_7, reject_7) => { require(['./vfs'], resolve_7, reject_7); });
-        let rsync = await new Promise((resolve_8, reject_8) => { require(['./rsync'], resolve_8, reject_8); });
+        let vfs = await new Promise((resolve_6, reject_6) => { require(['./vfs'], resolve_6, reject_6); });
+        let rsync = await new Promise((resolve_7, reject_7) => { require(['./rsync'], resolve_7, reject_7); });
         let path = `${dir}/${tsid}/text`;
         let pathEnc = `${dir}/${tsid}/${conf.CHAT_AES_NAME}`;
         let [text, textEnc, status] = await Promise.all([
@@ -105,13 +107,16 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
                 return null;
             }
             try {
+                let time = Date.now();
                 text = await decryptMessage(ruid, textEnc, tsid);
-                if (text)
+                if (text) {
+                    log.i('Message decrypted from', ruid, 'in', Date.now() - time, 'ms');
                     log.d('Decrypted message:', JSON.stringify(text));
+                }
             }
             catch (err) {
-                // Wrong AES CBC IV?
-                log.w('Failed to decrypt message:', tsid, err);
+                log.w('Failed to decrypt message (wrong AES CBC IV?):', tsid, err);
+                text = 'Failed to decrypt: ' + textEnc;
             }
         }
         return text && { text, status };
@@ -121,14 +126,14 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
         log.i('Sending message to', ruid);
         if (!conf.RX_USERID.test(ruid))
             throw new Error('Invalid uid: ' + ruid);
-        let user = await new Promise((resolve_9, reject_9) => { require(['./user'], resolve_9, reject_9); });
+        let user = await new Promise((resolve_8, reject_8) => { require(['./user'], resolve_8, reject_8); });
         let uid = await user.uid.get();
         let message = {
             user: uid,
             text: text,
             date: new Date,
         };
-        let vfs = await new Promise((resolve_10, reject_10) => { require(['./vfs'], resolve_10, reject_10); });
+        let vfs = await new Promise((resolve_9, reject_9) => { require(['./vfs'], resolve_9, reject_9); });
         let tsid = exports.date2tsid(message.date);
         let remoteDir = exports.getRemoteDir(ruid, tsid);
         let localDir = exports.getLocalDir(ruid, tsid);
@@ -136,7 +141,9 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
         await vfs.root.set(`${localDir}/text`, text);
         let encrypted = false;
         try {
+            let time = Date.now();
             encrypted = await encryptMessage(ruid, text, tsid);
+            log.i('Message encrypted for', ruid, 'in', Date.now() - time, 'ms');
         }
         catch (err) {
             log.w('Failed to encrypt the message:', err.message);
@@ -146,7 +153,7 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
             await vfs.root.set(`${remoteDir}/text`, text);
         }
         log.d('Syncing the messages.');
-        let rsync = await new Promise((resolve_11, reject_11) => { require(['./rsync'], resolve_11, reject_11); });
+        let rsync = await new Promise((resolve_10, reject_10) => { require(['./rsync'], resolve_10, reject_10); });
         rsync.start();
         log.i('Message sent to', ruid, 'in', Date.now() - time, 'ms');
         return message;
@@ -161,7 +168,7 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
             return false;
         log.d('Running AES-CBC.');
         let cbciv = await getCbcInitVector(ruid, tsid);
-        let aes = await new Promise((resolve_12, reject_12) => { require(['./aes'], resolve_12, reject_12); });
+        let aes = await new Promise((resolve_11, reject_11) => { require(['./aes'], resolve_11, reject_11); });
         let aesdata = await aes.encrypt(text, aeskey, cbciv);
         await setAesData(ruid, tsid, aesdata);
         return true;
@@ -172,29 +179,35 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
             return null;
         log.d('Running AES-CBC.');
         let cbciv = await getCbcInitVector(ruid, tsid);
-        let aes = await new Promise((resolve_13, reject_13) => { require(['./aes'], resolve_13, reject_13); });
+        let aes = await new Promise((resolve_12, reject_12) => { require(['./aes'], resolve_12, reject_12); });
         let data = buffer_1.default.from(base64, 'base64').toArray(Uint8Array);
         let text = await aes.decrypt(data, aeskey, cbciv);
         return text;
     }
     async function isEncEnabled() {
         log.d('Checking if encryption is enabled.');
-        let gp = await new Promise((resolve_14, reject_14) => { require(['./gp'], resolve_14, reject_14); });
+        let gp = await new Promise((resolve_13, reject_13) => { require(['./gp'], resolve_13, reject_13); });
         let enabled = await gp.chatEncrypt.get();
         if (!enabled)
             log.d('Encryption disabled in the settings.');
         return enabled;
     }
     async function getAesKey(ruid) {
+        let p = aeskeys.get(ruid) ||
+            new prop_1.AsyncProp(() => deriveSharedKey(ruid));
+        aeskeys.set(ruid, p);
+        return p.get();
+    }
+    async function deriveSharedKey(ruid) {
         log.d('Getting pubkey from', ruid);
-        let ucache = await new Promise((resolve_15, reject_15) => { require(['./ucache'], resolve_15, reject_15); });
+        let ucache = await new Promise((resolve_14, reject_14) => { require(['./ucache'], resolve_14, reject_14); });
         let remote = await ucache.getUserInfo(ruid, ['pubkey']);
         if (!remote.pubkey) {
             log.d(ruid, 'doesnt have pubkey, so cant encrypt the message.');
             return null;
         }
         log.d('Deriving a shared 256 bit secret with', ruid);
-        let user = await new Promise((resolve_16, reject_16) => { require(['./user'], resolve_16, reject_16); });
+        let user = await new Promise((resolve_15, reject_15) => { require(['./user'], resolve_15, reject_15); });
         let secret = await user.deriveSharedSecret(remote.pubkey);
         log.d('The shared secret:', secret);
         let aeskey = await hash_1.sha256(secret);
@@ -203,11 +216,11 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
     }
     async function setAesData(ruid, tsid, data) {
         log.d('Saving the encrypted text:', data);
-        let vfs = await new Promise((resolve_17, reject_17) => { require(['./vfs'], resolve_17, reject_17); });
+        let vfs = await new Promise((resolve_16, reject_16) => { require(['./vfs'], resolve_16, reject_16); });
         await vfs.root.set(exports.getRemoteDir(ruid, tsid) + '/' + conf.CHAT_AES_NAME, new buffer_1.default(data).toString('base64'));
     }
     async function getCbcInitVector(ruid, tsid) {
-        let user = await new Promise((resolve_18, reject_18) => { require(['./user'], resolve_18, reject_18); });
+        let user = await new Promise((resolve_17, reject_17) => { require(['./user'], resolve_17, reject_17); });
         let suid = await user.uid.get();
         let hs = await Promise.all([
             hash_1.sha256(suid),

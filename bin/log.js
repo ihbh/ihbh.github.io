@@ -1,4 +1,4 @@
-define(["require", "exports", "./logdb", "./config"], function (require, exports, logdb, conf) {
+define(["require", "exports", "./logdb", "./config", "./buffer"], function (require, exports, logdb, conf, buffer_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const cname = {
@@ -10,6 +10,8 @@ define(["require", "exports", "./logdb", "./config"], function (require, exports
     function cleanup(x) {
         if (typeof x == 'string' && x.length > conf.LOG_MAXLEN)
             return x.slice(0, conf.LOG_MAXLEN) + '...(' + x.length + ' chars)';
+        if (x instanceof Uint8Array)
+            return 'ui8:' + x.length + ':' + new buffer_1.default(x).toString('hex');
         return x;
     }
     class FLog {

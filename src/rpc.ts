@@ -120,7 +120,7 @@ export async function invoke(name: string, args) {
 }
 
 async function invokeInternal(name: string, args, reqid: string) {
-  log.i(reqid, name, args);
+  log.i(reqid, name, JSON.stringify(args));
   let user = await import('./user');
   let path = '/rpc/' + name;
   let url = (await rpcurl.get()) + path;
