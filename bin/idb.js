@@ -143,10 +143,10 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             return [].slice.call(list);
         }
     }
+    exports.DB = DB;
     DB.idbs = new Map();
     DB.time = Date.now();
     DB.vidx = 1;
-    exports.DB = DB;
     class DBTable {
         constructor(name, db, { logs = true } = {}) {
             this.name = name;

@@ -49,12 +49,12 @@ define(["require", "exports"], function (require, exports) {
         },
     };
     class Buffer {
-        static from(data, enc) {
-            return decoders[enc](data);
-        }
         constructor(data) {
             this.buffer = data instanceof ArrayBuffer
                 ? data : data.buffer;
+        }
+        static from(data, enc) {
+            return decoders[enc](data);
         }
         toString(enc) {
             return encoders[enc](this.buffer);

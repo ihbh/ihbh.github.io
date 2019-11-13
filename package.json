@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "@types/ol": "5.3.5",
-    "typescript": "3.5.3"
+    "typescript": "3.7.2"
   },
   "dependencies": {
     "ed25519.wasm": "1.0.3"

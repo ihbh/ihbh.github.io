@@ -151,7 +151,7 @@ define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page
         let dir2 = `${conf.LOCAL_DIR}/chats/${remoteUid}`;
         let tsids2 = (await vfs_1.default.dir(dir2)) || [];
         let messages2 = await chatman.getMessageTexts(dir2, diff(tsids2, Object.keys(messages)));
-        return Object.assign({}, messages, messages2);
+        return Object.assign(Object.assign({}, messages), messages2);
     }
     async function setOutgoingMessagesTag() {
         log.i('Adding a tag to remember this chat.');
