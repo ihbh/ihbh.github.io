@@ -103,7 +103,7 @@ export const root = new class RootFS implements VFS {
         throw new Error(`${rootdir} doesn't support '${fsop}'`);
       let result = fn ?
         await fn.call(handler, rempath, ...args) :
-        await handler.invoke(fsop, rempath, ...args);
+        await handler.invoke!(fsop, rempath, ...args);
       if (result !== undefined)
         log.d(fsop, path, '->', JSON.stringify(result));
       return result;

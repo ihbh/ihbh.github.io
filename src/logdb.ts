@@ -1,13 +1,13 @@
 import * as conf from './config';
 import { DB, DBTable } from './idb';
 
-let db: DB = null;
-let dbt: DBTable = null;
+let db: DB|null = null;
+let dbt: DBTable|null = null;
 let prevLogTime = 0;
 let prevLogCollisionId = 0;
 let flushTimer = 0;
 let pendingLogs: [number, any][] = [];
-let pFlushLogs: Promise<void>;
+let pFlushLogs: Promise<void>|null;
 
 writeLog('I', '[-]', [new Date().toJSON()]);
 

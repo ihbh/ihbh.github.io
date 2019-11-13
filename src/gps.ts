@@ -48,7 +48,7 @@ export function watch(listener: (pos: Coordinates) => void, timeout: number): Wa
       clearTimeout(tid);
       navigator.geolocation.clearWatch(wid);
       log.i('Watcher stopped:', wid);
-      wid = null;
+      wid = 0;
     }
   };
 

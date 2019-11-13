@@ -27,7 +27,7 @@ export class DB {
   static close(dbname: string) {
     let db = DB.idbs.get(dbname);
     if (!db) return;
-    db.idb.close();
+    db.idb!.close();
     DB.idbs.delete(dbname);
   }
 
@@ -84,8 +84,8 @@ export class DB {
     }
   }
 
-  private idb: IDBDatabase;
-  private ready: Promise<IDBDatabase>;
+  private idb: IDBDatabase|null;
+  private ready: Promise<IDBDatabase>|null;
   private readonly tables = new Map<string, DBTable>();
 
   constructor(public readonly name: string) {
@@ -134,7 +134,7 @@ export class DB {
       req.onsuccess = (e: any) => {
         log.i(this.name + ':success', Date.now() - time, 'ms');
         this.idb = e.target.result;
-        resolve(this.idb);
+        resolve(this.idb!);
       };
       req.onerror = e => {
         log.e(this.name + ':error', e);
@@ -235,10 +235,10 @@ export class DBTable {
     let txid = Math.random().toString(16).slice(2, 2 + 6);
     let time = Date.now();
     let txrem = ptss.length;
-    let txdec = this.logs && (() => {
+    let txdec = this.logs ? (() => {
       if (!--txrem)
         this.log(txid, 'done:', Date.now() - time, 'ms');
-    });
+    }) : null;
 
     this.log(txid, 'exec:', ...ptss.map(t => '\n- ' + t.name));
 
@@ -249,15 +249,15 @@ export class DBTable {
         let r = fn(s);
         r.onerror = () => {
           reject(new Error(`idbtx ${name} failed: ${r.error}`));
-          this.logs && txdec();
+          this.logs && txdec!();
         };
         r.onsuccess = () => {
           resolve(r.result);
-          this.logs && txdec();
+          this.logs && txdec!();
         };
       } else {
         resolve(defval);
-        this.logs && txdec();
+        this.logs && txdec!();
       }
     }
   }

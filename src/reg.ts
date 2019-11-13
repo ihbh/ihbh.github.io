@@ -28,10 +28,10 @@ export async function selectPhoto(): Promise<string> {
     input.click();
     input.onchange = async () => {
       try {
-        log.i('Selected files:', input.files.length);
-        if (input.files.length != 1)
+        log.i('Selected files:', input.files!.length);
+        if (input.files!.length != 1)
           throw new Error('Only 1 file must be selected.');
-        let file = input.files[0];
+        let file = input.files![0];
         if (!file) throw new Error('No file selected.');
         if (conf.DEBUG) window['file'] = file;
         await saveOriginalImage(file);
@@ -64,7 +64,7 @@ async function getJpegFromFile(file: File) {
   let canvas = document.createElement('canvas');
   canvas.width = s;
   canvas.height = s;
-  let context = canvas.getContext('2d');
+  let context = canvas.getContext('2d')!;
   log.i('cropped size:', s, 'x', s,
     'at', 'dx=' + x, 'dy=' + y);
   context.drawImage(bitmap,
@@ -91,7 +91,7 @@ function getCroppedAndResizedPhoto(img: HTMLImageElement, {
   let canvas = document.createElement('canvas');
   canvas.width = s;
   canvas.height = s;
-  let context = canvas.getContext('2d');
+  let context = canvas.getContext('2d')!;
   if (grayscale) context.filter = GRAYSCALE_FILTER;
   context.drawImage(img,
     0, 0, w, h,
@@ -108,7 +108,7 @@ export function downsizePhoto(img: HTMLImageElement) {
 
   loop: for (let grayscale of [false, true]) {
     for (let quality = qmax; quality >= qmin; quality -= 0.1) {
-      dataurl = getCroppedAndResizedPhoto(img, { quality, grayscale });
+      dataurl = getCroppedAndResizedPhoto(img, { quality, grayscale })!;
       if (dataurl.length <= conf.IMG_MAXBYTES)
         break loop;
     }
@@ -119,7 +119,7 @@ export function downsizePhoto(img: HTMLImageElement) {
 
 export function rotatePhoto(img: HTMLImageElement) {
   let s = img.naturalWidth;
-  let ctx = getSquareContext2d(img);
+  let ctx = getSquareContext2d(img)!;
   ctx.translate(s / 2, s / 2);
   ctx.rotate(Math.PI / 2);
   ctx.drawImage(img, -s / 2, -s / 2);
@@ -127,7 +127,7 @@ export function rotatePhoto(img: HTMLImageElement) {
 }
 
 export function flipPhoto(img: HTMLImageElement) {
-  let ctx = getSquareContext2d(img);
+  let ctx = getSquareContext2d(img)!;
   let s = img.naturalWidth;
   ctx.translate(s, 0);
   ctx.scale(-1, 1);

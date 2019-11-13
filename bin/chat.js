@@ -40,9 +40,9 @@ define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page
     }
     exports.stop = stop;
     async function setSendButtonHandler() {
-        let input = dom.id.chatReplyText;
         dom.id.chatReplySend.addEventListener('click', async () => {
             try {
+                let input = dom.id.chatReplyText;
                 let text = input.textContent.trim();
                 if (!text)
                     return;

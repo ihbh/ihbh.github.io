@@ -6,10 +6,11 @@ define(["require", "exports", "./config", "./log", "./prop", "./qargs"], functio
     let pbtimer = 0;
     class RpcError extends Error {
         constructor(method, response) {
-            super(`RPC ${method} failed: ${response && response.status}`);
+            var _a, _b;
+            super(`RPC ${method} failed: ${(_a = response) === null || _a === void 0 ? void 0 : _a.status}`);
             this.method = method;
             this.response = response;
-            this.status = response && response.status;
+            this.status = ((_b = response) === null || _b === void 0 ? void 0 : _b.status) || 0;
         }
     }
     exports.RpcError = RpcError;
@@ -55,7 +56,7 @@ define(["require", "exports", "./config", "./log", "./prop", "./qargs"], functio
             log.w(reqid, 'error:', err);
             if (err instanceof RpcError)
                 throw err;
-            throw new RpcError(name, null);
+            throw new RpcError(name);
         }
     }
     function schedule(name, args, reqid) {
@@ -135,7 +136,7 @@ define(["require", "exports", "./config", "./log", "./prop", "./qargs"], functio
             log.w('The entire batch failed:', err);
             for (let { reject } of batch) {
                 reject(err instanceof RpcError ?
-                    err : new RpcError('Batch.Run', null));
+                    err : new RpcError('Batch.Run'));
             }
         }
     }

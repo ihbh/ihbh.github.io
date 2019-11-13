@@ -72,7 +72,7 @@ async function syncFile(fpathCached: string, fpathRemote: string) {
   let { default: vfs } = await import('./vfs');
 
   let data = await vfs.get(fpathCached);
-  let hash = null;
+  let hash: string|null = null;
 
   if (data) {
     let rsync = await import('./rsync');

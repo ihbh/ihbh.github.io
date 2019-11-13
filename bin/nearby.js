@@ -45,7 +45,7 @@ define(["require", "exports", "./page", "./config", "./dom", "./gp", "./loc", ".
                 infos = await dbg.getDebugPeopleNearby();
             }
             if (infos.length > 0) {
-                setStatus(null);
+                setStatus('');
                 let container = dom.id.visitors;
                 container.append(...infos.map(makeUserCard));
             }

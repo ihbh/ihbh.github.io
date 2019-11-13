@@ -1,7 +1,7 @@
 import { AsyncProp } from "./prop";
 import vfs from './vfs';
 
-function prop<T>(path: string, defval: T = null) {
+function prop<T>(path: string, defval: T|null = null) {
   return new AsyncProp<T>({
     nocache: true,
 

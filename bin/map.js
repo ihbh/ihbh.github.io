@@ -28,7 +28,8 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./vfs", "./
     }
     exports.init = init;
     function stop() {
-        watcher && watcher.stop();
+        var _a;
+        (_a = watcher) === null || _a === void 0 ? void 0 : _a.stop();
         watcher = null;
     }
     exports.stop = stop;
@@ -168,7 +169,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./vfs", "./
             throw new Error('GPS not ready.');
         let loc = await new Promise((resolve_4, reject_4) => { require(['./loc'], resolve_4, reject_4); });
         let { latitude: lat, longitude: lon, altitude: alt, } = bestPos;
-        return loc.shareLocation({ lat, lon, alt });
+        return loc.shareLocation({ lat, lon, alt: alt });
     }
 });
 //# sourceMappingURL=map.js.map

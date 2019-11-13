@@ -33,7 +33,7 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
                 clearTimeout(tid);
                 navigator.geolocation.clearWatch(wid);
                 log.i('Watcher stopped:', wid);
-                wid = null;
+                wid = 0;
             }
         };
         return watcher;

@@ -89,7 +89,7 @@ export async function getDebugPeopleNearby() {
   let ntest = +qargs.get('pnt') ||
     conf.DBG_N_USERS_NEARBY;
   log.i('Returning test data:', ntest);
-  let res = [];
+  let res: any[] = [];
   for (let i = 0; i < ntest; i++) {
     res.push({
       uid: 'uid-' + i,

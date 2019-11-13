@@ -119,10 +119,10 @@ function makeEditable(el: HTMLElement, path: string) {
   el.setAttribute('contenteditable', '');
   let prevText = '';
   el.addEventListener('focusin', () => {
-    prevText = el.textContent;
+    prevText = el.textContent!;
   });
   el.addEventListener('focusout', async () => {
-    let newText = el.textContent;
+    let newText = el.textContent!;
     if (newText == prevText) return;
 
     try {
@@ -158,15 +158,15 @@ async function renderAsDir(dirPath: string, sfc: boolean, idir: string) {
 
   let ps = names.map(async name => {
     let path = dirPath + '/' + name;
-    let href = page.href('explorer', { 
+    let href = page.href('explorer', {
       path,
-      sfc: sfc ? 1 : null,
-      idir: idir ? 1 : null,
-     });
+      sfc: sfc ? 1 : undefined,
+      idir: idir ? 1 : undefined,
+    });
     let nameTag = <a href={href}>{decodeURIComponent(name)}</a>;
-    let dataTag: HTMLElement = null;
-    let infoTag: HTMLElement = null;
-    let unitTag: HTMLElement = null;
+    let dataTag: HTMLElement | null = null;
+    let infoTag: HTMLElement | null = null;
+    let unitTag: HTMLElement | null = null;
 
     try {
       if (sfc) {
@@ -174,8 +174,8 @@ async function renderAsDir(dirPath: string, sfc: boolean, idir: string) {
         if (data !== null) {
           let json = JSON.stringify(data);
           dataTag = <i>{json}</i>;
-          dataTag.setAttribute('spellcheck', 'false');
-          makeEditable(dataTag, path);
+          dataTag!.setAttribute('spellcheck', 'false');
+          makeEditable(dataTag!, path);
         }
       }
     } catch { }
@@ -205,7 +205,7 @@ async function renderAsDir(dirPath: string, sfc: boolean, idir: string) {
   await Promise.all(ps);
 
   for (let name of names.sort())
-    links.appendChild(tags.get(name));
+    links.appendChild(tags.get(name)!);
 
   root.appendChild(links);
 }

@@ -50,7 +50,7 @@ function parseArgs(str = location.hash.slice(1)) {
 }
 
 function serializeArgs(args: Map<string, string>) {
-  let pairs = [];
+  let pairs: string[] = [];
 
   for (let [key, val] of args) {
     if (isNull(val)) continue;

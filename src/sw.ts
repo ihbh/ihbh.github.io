@@ -11,7 +11,7 @@
   };
 
   const sleep = (dt: number) => new Promise<void>(
-    resolve => setTimeout(() => resolve(null), dt));
+    resolve => setTimeout(() => resolve(), dt));
 
   const handlers = new Map<string, (args?) => Promise<any>>();
 
@@ -112,7 +112,7 @@
     log.i('Getting cached response.');
     let cache = await caches.open(CACHE_NAME);
     let resp = await cache.match(url);
-    return {
+    return resp && {
       status: resp.status,
       statusText: resp.statusText,
       body: await resp.text(),

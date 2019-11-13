@@ -75,7 +75,7 @@ export async function init() {
     }
 
     if (infos.length > 0) {
-      setStatus(null);
+      setStatus('');
       let container = dom.id.visitors;
       container.append(...infos.map(makeUserCard));
     } else {
@@ -100,7 +100,7 @@ function setStatus(text: string) {
 }
 
 function initNote() {
-  getUXComp(fsedit).start();
+  getUXComp(fsedit)!.start!();
 }
 
 async function initVisitCount({ lat, lon }) {

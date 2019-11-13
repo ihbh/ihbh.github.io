@@ -44,7 +44,7 @@ export default new class implements VFS {
       return value;
     if (!props.has(path))
       return null;
-    value = props.get(path).value;
+    value = props.get(path)!.value;
     return value;
   }
 

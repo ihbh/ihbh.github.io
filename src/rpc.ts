@@ -26,10 +26,10 @@ export class RpcError extends Error {
 
   constructor(
     public method: string,
-    public response: RpcErrorResponse) {
+    public response?: RpcErrorResponse) {
 
-    super(`RPC ${method} failed: ${response && response.status}`);
-    this.status = response && response.status;
+    super(`RPC ${method} failed: ${response?.status}`);
+    this.status = response?.status || 0;
   }
 }
 
@@ -158,7 +158,7 @@ async function invokeInternal(name: string, args, reqid: string) {
     log.w(reqid, 'error:', err);
     if (err instanceof RpcError)
       throw err;
-    throw new RpcError(name, null);
+    throw new RpcError(name);
   }
 }
 
@@ -255,7 +255,7 @@ async function sendBatch() {
     log.w('The entire batch failed:', err);
     for (let { reject } of batch) {
       reject(err instanceof RpcError ?
-        err : new RpcError('Batch.Run', null));
+        err : new RpcError('Batch.Run'));
     }
   }
 }

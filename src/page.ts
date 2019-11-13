@@ -19,11 +19,17 @@ interface PageArgs {
   };
 }
 
+interface PageObj {
+  render(): Promise<HTMLElement>;
+  init(): Promise<void>;
+  stop?(): void;
+}
+
 type PageId = keyof PageArgs;
 
 const log = new TaggedLogger('page');
 
-let cpm = null;
+let cpm: PageObj|null = null;
 
 export async function init() {
   log.i('Added hashchange listener.');
@@ -46,14 +52,14 @@ export async function refresh() {
   cpm = await import('./' + id);
   log.i('Rendering page.');
 
-  let div = await cpm.render();
+  let div = await cpm!.render();
   document.body.setAttribute('page', id);
   replaceContents(dom.id.pageContainer, div);
 
   initLinks();
 
   log.i('Initializing page.');
-  await cpm.init();
+  await cpm!.init();
 
   log.i('Initialized in', Date.now() - time, 'ms');
 }
@@ -86,7 +92,7 @@ function initLinks() {
 
   for (let button of [].slice.call(buttons) as HTMLButtonElement[]) {
     let id = button.getAttribute('id');
-    let href = button.getAttribute('href');
+    let href = button.getAttribute('href')!;
     log.d(`button#${id}`, href);
     button.onclick = () => location.href = href;
   }
@@ -100,7 +106,7 @@ function replaceContents(parent: HTMLElement, content: HTMLElement) {
 
 function stopCurrentPage() {
   try {
-    if (cpm && cpm.stop) {
+    if (cpm?.stop) {
       log.i('Stopping current page.');
       cpm.stop();
     }

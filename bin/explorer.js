@@ -133,8 +133,8 @@ define(["require", "exports", "./page", "./dom", "./log", "./qargs", "./react", 
             let path = dirPath + '/' + name;
             let href = page.href('explorer', {
                 path,
-                sfc: sfc ? 1 : null,
-                idir: idir ? 1 : null,
+                sfc: sfc ? 1 : undefined,
+                idir: idir ? 1 : undefined,
             });
             let nameTag = react_1.default.createElement("a", { href: href }, decodeURIComponent(name));
             let dataTag = null;

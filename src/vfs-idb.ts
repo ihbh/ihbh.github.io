@@ -29,7 +29,7 @@ export default new class IDBFS implements VFS {
     }
 
     let fs = await getTableFS(dbname, tname);
-    let relpaths = await fs.find(tpath);
+    let relpaths = await fs.find!(tpath);
     return relpaths.map(
       rel => '/' + dbname + '/' + tname + rel);
   }
@@ -41,14 +41,14 @@ export default new class IDBFS implements VFS {
     let db = DB.open(dbname);
     if (!tname) return db.tnames();
     let fs = await getTableFS(dbname, tname);
-    return fs.dir(tpath);
+    return fs.dir!(tpath);
   }
 
   async invoke(fsop: keyof VFS, path: string, ...args) {
     log.d(fsop, path, ...args);
     let [dbname, tname, tpath] = splitPath(path);
     let fs = await getTableFS(dbname, tname);
-    return fs.invoke(fsop, tpath, ...args);
+    return fs.invoke!(fsop, tpath, ...args);
   }
 };
 

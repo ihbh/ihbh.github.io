@@ -1,5 +1,5 @@
 type Getter<T> = () => T | Promise<T>;
-type Setter<T> = (value: T) => void | Promise<void>;
+type Setter<T> = (value: T | null) => void | Promise<void>;
 
 interface Args<T> {
   get: Getter<T>;
@@ -10,7 +10,7 @@ interface Args<T> {
 export class AsyncProp<T> {
   private nocache: boolean;
   private getter: Getter<T>;
-  private setter: Setter<T>;
+  private setter?: Setter<T>;
   private pget: Promise<T>;
 
   constructor(args: Getter<T> | Args<T>) {
@@ -27,7 +27,7 @@ export class AsyncProp<T> {
       (this.pget = Promise.resolve(get()));
   }
 
-  set(value: T): Promise<void> {
+  set(value: T | null): Promise<void> {
     let set = this.setter;
     if (!set)
       throw new Error('This is a read only prop.');

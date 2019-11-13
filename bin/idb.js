@@ -194,10 +194,10 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             let txid = Math.random().toString(16).slice(2, 2 + 6);
             let time = Date.now();
             let txrem = ptss.length;
-            let txdec = this.logs && (() => {
+            let txdec = this.logs ? (() => {
                 if (!--txrem)
                     this.log(txid, 'done:', Date.now() - time, 'ms');
-            });
+            }) : null;
             this.log(txid, 'exec:', ...ptss.map(t => '\n- ' + t.name));
             this.pending = [];
             for (let { name, fn, defval, resolve, reject } of ptss) {

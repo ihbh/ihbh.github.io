@@ -15,7 +15,7 @@ interface Args {
 
 export default class JsonFS implements VFS {
   private args: Args;
-  private cachedKeys: Promise<string[]>;
+  private cachedKeys: Promise<string[]>|null;
 
   constructor(args: Args) {
     this.args = {
@@ -52,7 +52,7 @@ export default class JsonFS implements VFS {
     if (!dir.endsWith('/'))
       dir += '/';
     let keys = await this.fetchKeys();
-    let paths = keys.map(this.args.path);
+    let paths = keys.map(this.args.path!);
     if (dir == '/')
       return paths;
     return paths.filter(
@@ -80,7 +80,7 @@ export default class JsonFS implements VFS {
       throw new Error('Bad path: ' + path);
     let keys = await this.fetchKeys();
     for (let key of keys) {
-      if (this.args.path(key) == path) {
+      if (this.args.path!(key) == path) {
         let data = await this.args.read(key);
         return data === undefined ? null : data;
       }
@@ -97,7 +97,7 @@ export default class JsonFS implements VFS {
     if (data === null)
       throw new Error('jsonfs.set(null)');
     this.clearKeys();
-    let key = this.args.key(path);
+    let key = this.args.key!(path);
     await this.args.write(key, data);
   }
 
@@ -108,7 +108,7 @@ export default class JsonFS implements VFS {
     if (!path || path.endsWith('/'))
       throw new Error('Bad path: ' + path);
     this.clearKeys();
-    let key = this.args.key(path);
+    let key = this.args.key!(path);
     await this.args.remove(key);
   }
 

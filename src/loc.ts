@@ -5,7 +5,7 @@ export interface Place {
   time: number; // Date.now()/1000
   lat: number;
   lon: number;
-  alt: number;
+  alt?: number;
 }
 
 export interface Places {
@@ -16,7 +16,7 @@ export interface Places {
 export interface GpsCoords {
   lat: number;
   lon: number;
-  alt: number;
+  alt?: number;
 }
 
 export interface VisitorNote {

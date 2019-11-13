@@ -33,7 +33,8 @@ define(["require", "exports", "./config", "./idb", "./log", "./ls", "./sleep"], 
             log.i('Waiting for input.onchange...');
             let file = await new Promise((resolve, reject) => {
                 input.onchange = () => {
-                    if (input.files.length == 1)
+                    var _a;
+                    if (((_a = input.files) === null || _a === void 0 ? void 0 : _a.length) == 1)
                         resolve(input.files[0]);
                     else
                         reject(new Error('One file must have been selected.'));

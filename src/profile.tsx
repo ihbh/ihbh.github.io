@@ -127,8 +127,8 @@ async function showUserInfo() {
 
   showUserId();
 
-  dom.id.regName.textContent = await usr.getDisplayName(uid);
-  dom.id.regAbout.textContent = await usr.getAbout(uid);
+  dom.id.regName!.textContent = await usr.getDisplayName(uid);
+  dom.id.regAbout!.textContent = await usr.getAbout(uid);
   let imguri = await usr.getPhotoUri(uid);
   if (imguri) dom.id.regPhoto.src = imguri;
 }
@@ -139,7 +139,7 @@ async function showUserId() {
 
 function setUserProp(name: string, text: string) {
   let table = dom.id.regDetails;
-  let tbody = table.querySelector('tbody');
+  let tbody = table.querySelector('tbody')!;
   tbody.append(
     <tr>
       <td>{name}</td>

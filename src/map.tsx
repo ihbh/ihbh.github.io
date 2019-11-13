@@ -19,9 +19,9 @@ interface LastGps {
 
 const log = new TaggedLogger('map');
 
-let osm: OSM;
-let bestPos: Coordinates;
-let watcher: gps.Watcher;
+let osm: OSM | null;
+let bestPos: Coordinates | null;
+let watcher: gps.Watcher | null;
 
 export async function render() {
   return <div id="p-map"
@@ -70,7 +70,7 @@ export async function init() {
 }
 
 export function stop() {
-  watcher && watcher.stop();
+  watcher?.stop();
   watcher = null;
 }
 
@@ -158,7 +158,7 @@ async function updateMap({ lat, lon, alt, acc }) {
   try {
     let s = conf.MAP_1M * await gp.mapBoxSize.get();
     log.i('Updating OSM view box:', s, { lat, lon });
-    osm.setBBox({
+    osm!.setBBox({
       min: { lat: lat - s, lon: lon - s },
       max: { lat: lat + s, lon: lon + s },
     });
@@ -166,8 +166,8 @@ async function updateMap({ lat, lon, alt, acc }) {
     log.i('Updating OSM markers.');
     let opacity = acc < (await gp.mapGoodAcc.get()) ? 1
       : (await gp.mapPoorAccOpacity.get());
-    osm.clearMarkers();
-    osm.addMarker({ lat, lon, opacity });
+    osm!.clearMarkers();
+    osm!.addMarker({ lat, lon, opacity });
   } catch (err) {
     log.e('Failed to refresh GPS coords:', err);
   }
@@ -208,7 +208,7 @@ async function initSendButton() {
     let pwa = await import('./pwa');
     pwa.showInstallPrompt();
     button.disabled = true;
-    let tskey = null;
+    let tskey: string | null = null;
 
     try {
       tskey = await shareDisplayedLocation();
@@ -230,5 +230,5 @@ async function shareDisplayedLocation() {
     longitude: lon,
     altitude: alt,
   } = bestPos;
-  return loc.shareLocation({ lat, lon, alt });
+  return loc.shareLocation({ lat, lon, alt: alt! });
 }

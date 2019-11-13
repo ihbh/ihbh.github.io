@@ -48,7 +48,7 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
             verifyUserId(uid);
             let ucache = await new Promise((resolve_5, reject_5) => { require(['./ucache'], resolve_5, reject_5); });
             let info = await ucache.getUserInfo(uid);
-            return info.name;
+            return info.name || null;
         }
         else {
             let gp = await new Promise((resolve_6, reject_6) => { require(['./gp'], resolve_6, reject_6); });
@@ -60,7 +60,7 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
         if (uid) {
             let ucache = await new Promise((resolve_7, reject_7) => { require(['./ucache'], resolve_7, reject_7); });
             let info = await ucache.getUserInfo(uid);
-            return info.about;
+            return info.about || null;
         }
         else {
             let gp = await new Promise((resolve_8, reject_8) => { require(['./gp'], resolve_8, reject_8); });
@@ -86,7 +86,7 @@ define(["require", "exports", "./config", "./log"], function (require, exports, 
     }
     exports.getAbuseReport = getAbuseReport;
     function dataUriToBlob(datauri) {
-        let [, mime, b64] = /^data:(.+);base64,(.+)$/.exec(datauri);
+        let [, mime, b64] = /^data:(.+);base64,(.+)$/.exec(datauri) || [];
         let data = atob(b64);
         let bytes = new Uint8Array(data.length);
         for (let i = 0; i < data.length; i++)

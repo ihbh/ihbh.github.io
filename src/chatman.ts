@@ -30,7 +30,7 @@ import { TaggedLogger } from './log';
 import { AsyncProp } from './prop';
 
 const log = new TaggedLogger('chatman');
-const aeskeys = new Map<string, AsyncProp<Uint8Array>>();
+const aeskeys = new Map<string, AsyncProp<Uint8Array|null>>();
 
 export interface ChatMessage {
   status?: 'synced' | 'failed';
@@ -107,7 +107,7 @@ export async function getMessageTexts(dir: string, tsids?: string[], ruid?: stri
     if (!tsids) tsids = (await vfs.root.dir(dir)) || [];
     log.i(`Getting ${tsids.length} messages from ${dir}/*/text`);
     let ps = tsids.map(async tsid => {
-      let message = await getMessageText(dir, tsid, ruid);
+      let message = await getMessageText(dir, tsid, ruid!);
       if (message) messages[tsid] = message;
     });
     await Promise.all(ps);
@@ -118,7 +118,9 @@ export async function getMessageTexts(dir: string, tsids?: string[], ruid?: stri
   }
 }
 
-async function getMessageText(dir: string, tsid: string, ruid: string | null): Promise<RemoteMessage> {
+async function getMessageText(dir: string, tsid: string, ruid: string | null)
+  : Promise<null | RemoteMessage> {
+
   let vfs = await import('./vfs');
   let rsync = await import('./rsync');
   let path = `${dir}/${tsid}/text`;
@@ -138,7 +140,7 @@ async function getMessageText(dir: string, tsid: string, ruid: string | null): P
 
     try {
       let time = Date.now();
-      text = await decryptMessage(ruid, textEnc, tsid);
+      text = await decryptMessage(ruid!, textEnc, tsid);
       if (text) {
         log.i('Message decrypted from', ruid, 'in', Date.now() - time, 'ms');
         log.d('Decrypted message:', JSON.stringify(text));

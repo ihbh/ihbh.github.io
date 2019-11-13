@@ -1,8 +1,10 @@
+"use strict";
 (function init() {
     const modules = new Map();
-    window['ihbh'] = { mods: modules };
+    const modexps = {};
+    window['mods'] = modexps;
     function log(...args) {
-        console.debug('[amd] I', ...args);
+        console.debug('I [amd]', ...args);
     }
     function define(deps, init) {
         if (!init) {
@@ -12,7 +14,9 @@
         let script = getCurrentScript();
         let url = script.getAttribute('src');
         let mod = modules.get(url);
-        if (mod && mod.url)
+        if (!mod)
+            throw new Error('mod=null: ' + url);
+        if (mod.url)
             throw new Error('Module already defined: ' + url);
         mod.url = url;
         mod.deps = deps.map(dep => {
@@ -37,6 +41,7 @@
             if (!mod.init)
                 throw new Error('define() call missing: ' + url);
             mod.exports = {};
+            modexps[url] = mod.exports;
             let pdeps = mod.deps.map(dep => {
                 switch (dep) {
                     case 'require':

@@ -1,3 +1,4 @@
+"use strict";
 // sw.js must be placed next to index.html
 // developers.google.com/web/fundamentals/primers/service-workers/
 (function init() {
@@ -8,7 +9,7 @@
         i: (...args) => console.info('I [sw]', ...args),
         w: (...args) => console.warn('W [sw]', ...args),
     };
-    const sleep = (dt) => new Promise(resolve => setTimeout(() => resolve(null), dt));
+    const sleep = (dt) => new Promise(resolve => setTimeout(() => resolve(), dt));
     const handlers = new Map();
     log.i('loaded; ttl:', TIMEOUT, 'ms');
     self.addEventListener('install', (event) => {
@@ -92,7 +93,7 @@
         log.i('Getting cached response.');
         let cache = await caches.open(CACHE_NAME);
         let resp = await cache.match(url);
-        return {
+        return resp && {
             status: resp.status,
             statusText: resp.statusText,
             body: await resp.text(),

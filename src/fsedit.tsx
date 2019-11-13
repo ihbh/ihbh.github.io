@@ -46,7 +46,7 @@ export default class FsEdit implements UXComp {
 
   private async save() {
     this.timer = 0;
-    let text = this.root.textContent.trim();
+    let text = this.root.textContent!.trim();
     if (text == this.prev) return;
 
     try {

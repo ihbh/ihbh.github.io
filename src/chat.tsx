@@ -64,11 +64,10 @@ export function stop() {
 }
 
 async function setSendButtonHandler() {
-  let input = dom.id.chatReplyText;
-
   dom.id.chatReplySend.addEventListener('click', async () => {
     try {
-      let text = input.textContent.trim();
+      let input = dom.id.chatReplyText;
+      let text = input.textContent!.trim();
       if (!text) return;
       await sendMessage(text);
       input.textContent = '';
@@ -90,7 +89,7 @@ async function initDraftAutoSaving() {
   let input = dom.id.chatReplyText;
 
   timer = setInterval(async () => {
-    let newText = input.textContent;
+    let newText = input.textContent!;
     await draft.set(newText.trim());
   }, conf.CHAT_AUTOSAVE_INTERVAL * 1000);
 
@@ -141,7 +140,7 @@ function addMessagesToDOM(messages: chatman.ChatMessage[]) {
 
   for (let message of messages) {
     let div = renderMessage(message);
-    let next = findNextMessage(div.getAttribute('time'));
+    let next = findNextMessage(div.getAttribute('time')!);
     container.insertBefore(div, next);
   }
 }
@@ -153,7 +152,7 @@ function findNextMessage(tsid: string) {
   for (let i = 0; i < list.length; i++) {
     let next = list.item(i);
     if (next instanceof HTMLElement)
-      if (tsid <= next.getAttribute('time'))
+      if (tsid <= next.getAttribute('time')!)
         return next;
   }
 

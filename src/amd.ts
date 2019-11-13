@@ -8,10 +8,11 @@
   }
 
   const modules = new Map<string, ModuleDef>();
-  window['ihbh'] = { mods: modules };
+  const modexps = {};
+  window['mods'] = modexps;
 
   function log(...args) {
-    console.debug('[amd] I', ...args);
+    console.debug('I [amd]', ...args);
   }
 
   function define(deps: string[], init: (...deps) => void) {
@@ -21,9 +22,11 @@
     }
 
     let script = getCurrentScript();
-    let url = script.getAttribute('src');
+    let url = script.getAttribute('src')!;
     let mod = modules.get(url);
-    if (mod && mod.url)
+    if (!mod)
+      throw new Error('mod=null: ' + url);
+    if (mod.url)
       throw new Error('Module already defined: ' + url);
     mod.url = url;
     mod.deps = deps.map(dep => {
@@ -49,7 +52,8 @@
       if (!mod.init)
         throw new Error('define() call missing: ' + url);
       mod.exports = {};
-      let pdeps = mod.deps.map(dep => {
+      modexps[url] = mod.exports;
+      let pdeps = mod.deps!.map(dep => {
         switch (dep) {
           case 'require':
             return require;
@@ -60,7 +64,7 @@
         };
       });
       return Promise.all(pdeps).then(alldeps => {
-        let init = mod.init;
+        let init = mod.init!;
         mod.exports = init(...alldeps)
           || mod.exports;
         log('ready:', url);

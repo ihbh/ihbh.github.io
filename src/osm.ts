@@ -24,7 +24,15 @@ export interface Marker {
   remove(): void;
 }
 
-async function importOpenLayersLib() {
+type ExtOL = typeof ol & {
+  geom: any;
+  proj: any;
+  layer: any;
+  style: any;
+  source: any;
+};
+
+async function importOpenLayersLib(): Promise<ExtOL> {
   let url = await gp.osmurl.get();
   let ol = await import(url + config.OSM_LIB);
   if (config.DEBUG) window['ol'] = ol;
@@ -32,9 +40,9 @@ async function importOpenLayersLib() {
 }
 
 export class OSM {
-  private mapid: string = null;
-  private map: ol.Map = null;
-  private ol = null;
+  private mapid: string | null = null;
+  private map: ol.Map | null = null;
+  private ol: ExtOL | null = null;
   private markers = new Map<string, Marker>();
 
   onaddmarker: (pos: LonLat) => any;
@@ -48,13 +56,13 @@ export class OSM {
       JSON.stringify(bbox));
 
     this.ol = await importOpenLayersLib();
-    let ol = this.ol;
+    let ol = this.ol!;
 
     let url = await gp.osmurl.get();
     dom.loadStyles(url + config.OSM_CSS);
 
     this.map = new ol.Map({
-      target: this.mapid,
+      target: this.mapid!,
       layers: [
         new ol.layer.Tile({
           source: new ol.source.OSM()
@@ -67,10 +75,10 @@ export class OSM {
   }
 
   private addClickHandler() {
-    this.map.on('singleclick', e => {
-      let [lon, lat] = this.ol.proj.toLonLat(e.coordinate);
+    this.map!.on('singleclick', e => {
+      let [lon, lat] = this.ol!.proj.toLonLat(e.coordinate);
       log.d('map:singleclick', lat, lon);
-      this.map.forEachLayerAtPixel(e.pixel, (layer) => {
+      this.map!.forEachLayerAtPixel(e.pixel, (layer) => {
         let key = layer.get('myKey');
         if (key) {
           log.d('layer:', key);
@@ -79,12 +87,12 @@ export class OSM {
       });
     });
 
-    this.map.on('dblclick', e => {
-      let [lon, lat] = this.ol.proj.toLonLat(e.coordinate);
+    this.map!.on('dblclick', e => {
+      let [lon, lat] = this.ol!.proj.toLonLat(e.coordinate);
       log.d('map:dblclick', lat, lon);
       if (!this.onaddmarker) return;
 
-      this.map.forEachLayerAtPixel(e.pixel, (layer) => {
+      this.map!.forEachLayerAtPixel(e.pixel, (layer) => {
         log.d('Firing the addmarker event.');
         this.onaddmarker({ lon, lat });
       });
@@ -107,7 +115,7 @@ export class OSM {
   }
 
   setBBox({ min, max }: BBox) {
-    let ol = this.ol;
+    let ol = this.ol!;
 
     let minpos = ol.proj.fromLonLat([min.lon, min.lat]);
     let maxpos = ol.proj.fromLonLat([max.lon, max.lat]);
@@ -117,14 +125,14 @@ export class OSM {
     let clat = (min.lat + max.lat) / 2;
     let clon = (min.lon + max.lon) / 2;
 
-    this.map.getView().setCenter(
+    this.map!.getView().setCenter(
       ol.proj.fromLonLat([clon, clat]));
 
-    this.map.getView().fit(extent);
+    this.map!.getView().fit(extent);
   }
 
   async addMarker({ id = '', lat, lon, opacity = 1 }) {
-    let ol = this.ol;
+    let ol = this.ol!;
     id = id || Math.random().toString(16).slice(2);
     log.i(`marker: id=${id}, lat=${lat}, lon=${lon}`);
     let iconSize = config.MARKER_ICON_SIZE;
@@ -150,18 +158,18 @@ export class OSM {
       }),
     });
 
-    this.map.addLayer(layer);
+    this.map!.addLayer(layer);
     this.markers.set(id, {
       id, lat, lon,
       remove: () => {
         if (!this.markers.has(id))
           throw new Error('Marker already deleted: ' + id);
-        this.map.removeLayer(layer);
+        this.map!.removeLayer(layer);
         this.markers.delete(id);
       },
     });
 
-    return this.markers.get(id);
+    return this.markers.get(id)!;
   }
 
   clearMarkers() {

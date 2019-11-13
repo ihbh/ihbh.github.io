@@ -48,7 +48,7 @@ export async function getDisplayName(uid = '') {
     verifyUserId(uid);
     let ucache = await import('./ucache');
     let info = await ucache.getUserInfo(uid);
-    return info.name;
+    return info.name || null;
   } else {
     let gp = await import('./gp');
     return gp.username.get();
@@ -59,7 +59,7 @@ export async function getAbout(uid = '') {
   if (uid) {
     let ucache = await import('./ucache');
     let info = await ucache.getUserInfo(uid);
-    return info.about;
+    return info.about || null;
   } else {
     let gp = await import('./gp');
     return gp.userinfo.get();
@@ -86,7 +86,7 @@ export async function getAbuseReport(uid: string) {
 }
 
 function dataUriToBlob(datauri: string) {
-  let [, mime, b64] = /^data:(.+);base64,(.+)$/.exec(datauri);
+  let [, mime, b64] = /^data:(.+);base64,(.+)$/.exec(datauri) || [];
   let data = atob(b64);
   let bytes = new Uint8Array(data.length);
   for (let i = 0; i < data.length; i++)

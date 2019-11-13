@@ -49,7 +49,7 @@ export async function invoke(type: string, args?) {
   let id = new Date().toJSON() + '/' +
     Math.random().toString(16).slice(2);
   let message = { id, type, args };
-  sw.controller.postMessage(message);
+  sw.controller!.postMessage(message);
   return new Promise<any>((resolve, reject) => {
     pendingMessages.set(id, { resolve, reject });
   });

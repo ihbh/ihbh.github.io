@@ -44,7 +44,7 @@ export async function importData() {
     log.i('Waiting for input.onchange...');
     let file = await new Promise<File>((resolve, reject) => {
       input.onchange = () => {
-        if (input.files.length == 1)
+        if (input.files?.length == 1)
           resolve(input.files[0]);
         else
           reject(new Error('One file must have been selected.'));

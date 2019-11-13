@@ -61,7 +61,7 @@ export async function init() {
     page.root().textContent = 'No chats yet. Find someone on the map.';
 }
 
-function renderUserCard(info: UserInfo) {
+function renderUserCard(info: UserInfo): HTMLElement {
   let href = page.href('chat', { uid: info.uid });
   return <a href={href}>
     <img src={info.photo || conf.NOUSERPIC} />

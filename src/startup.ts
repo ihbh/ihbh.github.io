@@ -3,7 +3,7 @@ import * as rsync from './rsync';
 
 const log = new TaggedLogger('startup');
 
-let callbacks = [];
+let callbacks: Array<() => void> = [];
 
 register(() => void rsync.start());
 

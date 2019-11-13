@@ -70,8 +70,9 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./config"], function
         parent.append(content);
     }
     function stopCurrentPage() {
+        var _a;
         try {
-            if (cpm && cpm.stop) {
+            if ((_a = cpm) === null || _a === void 0 ? void 0 : _a.stop) {
                 log.i('Stopping current page.');
                 cpm.stop();
             }
