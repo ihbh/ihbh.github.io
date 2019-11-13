@@ -7,6 +7,7 @@ export const id = {
   get linkDarkMode() { return $('#darkmode') as HTMLAnchorElement; },
   get logs() { return $('#logs'); },
   get gotoCommon() { return $('#gps-london'); },
+  get linkCommons() { return $('#commons-link'); },
   get showLogs() { return $('#show-logs'); },
   get errors() { return $('#errors'); },
 

@@ -19,6 +19,8 @@ export async function init() {
 
   dom.id.gotoCommon.onclick =
     () => gotoCommonPlace();
+  dom.id.linkCommons.onclick =
+    () => gotoCommonPlace();
 
   dom.id.showLogs.addEventListener('click', async () => {
     let div = dom.id.logs;

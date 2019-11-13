@@ -12,6 +12,8 @@ define(["require", "exports", "./config", "./dom", "./log", "./logdb", "./qargs"
         };
         dom.id.gotoCommon.onclick =
             () => loc_1.gotoCommonPlace();
+        dom.id.linkCommons.onclick =
+            () => loc_1.gotoCommonPlace();
         dom.id.showLogs.addEventListener('click', async () => {
             let div = dom.id.logs;
             if (!div.style.display) {

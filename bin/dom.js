@@ -9,6 +9,7 @@ define(["require", "exports"], function (require, exports) {
         get linkDarkMode() { return $('#darkmode'); },
         get logs() { return $('#logs'); },
         get gotoCommon() { return $('#gps-london'); },
+        get linkCommons() { return $('#commons-link'); },
         get showLogs() { return $('#show-logs'); },
         get errors() { return $('#errors'); },
         // Main OSM Map
