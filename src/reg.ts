@@ -34,7 +34,7 @@ export async function selectPhoto(): Promise<string> {
         let file = input.files![0];
         if (!file) throw new Error('No file selected.');
         if (conf.DEBUG) window['file'] = file;
-        await saveOriginalImage(file);
+        saveOriginalImage(file);
         let url = await getJpegFromFile(file);
         resolve(url);
       } catch (err) {
@@ -46,11 +46,15 @@ export async function selectPhoto(): Promise<string> {
 }
 
 async function saveOriginalImage(file: File) {
-  let buffer = await file.arrayBuffer();
-  log.i('Saving original image:', buffer.byteLength, 'bytes');
-  let base64 = new Buffer(buffer).toString('base64');
-  let dataUrl = 'data:' + file.type + ';base64,' + base64;
-  await gp.hdimg.set(dataUrl);
+  try {
+    let buffer = await file.arrayBuffer();
+    log.i('Saving original image:', buffer.byteLength, 'bytes');
+    let base64 = new Buffer(buffer).toString('base64');
+    let dataUrl = 'data:' + file.type + ';base64,' + base64;
+    await gp.hdimg.set(dataUrl);
+  } catch (err) {
+    log.w('Failed to save the original image:', err);
+  }
 }
 
 async function getJpegFromFile(file: File) {

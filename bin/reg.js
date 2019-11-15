@@ -20,7 +20,7 @@ define(["require", "exports", "./config", "./gp", "./log", "./buffer"], function
                         throw new Error('No file selected.');
                     if (conf.DEBUG)
                         window['file'] = file;
-                    await saveOriginalImage(file);
+                    saveOriginalImage(file);
                     let url = await getJpegFromFile(file);
                     resolve(url);
                 }
@@ -33,11 +33,16 @@ define(["require", "exports", "./config", "./gp", "./log", "./buffer"], function
     }
     exports.selectPhoto = selectPhoto;
     async function saveOriginalImage(file) {
-        let buffer = await file.arrayBuffer();
-        log.i('Saving original image:', buffer.byteLength, 'bytes');
-        let base64 = new buffer_1.default(buffer).toString('base64');
-        let dataUrl = 'data:' + file.type + ';base64,' + base64;
-        await gp.hdimg.set(dataUrl);
+        try {
+            let buffer = await file.arrayBuffer();
+            log.i('Saving original image:', buffer.byteLength, 'bytes');
+            let base64 = new buffer_1.default(buffer).toString('base64');
+            let dataUrl = 'data:' + file.type + ';base64,' + base64;
+            await gp.hdimg.set(dataUrl);
+        }
+        catch (err) {
+            log.w('Failed to save the original image:', err);
+        }
     }
     async function getJpegFromFile(file) {
         log.i('selected file:', file.type, file.size, 'bytes');
