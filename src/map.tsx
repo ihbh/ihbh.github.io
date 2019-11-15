@@ -187,7 +187,7 @@ async function setLastGps(pos: LastGps) {
   await Promise.all(ps);
 }
 
-async function getLastGps(): Promise<LastGps> {
+async function getLastGps(): Promise<LastGps | null> {
   let pos: LastGps = { lat: 0, lon: 0, acc: 0, alt: 0 };
   let ps = Object.keys(pos).map(
     async key => {
@@ -196,6 +196,8 @@ async function getLastGps(): Promise<LastGps> {
       pos[key] = val || 0;
     });
   await Promise.all(ps);
+  if (!pos.lat && !pos.lon)
+    return null;
   return pos;
 }
 

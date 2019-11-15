@@ -4,7 +4,7 @@
     "cp-libs": "npm run cp-scop",
     "cp-scop": "mkdir -p bin/ed25519; rsync -avc --exclude='*.json' node_modules/ed25519.wasm/* bin/ed25519",
     "cp-sw": "cp -f bin/sw.js sw.js",
-    "webfsd": "killall -q webfsd; webfsd -F -l - -p 8080 -r . -f index.html"
+    "webfsd": "killall -q webfsd; echo 'Open http://localhost:8080/'; webfsd -F -l - -p 8080 -r . -f index.html"
   },
   "devDependencies": {
     "@types/ol": "5.3.5",

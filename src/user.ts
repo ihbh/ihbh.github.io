@@ -17,8 +17,8 @@ interface Ed25519 {
 }
 
 interface EdKeyPair {
-  publicKey: Uint8Array; // 32 bytes
-  secretKey: Uint8Array; // 64 bytes
+  [0]: Uint8Array; // pubkey, 32 bytes
+  [1]: Uint8Array; // privkey, 64 bytes
 }
 
 const log = new TaggedLogger('user');
@@ -55,8 +55,9 @@ let keypair = new AsyncProp(async () => {
     let sc = await wasmlib.get();
     log.i('Generating a ed25519 key pair.');
     let keys = sc.createKeypair(seed);
-    pubkey = new Buffer(keys.publicKey).toString('hex');
-    privkey = new Buffer(keys.secretKey).toString('hex');
+    if (!keys) throw new Error('createKeypair() = null');
+    pubkey = new Buffer(keys[0]).toString('hex');
+    privkey = new Buffer(keys[1]).toString('hex');
     await gp.pubkey.set(pubkey);
     await gp.privkey.set(privkey);
     log.i('pubkey:', pubkey);

@@ -33,8 +33,10 @@ define(["require", "exports", "./buffer", "./log", "./gp", "./prop"], function (
             let sc = await wasmlib.get();
             log.i('Generating a ed25519 key pair.');
             let keys = sc.createKeypair(seed);
-            pubkey = new buffer_1.default(keys.publicKey).toString('hex');
-            privkey = new buffer_1.default(keys.secretKey).toString('hex');
+            if (!keys)
+                throw new Error('createKeypair() = null');
+            pubkey = new buffer_1.default(keys[0]).toString('hex');
+            privkey = new buffer_1.default(keys[1]).toString('hex');
             await gp.pubkey.set(pubkey);
             await gp.privkey.set(privkey);
             log.i('pubkey:', pubkey);

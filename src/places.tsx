@@ -41,7 +41,7 @@ async function loadMap() {
     let link = <a>Vancouver</a>;
     link.onclick = () => loc.gotoCommonPlace();
     dom.id.mapAll.appendChild(
-      <div class="none">Nobody has been here before.
+      <div class="none">No places visited yet.
         However you can visit {link} and see who's been
         there.</div>);
     return;

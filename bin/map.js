@@ -141,6 +141,8 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./vfs", "./
             pos[key] = val || 0;
         });
         await Promise.all(ps);
+        if (!pos.lat && !pos.lon)
+            return null;
         return pos;
     }
     async function initSendButton() {

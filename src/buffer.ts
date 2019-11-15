@@ -62,6 +62,7 @@ export default class Buffer {
   private buffer: ArrayBuffer;
 
   constructor(data: Uint8Array | ArrayBuffer) {
+    if (!data) throw new Error('new Buffer(null)');
     this.buffer = data instanceof ArrayBuffer
       ? data : data.buffer;
   }

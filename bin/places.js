@@ -32,7 +32,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./
             let link = react_1.default.createElement("a", null, "Vancouver");
             link.onclick = () => loc.gotoCommonPlace();
             dom.id.mapAll.appendChild(react_1.default.createElement("div", { class: "none" },
-                "Nobody has been here before. However you can visit ",
+                "No places visited yet. However you can visit ",
                 link,
                 " and see who's been there."));
             return;

@@ -50,6 +50,8 @@ define(["require", "exports"], function (require, exports) {
     };
     class Buffer {
         constructor(data) {
+            if (!data)
+                throw new Error('new Buffer(null)');
             this.buffer = data instanceof ArrayBuffer
                 ? data : data.buffer;
         }
