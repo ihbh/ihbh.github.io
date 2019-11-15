@@ -38,6 +38,7 @@ export async function selectPhoto(): Promise<string> {
         let url = await getJpegFromFile(file);
         resolve(url);
       } catch (err) {
+        log.e('Image selection failed:', err);
         reject(err);
       }
     };

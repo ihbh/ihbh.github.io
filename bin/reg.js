@@ -25,6 +25,7 @@ define(["require", "exports", "./config", "./gp", "./log", "./buffer"], function
                     resolve(url);
                 }
                 catch (err) {
+                    log.e('Image selection failed:', err);
                     reject(err);
                 }
             };
