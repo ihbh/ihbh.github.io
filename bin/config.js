@@ -31,6 +31,8 @@ define(["require", "exports"], function (require, exports) {
     exports.IMG_MAXBYTES = 2048; // must fit in one request
     exports.CHAT_AUTOSAVE_INTERVAL = 1; // seconds
     exports.CHAT_AES_NAME = 'aes256';
+    exports.CHAT_AES_MODE = 'AES-GCM';
+    exports.CHAT_AES_KEY_SIZE = 256;
     exports.MARKER_ICON_URL = '/icons/marker.png'; // must be PNG for OSM
     exports.MARKER_ICON_SIZE = 64;
     exports.DEFAULT_RPC_PORT = 3921;

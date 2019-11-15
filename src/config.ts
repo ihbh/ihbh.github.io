@@ -31,6 +31,8 @@ export const IMG_MAXBYTES = 2048; // must fit in one request
 
 export const CHAT_AUTOSAVE_INTERVAL = 1; // seconds
 export const CHAT_AES_NAME = 'aes256';
+export const CHAT_AES_MODE = 'AES-GCM';
+export const CHAT_AES_KEY_SIZE = 256;
 
 export const MARKER_ICON_URL = '/icons/marker.png'; // must be PNG for OSM
 export const MARKER_ICON_SIZE = 64;

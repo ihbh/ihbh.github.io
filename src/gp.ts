@@ -110,5 +110,5 @@ export const chatEncrypt = vfsconf.register({
   value: true,
   test: x => !!x === x,
   path: '/chat/encrypt',
-  description: `Encrypts sent chat messages (AES256+X25519).`,
+  description: `Enables AES256+X25519 encryption for chat messages.`,
 });

@@ -10,13 +10,13 @@
 //        thisUser.privkey,
 //        remoteUser.pubkey))
 //
-//    cbc_iv = bytes 0..15 of
+//    aes_iv = bytes 0..15 of
 //      sha256(suid) xor
 //      sha256(ruid) xor
 //      sha256(tsid)
 //
-//    encrypted = aes256_cbc(
-//      text, aeskey, cbc_iv)
+//    encrypted = aes256_gcm(
+//      text, aeskey, aes_iv)
 //
 //    ~/shared/chats/<ruid>/<tsid>/aes256 = encrypted
 //    ~/shared/chats/<ruid>/<tsid>/text = text, if encryption disabled
@@ -30,7 +30,7 @@ import { TaggedLogger } from './log';
 import { AsyncProp } from './prop';
 
 const log = new TaggedLogger('chatman');
-const aeskeys = new Map<string, AsyncProp<Uint8Array|null>>();
+const aeskeys = new Map<string, AsyncProp<Uint8Array | null>>();
 
 export interface ChatMessage {
   status?: 'synced' | 'failed';
@@ -146,7 +146,7 @@ async function getMessageText(dir: string, tsid: string, ruid: string | null)
         log.d('Decrypted message:', JSON.stringify(text));
       }
     } catch (err) {
-      log.w('Failed to decrypt message (wrong AES CBC IV?):', tsid, err);
+      log.w('Failed to decrypt message (wrong AES IV?):', tsid, err);
       text = 'Failed to decrypt: ' + textEnc;
     }
   }
@@ -200,16 +200,16 @@ export async function sendMessage(ruid: string, text: string) {
 }
 
 async function encryptMessage(ruid: string, text: string, tsid: string) {
-  let enabled = await isEncEnabled();
+  let enabled = await isAesEnabled();
   if (!enabled) return false;
 
   let aeskey = await getAesKey(ruid);
   if (!aeskey) return false;
 
-  log.d('Running AES-CBC.');
-  let cbciv = await getCbcInitVector(ruid, tsid);
+  log.d('Running AES.');
+  let iv = await getInitVector(ruid, tsid);
   let aes = await import('./aes');
-  let aesdata = await aes.encrypt(text, aeskey, cbciv);
+  let aesdata = await aes.encrypt(text, aeskey, iv);
 
   await setAesData(ruid, tsid, aesdata);
   return true;
@@ -218,15 +218,15 @@ async function encryptMessage(ruid: string, text: string, tsid: string) {
 async function decryptMessage(ruid: string, base64: string, tsid: string) {
   let aeskey = await getAesKey(ruid);
   if (!aeskey) return null;
-  log.d('Running AES-CBC.');
-  let cbciv = await getCbcInitVector(ruid, tsid);
+  log.d('Running AES.');
+  let iv = await getInitVector(ruid, tsid);
   let aes = await import('./aes');
   let data = Buffer.from(base64, 'base64').toArray(Uint8Array);
-  let text = await aes.decrypt(data, aeskey, cbciv);
+  let text = await aes.decrypt(data, aeskey, iv);
   return text;
 }
 
-async function isEncEnabled() {
+async function isAesEnabled() {
   log.d('Checking if encryption is enabled.');
   let gp = await import('./gp');
   let enabled = await gp.chatEncrypt.get();
@@ -269,7 +269,7 @@ async function setAesData(ruid: string, tsid: string, data: Uint8Array) {
     new Buffer(data).toString('base64'));
 }
 
-async function getCbcInitVector(ruid: string, tsid: string) {
+async function getInitVector(ruid: string, tsid: string) {
   let user = await import('./user');
   let suid = await user.uid.get();
 
@@ -279,14 +279,14 @@ async function getCbcInitVector(ruid: string, tsid: string) {
     sha256(Buffer.from(tsid, 'utf8').toArray(Uint8Array)),
   ]);
 
-  let cbciv = new Uint8Array(16);
+  let iv = new Uint8Array(16);
 
-  for (let i = 0; i < cbciv.length; i++) {
-    cbciv[i] = 0;
+  for (let i = 0; i < iv.length; i++) {
+    iv[i] = 0;
     for (let j = 0; j < hs.length; j++)
-      cbciv[i] ^= hs[j][i];
+      iv[i] ^= hs[j][i];
   }
 
-  log.d('AES CBC init vector:', cbciv);
-  return cbciv;
+  log.d('AES IV:', iv);
+  return iv;
 }

@@ -10,13 +10,13 @@
 //        thisUser.privkey,
 //        remoteUser.pubkey))
 //
-//    cbc_iv = bytes 0..15 of
+//    aes_iv = bytes 0..15 of
 //      sha256(suid) xor
 //      sha256(ruid) xor
 //      sha256(tsid)
 //
-//    encrypted = aes256_cbc(
-//      text, aeskey, cbc_iv)
+//    encrypted = aes256_gcm(
+//      text, aeskey, aes_iv)
 //
 //    ~/shared/chats/<ruid>/<tsid>/aes256 = encrypted
 //    ~/shared/chats/<ruid>/<tsid>/text = text, if encryption disabled
@@ -115,7 +115,7 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
                 }
             }
             catch (err) {
-                log.w('Failed to decrypt message (wrong AES CBC IV?):', tsid, err);
+                log.w('Failed to decrypt message (wrong AES IV?):', tsid, err);
                 text = 'Failed to decrypt: ' + textEnc;
             }
         }
@@ -160,16 +160,16 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
     }
     exports.sendMessage = sendMessage;
     async function encryptMessage(ruid, text, tsid) {
-        let enabled = await isEncEnabled();
+        let enabled = await isAesEnabled();
         if (!enabled)
             return false;
         let aeskey = await getAesKey(ruid);
         if (!aeskey)
             return false;
-        log.d('Running AES-CBC.');
-        let cbciv = await getCbcInitVector(ruid, tsid);
+        log.d('Running AES.');
+        let iv = await getInitVector(ruid, tsid);
         let aes = await new Promise((resolve_11, reject_11) => { require(['./aes'], resolve_11, reject_11); });
-        let aesdata = await aes.encrypt(text, aeskey, cbciv);
+        let aesdata = await aes.encrypt(text, aeskey, iv);
         await setAesData(ruid, tsid, aesdata);
         return true;
     }
@@ -177,14 +177,14 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
         let aeskey = await getAesKey(ruid);
         if (!aeskey)
             return null;
-        log.d('Running AES-CBC.');
-        let cbciv = await getCbcInitVector(ruid, tsid);
+        log.d('Running AES.');
+        let iv = await getInitVector(ruid, tsid);
         let aes = await new Promise((resolve_12, reject_12) => { require(['./aes'], resolve_12, reject_12); });
         let data = buffer_1.default.from(base64, 'base64').toArray(Uint8Array);
-        let text = await aes.decrypt(data, aeskey, cbciv);
+        let text = await aes.decrypt(data, aeskey, iv);
         return text;
     }
-    async function isEncEnabled() {
+    async function isAesEnabled() {
         log.d('Checking if encryption is enabled.');
         let gp = await new Promise((resolve_13, reject_13) => { require(['./gp'], resolve_13, reject_13); });
         let enabled = await gp.chatEncrypt.get();
@@ -219,7 +219,7 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
         let vfs = await new Promise((resolve_16, reject_16) => { require(['./vfs'], resolve_16, reject_16); });
         await vfs.root.set(exports.getRemoteDir(ruid, tsid) + '/' + conf.CHAT_AES_NAME, new buffer_1.default(data).toString('base64'));
     }
-    async function getCbcInitVector(ruid, tsid) {
+    async function getInitVector(ruid, tsid) {
         let user = await new Promise((resolve_17, reject_17) => { require(['./user'], resolve_17, reject_17); });
         let suid = await user.uid.get();
         let hs = await Promise.all([
@@ -227,14 +227,14 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
             hash_1.sha256(ruid),
             hash_1.sha256(buffer_1.default.from(tsid, 'utf8').toArray(Uint8Array)),
         ]);
-        let cbciv = new Uint8Array(16);
-        for (let i = 0; i < cbciv.length; i++) {
-            cbciv[i] = 0;
+        let iv = new Uint8Array(16);
+        for (let i = 0; i < iv.length; i++) {
+            iv[i] = 0;
             for (let j = 0; j < hs.length; j++)
-                cbciv[i] ^= hs[j][i];
+                iv[i] ^= hs[j][i];
         }
-        log.d('AES CBC init vector:', cbciv);
-        return cbciv;
+        log.d('AES IV:', iv);
+        return iv;
     }
 });
 //# sourceMappingURL=chatman.js.map
