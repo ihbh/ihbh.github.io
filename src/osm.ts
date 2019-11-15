@@ -53,7 +53,7 @@ export class OSM {
 
   async render(bbox?: BBox) {
     log.i('Rendering OSM in #' + this.mapid,
-      JSON.stringify(bbox));
+      'bbox:', JSON.stringify(bbox));
 
     this.ol = await importOpenLayersLib();
     let ol = this.ol!;

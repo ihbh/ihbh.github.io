@@ -18,7 +18,7 @@ define(["require", "exports", "./dom", "./log", "./config", "./gp"], function (r
             this.mapid = mapid.replace('#', '');
         }
         async render(bbox) {
-            log.i('Rendering OSM in #' + this.mapid, JSON.stringify(bbox));
+            log.i('Rendering OSM in #' + this.mapid, 'bbox:', JSON.stringify(bbox));
             this.ol = await importOpenLayersLib();
             let ol = this.ol;
             let url = await gp.osmurl.get();

@@ -14,6 +14,8 @@ function cleanup(x) {
     return x.slice(0, conf.LOG_MAXLEN) + '...(' + x.length + ' chars)';
   if (x instanceof Uint8Array)
     return 'ui8:' + x.length + ':' + new Buffer(x).toString('hex');
+  if (x instanceof Error)
+    return (x.message || x) + '';
   return x;
 }
 

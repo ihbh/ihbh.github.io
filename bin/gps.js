@@ -9,7 +9,7 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             timeout,
         };
         let sendUpdate = async (pos) => {
-            if (!wid)
+            if (wid === null)
                 return;
             let { latitude, longitude, altitude, accuracy } = pos.coords;
             log.i(`update: lat=${latitude.toFixed(4)} lon=${longitude.toFixed(4)} ` +
@@ -17,23 +17,25 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
             listener(pos.coords);
         };
         let logError = (err) => {
-            log.w('error:', err);
+            var _a;
+            log.e(((_a = err) === null || _a === void 0 ? void 0 : _a.message) || err);
         };
         navigator.geolocation.getCurrentPosition(sendUpdate, logError, options);
+        // wid can be 0 on Firefox
         let wid = navigator.geolocation.watchPosition(sendUpdate, logError, options);
         let tid = setTimeout(() => {
-            log.i('Stopped watching as the timeout expired:', timeout);
+            log.i('Cancelled by timeout:', wid, timeout);
             watcher.stop();
         }, timeout);
         log.i('Watcher started:', wid, 'timeout:', timeout);
         let watcher = {
             stop() {
-                if (!wid)
+                if (wid === null)
                     return;
                 clearTimeout(tid);
                 navigator.geolocation.clearWatch(wid);
                 log.i('Watcher stopped:', wid);
-                wid = 0;
+                wid = null;
             }
         };
         return watcher;
