@@ -23,7 +23,14 @@
       style-src 'self' 'unsafe-inline' cdn.rawgit.com;
       upgrade-insecure-requests;">
 
-  <script>window.gtime0 = Date.now()</script>
+  <script>
+    window.gtime0 = Date.now();
+    // Skip localhost/0.0.0.0 and other test domains.
+    if (location.protocol == 'http:' && /[.][a-z]+$/.test(location.hostname)) {
+      console.warn('Redirecting to HTTPS'); // GPS/Crypto won't work on HTTP
+      location.protocol = 'https:';
+    }
+  </script>
 
   <link rel="manifest"
         href="manifest.webmanifest">
