@@ -1,6 +1,7 @@
 define(["require", "exports", "./page", "./config", "./dom", "./log", "./react", "./ucache", "./user", "./vfs"], function (require, exports, page, conf, dom, log_1, react_1, ucache_1, user, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const LAST_SSEN = 'lastseen';
     const log = new log_1.TaggedLogger('unread');
     const cards = new Map();
     async function render() {
@@ -10,7 +11,9 @@ define(["require", "exports", "./page", "./config", "./dom", "./log", "./react",
     exports.render = render;
     async function init() {
         log.i('init()');
+        let time = Date.now();
         let infos;
+        cards.clear();
         try {
             infos = await getActiveChats();
         }
@@ -22,34 +25,50 @@ define(["require", "exports", "./page", "./config", "./dom", "./log", "./react",
             infos = await dbg.getDebugPeopleNearby();
         }
         log.i('Existing chats:', infos.length);
-        let container = dom.id.activeChats;
-        for (let info of infos) {
-            let card = renderUserCard(info);
-            cards.set(info.uid, card);
-            container.append(card);
-        }
+        for (let info of infos)
+            await insertUserCard(info);
         log.i('Checking if there are new unread messages.');
         let uids = await getUnreadChats();
         if (!uids.length)
             log.i('No new unread messages.');
         for (let uid of uids) {
             let card = cards.get(uid);
-            if (card) {
-                container.removeChild(card);
-            }
-            else {
+            if (!card) {
                 log.i('Unread chat from a new user:', uid);
                 let info = await ucache_1.getUserInfo(uid);
-                card = renderUserCard(info);
-                cards.set(uid, card);
+                card = await insertUserCard(info);
             }
             card.classList.add('unread');
-            container.insertBefore(card, container.firstChild);
         }
         if (!infos.length && !uids.length)
             page.root().textContent = 'No chats yet. Find someone on the map.';
+        log.i('Done in', Date.now() - time, 'ms');
     }
     exports.init = init;
+    async function insertUserCard(info) {
+        let card = cards.get(info.uid);
+        if (card)
+            return card;
+        let container = dom.id.activeChats;
+        card = renderUserCard(info);
+        cards.set(info.uid, card);
+        let chatman = await new Promise((resolve_2, reject_2) => { require(['./chatman'], resolve_2, reject_2); });
+        let lastseen = await chatman.getLastSeenTime(info.uid);
+        if (lastseen)
+            card.setAttribute(LAST_SSEN, lastseen.toJSON());
+        let next = findNextUserCardFor(card);
+        container.insertBefore(card, next);
+        return card;
+    }
+    function findNextUserCardFor(card) {
+        let container = dom.id.activeChats;
+        for (let i = 0; i < container.childElementCount; i++) {
+            let next = container.childNodes[i];
+            if (next.getAttribute(LAST_SSEN) <= card.getAttribute(LAST_SSEN))
+                return next;
+        }
+        return null;
+    }
     function renderUserCard(info) {
         let href = page.href('chat', { uid: info.uid });
         return react_1.default.createElement("a", { href: href },

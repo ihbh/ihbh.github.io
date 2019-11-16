@@ -93,7 +93,7 @@ define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page
         await cachedIncomingMessages(incoming);
         let diff = Date.now() - time;
         log.i('Rendered all messages in', diff, 'ms');
-        await setOutgoingMessagesTag();
+        await chatman.setLastSeenTime(remoteUid);
         await clearUnreadMark();
     }
     function addMessagesToDOM(messages) {
@@ -152,12 +152,6 @@ define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page
         let tsids2 = (await vfs_1.default.dir(dir2)) || [];
         let messages2 = await chatman.getMessageTexts(dir2, diff(tsids2, Object.keys(messages)));
         return Object.assign(Object.assign({}, messages), messages2);
-    }
-    async function setOutgoingMessagesTag() {
-        log.i('Adding a tag to remember this chat.');
-        let path = `~/chats/${remoteUid}/time`;
-        let time = new Date().toJSON();
-        await vfs_1.default.set(path, time);
     }
     async function clearUnreadMark() {
         log.i('Marking all messages as read.');

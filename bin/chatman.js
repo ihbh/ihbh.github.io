@@ -236,5 +236,18 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
         log.d('AES IV:', iv);
         return iv;
     }
+    async function setLastSeenTime(ruid, time = new Date) {
+        let path = `~/chats/${ruid}/time`;
+        let vfs = await new Promise((resolve_18, reject_18) => { require(['./vfs'], resolve_18, reject_18); });
+        await vfs.root.set(path, time.toJSON());
+    }
+    exports.setLastSeenTime = setLastSeenTime;
+    async function getLastSeenTime(ruid) {
+        let path = `~/chats/${ruid}/time`;
+        let vfs = await new Promise((resolve_19, reject_19) => { require(['./vfs'], resolve_19, reject_19); });
+        let time = await vfs.root.get(path);
+        return time ? new Date(time) : null;
+    }
+    exports.getLastSeenTime = getLastSeenTime;
 });
 //# sourceMappingURL=chatman.js.map

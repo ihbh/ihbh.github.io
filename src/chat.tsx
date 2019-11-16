@@ -129,7 +129,7 @@ async function fetchAndRenderMessages() {
   let diff = Date.now() - time;
   log.i('Rendered all messages in', diff, 'ms');
 
-  await setOutgoingMessagesTag();
+  await chatman.setLastSeenTime(remoteUid);
   await clearUnreadMark();
 }
 
@@ -200,13 +200,6 @@ async function getOutgoingMessages() {
     diff(tsids2, Object.keys(messages)));
 
   return { ...messages, ...messages2 };
-}
-
-async function setOutgoingMessagesTag() {
-  log.i('Adding a tag to remember this chat.');
-  let path = `~/chats/${remoteUid}/time`;
-  let time = new Date().toJSON();
-  await vfs.set(path, time);
 }
 
 async function clearUnreadMark() {

@@ -290,3 +290,16 @@ async function getInitVector(ruid: string, tsid: string) {
   log.d('AES IV:', iv);
   return iv;
 }
+
+export async function setLastSeenTime(ruid: string, time = new Date) {
+  let path = `~/chats/${ruid}/time`;
+  let vfs = await import('./vfs');
+  await vfs.root.set(path, time.toJSON());
+}
+
+export async function getLastSeenTime(ruid: string) {
+  let path = `~/chats/${ruid}/time`;
+  let vfs = await import('./vfs');
+  let time = await vfs.root.get(path);
+  return time ? new Date(time) : null;
+}

@@ -7,6 +7,8 @@ import { getUserInfo, UserInfo } from './ucache';
 import * as user from './user';
 import vfs from './vfs';
 
+const LAST_SSEN = 'lastseen';
+
 const log = new TaggedLogger('unread');
 const cards = new Map<string, HTMLElement>();
 
@@ -19,7 +21,9 @@ export async function render() {
 
 export async function init() {
   log.i('init()');
+  let time = Date.now();
   let infos: UserInfo[];
+  cards.clear();
 
   try {
     infos = await getActiveChats();
@@ -31,13 +35,9 @@ export async function init() {
   }
 
   log.i('Existing chats:', infos.length);
-  let container = dom.id.activeChats;
 
-  for (let info of infos) {
-    let card = renderUserCard(info);
-    cards.set(info.uid, card);
-    container.append(card);
-  }
+  for (let info of infos)
+    await insertUserCard(info);
 
   log.i('Checking if there are new unread messages.');
   let uids = await getUnreadChats();
@@ -45,20 +45,49 @@ export async function init() {
 
   for (let uid of uids) {
     let card = cards.get(uid);
-    if (card) {
-      container.removeChild(card);
-    } else {
+
+    if (!card) {
       log.i('Unread chat from a new user:', uid);
       let info = await getUserInfo(uid);
-      card = renderUserCard(info);
-      cards.set(uid, card);
+      card = await insertUserCard(info);
     }
+
     card.classList.add('unread');
-    container.insertBefore(card, container.firstChild);
   }
 
   if (!infos.length && !uids.length)
     page.root().textContent = 'No chats yet. Find someone on the map.';
+
+  log.i('Done in', Date.now() - time, 'ms');
+}
+
+async function insertUserCard(info: UserInfo) {
+  let card = cards.get(info.uid);
+  if (card) return card;
+
+  let container = dom.id.activeChats;
+  card = renderUserCard(info);
+  cards.set(info.uid, card);
+
+  let chatman = await import('./chatman');
+  let lastseen = await chatman.getLastSeenTime(info.uid);
+  if (lastseen)
+    card.setAttribute(
+      LAST_SSEN, lastseen.toJSON());
+
+  let next = findNextUserCardFor(card);
+  container.insertBefore(card, next);
+  return card;
+}
+
+function findNextUserCardFor(card: HTMLElement) {
+  let container = dom.id.activeChats;
+  for (let i = 0; i < container.childElementCount; i++) {
+    let next = container.childNodes[i] as HTMLElement;
+    if (next.getAttribute(LAST_SSEN)! <= card.getAttribute(LAST_SSEN)!)
+      return next;
+  }
+  return null;
 }
 
 function renderUserCard(info: UserInfo): HTMLElement {
