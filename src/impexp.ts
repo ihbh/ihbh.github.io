@@ -23,9 +23,12 @@ export async function exportData() {
     let a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = conf.DBG_DATA_FILENAME;
+    document.body.appendChild(a); // Required for Firefox.
     a.click();
+    a.remove();
 
-    log.i('Data exported in', Date.now() - ts, 'ms');
+    log.i('Data exported in', Date.now() - ts, 'ms',
+      (blob.size / 1024).toFixed(1), 'KB', a.href);
   } catch (err) {
     log.e('Failed to export data:', err);
   }
