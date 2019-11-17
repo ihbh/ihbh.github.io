@@ -37,7 +37,9 @@ Click the big "I've Been Here" button to share your GPS coordinates. The app wil
 
 ![](/docs/img/pages/map-2.jpg)
 
-Click on any of these user icons to chat:
+The app sends your coordinates only once. It doesn't monitor your location.
+
+Click on any of these users to chat:
 
 ![](/docs/img/pages/chat-1.jpg)
 
