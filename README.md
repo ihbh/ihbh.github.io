@@ -8,12 +8,14 @@ This web app is meant to work as a Progressive Web App (PWA) to avoid hurdles wi
 ![](/docs/img/pages/map-2.jpg)
 ![](/docs/img/pages/chat-1.jpg)
 
+See it in action: [ihbh.org](https://ihbh.org/) (if you're using adblockers, allow the site to load OpenStreetMaps).
+
 # Contents
 
-- [Get started](/docs/get-started)
-- [How-to guides](/docs/how-to)
-- [How it works](/docs/how-it-works)
-- [Reference](/docs/reference)
+- [Get started](https://ihbh.org/docs/get-started)
+- [How-to guides](https://ihbh.org/docs/how-to)
+- [How it works](https://ihbh.org/docs/how-it-works)
+- [Reference](https://ihbh.org/docs/reference)
 
 # Credits
 
