@@ -123,6 +123,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./vfs", "./
             log.e('Failed to refresh GPS coords:', err);
         }
     }
+    exports.updateMap = updateMap;
     async function showLastSeenPos() {
         let pos = await getLastGps();
         if (!pos)

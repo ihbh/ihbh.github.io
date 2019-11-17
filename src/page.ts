@@ -29,7 +29,7 @@ type PageId = keyof PageArgs;
 
 const log = new TaggedLogger('page');
 
-let cpm: PageObj|null = null;
+let cpm: PageObj | null = null;
 
 export async function init() {
   log.i('Added hashchange listener.');
@@ -45,13 +45,15 @@ export async function init() {
 
 export async function refresh() {
   let time = Date.now();
-  
+
   stopCurrentPage();
   let id = get();
   log.i('Loading page:', id);
   cpm = await import('./' + id);
-  log.i('Rendering page.');
+  if (conf.DEBUG)
+    window[conf.DBG_CPM_NAME] = cpm;
 
+  log.i('Rendering page.');
   let div = await cpm!.render();
   document.body.setAttribute('page', id);
   replaceContents(dom.id.pageContainer, div);

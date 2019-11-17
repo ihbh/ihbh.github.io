@@ -6,6 +6,7 @@ export const DBG_TEST_USER_PHOTO = '/icons/test.jpeg';
 export const DBG_DATA_FILENAME = 'ihbh.json';
 export const DBG_MAX_SHOW_LOGS = 500;
 export const DBG_MAX_LOG_ARG_LEN = 100;
+export const DBG_CPM_NAME = 'pmod'; // import() for the current page
 
 export const LOG_MAXLEN = 64;
 export const PAGE_DEFAULT = 'map';

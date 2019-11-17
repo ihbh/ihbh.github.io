@@ -154,7 +154,7 @@ function onGpsUpdated(pos: Coordinates) {
   updateMap({ lat, lon, alt, acc });
 }
 
-async function updateMap({ lat, lon, alt, acc }) {
+export async function updateMap({ lat, lon, alt, acc }) {
   try {
     let s = conf.MAP_1M * await gp.mapBoxSize.get();
     log.i('Updating OSM view box:', s, { lat, lon });
