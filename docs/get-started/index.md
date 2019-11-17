@@ -45,6 +45,12 @@ Click on any of these users to chat:
 
 Messages are encrypted.
 
+Click on the user icon in the top left to see this user's info.
+
+If something seems wrong, you can report the user:
+
+![](/docs/img/pages/user-2.jpg)
+
 ## See all your visited places
 
 The app stores locally all the places you've shared:
