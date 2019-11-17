@@ -1,0 +1,15 @@
+#!/bin/bash
+if [ -z "$@" ]; then
+  echo "Example: ./jpg.sh foo.png";
+  echo "Example: ./jpg.sh pics/*.png";
+  exit 1;
+fi
+
+convert() {
+  src="$1";
+  res="${1%.png}.jpg";
+  echo "Converting $src to $res";
+  ffmpeg -loglevel warning -i "$src" -vf scale=240:-1 "$res";
+}
+
+for file in "$@"; do convert "$file"; done
