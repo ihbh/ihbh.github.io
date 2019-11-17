@@ -69,12 +69,12 @@ body.darkmode {
 }
 
 #page:empty::before {
-  content: "Loading";
+  content: 'Loading';
   text-align: center;
   vertical-align: middle;
 }
 
-#page > * {
+#page>* {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -93,13 +93,14 @@ body.darkmode {
 }
 
 /** The dark mode button. */
+
 #darkmode {
   left: 0;
   bottom: 0;
   display: none;
 }
 
-body[page=map] #darkmode {
+body[page="map"] #darkmode {
   display: inherit;
 }
 
@@ -108,6 +109,7 @@ body.unreg #darkmode {
 }
 
 /** The overlay with errors. */
+
 #errors {
   position: fixed;
   width: 100%;
@@ -126,12 +128,13 @@ body.unreg #darkmode {
 }
 
 /** The "back home" link. */
+
 #home-link {
   left: 0;
   bottom: 0;
 }
 
-body[page=map] #home-link {
+body[page="map"] #home-link {
   display: none;
 }
 
@@ -140,17 +143,19 @@ body.unreg #home-link {
 }
 
 /** The "visit commons" link. */
+
 #commons-link {
   display: none;
 }
 
-body[page=map].debug #commons-link {
+body[page="map"].debug #commons-link {
   display: inherit;
   top: 0;
   left: 0;
 }
 
 /* debug menu */
+
 #debug-toggle {
   right: 0;
   top: 0;
@@ -196,6 +201,7 @@ body.debug #debug-toggle {
 }
 
 /* OSM */
+
 body #page .ol-attribution {
   bottom: 0;
   right: 0;
@@ -207,6 +213,7 @@ body #page .ol-attribution * {
 }
 
 /* page=profile */
+
 #p-profile {
   flex-direction: column;
   height: 100vh;
@@ -276,7 +283,7 @@ body #page .ol-attribution * {
 }
 
 #p-profile.self #reg-name:empty::before {
-  content: "Your name";
+  content: 'Your name';
   font-style: italic;
   color: #ccc;
 }
@@ -368,7 +375,7 @@ body #page .ol-attribution * {
 #p-profile.self .about:empty::before {
   font-style: italic;
   color: #888;
-  content: "Write something about yourself. You can add a link to your website here.";
+  content: 'Write something about yourself. You can add a link to your website here.';
 }
 
 #p-profile.report .reason {
@@ -379,7 +386,7 @@ body #page .ol-attribution * {
 #p-profile.report .reason:empty::before {
   font-style: italic;
   color: #f008;
-  content: "Care to explain why?";
+  content: 'Care to explain why?';
 }
 
 #p-profile .footer {
@@ -435,6 +442,7 @@ body #page .ol-attribution * {
 }
 
 /* page=map */
+
 #map {
   width: 100%;
   height: 100%;
@@ -462,7 +470,7 @@ body #page .ol-attribution * {
   top: 0.5rem;
 }
 
-#controls > * {
+#controls>* {
   margin-bottom: 0.25rem;
 }
 
@@ -493,10 +501,11 @@ body #page .ol-attribution * {
 }
 
 #see-chats.unread::after {
-  content: "+1";
+  content: '+1';
 }
 
 /* page=places */
+
 #all-places {
   width: 100%;
   height: 100%;
@@ -519,6 +528,7 @@ body #page .ol-attribution * {
 }
 
 /* page=nearby */
+
 #p-nearby {
   height: auto;
 }
@@ -539,7 +549,7 @@ body #page .ol-attribution * {
 }
 
 #vtime-bar > span::before {
-  content: " ";
+  content: ' ';
 }
 
 #unvisit {
@@ -553,12 +563,13 @@ body #page .ol-attribution * {
 }
 
 #p-nearby .fs-edit:empty::before {
-  content: "Add a note for this place?";
+  content: 'Add a note for this place?';
   color: #888;
   font-style: italic;
 }
 
 /* page=settings */
+
 #p-settings .controls {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -567,6 +578,7 @@ body #page .ol-attribution * {
 }
 
 /* page=unread */
+
 .user-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -606,6 +618,7 @@ body #page .ol-attribution * {
 }
 
 /* page=chat */
+
 #u-header {
   display: flex;
   flex-direction: row;
@@ -695,7 +708,7 @@ body #page .ol-attribution * {
 }
 
 #reply-text:empty::before {
-  content: "Your message here.";
+  content: 'Your message here.';
   color: #888;
   font-style: italic;
 }
@@ -706,6 +719,7 @@ body #page .ol-attribution * {
 }
 
 /* page=explorer */
+
 #p-explorer * {
   font-size: 12pt;
   font-family: monospace;
@@ -740,7 +754,7 @@ body #page .ol-attribution * {
   grid-template-columns: repeat(1, 1fr);
 }
 
-#p-explorer .links > div {
+#p-explorer .links>div {
   background: #ddd;
   color: #000;
   word-break: break-all;
@@ -749,32 +763,36 @@ body #page .ol-attribution * {
   user-select: none;
 }
 
-#p-explorer .links > div:hover {
+#p-explorer .links>div:hover {
   filter: invert(1);
 }
 
-#p-explorer .links > div * {
+#p-explorer .links>div * {
   text-decoration: none;
   font-style: normal;
 }
 
 /* prop name */
-#p-explorer .links:not(.sfc) > div a {
+
+#p-explorer .links:not(.sfc)>div a {
   display: block;
 }
 
 /* prop value */
-#p-explorer .links > div i {
+
+#p-explorer .links>div i {
   font-weight: bold;
 }
 
 /* prop units */
-#p-explorer .links > div b {
+
+#p-explorer .links>div b {
   color: #444;
 }
 
 /* prop description */
-#p-explorer .links > div s {
+
+#p-explorer .links>div s {
   color: #444;
   display: block;
   margin-top: 0.5em;
@@ -792,19 +810,20 @@ body #page .ol-attribution * {
   outline: none;
 }
 
-#p-explorer *[fstatus=updating] {
+#p-explorer *[fstatus="updating"] {
   color: #555 !important;
 }
 
-#p-explorer *[fstatus=updated] {
+#p-explorer *[fstatus="updated"] {
   color: #080 !important;
 }
 
-#p-explorer *[fstatus=failed] {
+#p-explorer *[fstatus="failed"] {
   color: #800 !important;
 }
 
 /* page=feedback */
+
 #p-feedback * {
   font-size: 0.75em;
 }
@@ -817,7 +836,7 @@ body #page .ol-attribution * {
 #p-feedback .text:empty::before {
   color: #888;
   font-style: italic;
-  content: "What did you want to say?";
+  content: 'What did you want to say?';
 }
 
 #p-feedback .footer {
@@ -834,6 +853,7 @@ body #page .ol-attribution * {
 }
 
 /** comp=fs-edit */
+
 .fs-edit {
   color: #444;
   font-size: 0.5em;
@@ -843,5 +863,3 @@ body #page .ol-attribution * {
 .fs-edit:focus {
   outline: none;
 }
-
-/*# sourceMappingURL=common.css.map */
