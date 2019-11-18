@@ -671,12 +671,14 @@ body.darkmode .fs-edit {
   height: 64px;
   border-radius: 50%;
   object-fit: cover;
+  border: 1px solid #fff4;
 }
 
 .user-cards span {
   font-size: 0.5em;
   text-align: center;
   word-break: break-word;
+  margin-top: 0.5em;
 }
 
 body.darkmode .user-cards span {
