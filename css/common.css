@@ -532,7 +532,11 @@ body.darkmode #p-profile .details td:first-child {
 
 #see-chats.unread {
   font-weight: bold;
-  color: #0ff;
+  color: #c40;
+}
+
+body.darkmode #see-chats.unread {
+  color: #c40;
 }
 
 #see-chats.unread::after {
@@ -651,9 +655,13 @@ body.darkmode .user-cards span {
   color: #888;
 }
 
-.user-cards .unread {
+.user-cards .unread span {
   font-weight: bold;
-  color: #0ff;
+  color: #c40;
+}
+
+body.darkmode .user-cards .unread span {
+  color: #c40;
 }
 
 #nearby-status {

@@ -7,6 +7,8 @@ $theme-color-4: #242;
 
 $text-color-main-dark: #ccc;
 $text-color-dark: #888;
+$text-unread-color: #c40;
+$text-unread-color-dark: #c40;
 
 $button-red-bg-color: #800;
 $button-red-bg-color-dark: #400;
@@ -553,7 +555,11 @@ body.darkmode #p-profile .details td:first-child {
 
 #see-chats.unread {
   font-weight: bold;
-  color: #0ff;
+  color: $text-unread-color;
+}
+
+body.darkmode #see-chats.unread {
+  color: $text-unread-color-dark;
 }
 
 #see-chats.unread::after {
@@ -676,9 +682,13 @@ body.darkmode .user-cards span {
   color: $text-color-dark;
 }
 
-.user-cards .unread {
+.user-cards .unread span {
   font-weight: bold;
-  color: #0ff;
+  color: $text-unread-color;
+}
+
+body.darkmode .user-cards .unread span {
+  color: $text-unread-color-dark;
 }
 
 #nearby-status {
