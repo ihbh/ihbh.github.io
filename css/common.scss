@@ -6,6 +6,7 @@ $theme-color-3: #484;
 $theme-color-4: #242;
 
 $text-color-main-dark: #ccc;
+$text-color: #000;
 $text-color-dark: #888;
 $text-unread-color: #c40;
 $text-unread-color-dark: #c40;
@@ -829,11 +830,17 @@ body.darkmode #reply-text {
 }
 
 #p-explorer .path {
-  background: #ccd;
+  background: $theme-color;
   color: #000;
   padding: 0.5em;
   word-break: break-all;
-  border-bottom: 0.25em solid #800;
+  border-bottom: 0.25em solid $theme-color-2;
+}
+
+body.darkmode #p-explorer .path {
+  background: $theme-color-dark;
+  color: $text-color-main-dark;
+  border-color: $theme-color-2-dark;
 }
 
 #p-explorer .path .controls * {
@@ -841,6 +848,10 @@ body.darkmode #reply-text {
   cursor: pointer;
   width: 1em;
   height: 1em;
+}
+
+body.darkmode #p-explorer .path .controls * {
+  filter: invert(1);
 }
 
 #p-explorer .path .controls *:hover {
@@ -858,7 +869,7 @@ body.darkmode #reply-text {
 }
 
 #p-explorer .links>div {
-  background: #ddd;
+  background: $theme-color;
   color: #000;
   word-break: break-all;
   text-decoration: none;
@@ -866,13 +877,29 @@ body.darkmode #reply-text {
   user-select: none;
 }
 
+body.darkmode #p-explorer .links>div {
+  background: $theme-color-dark;
+}
+
+body.darkmode #p-explorer .links>div>a {
+  color: $text-color-main-dark;
+}
+
 #p-explorer .links>div:hover {
-  filter: invert(1);
+  background-color: $theme-color-2;
+}
+
+body.darkmode #p-explorer .links>div:hover {
+  background-color: $theme-color-2-dark;
 }
 
 #p-explorer .links>div * {
   text-decoration: none;
   font-style: normal;
+}
+
+body.darkmode #p-explorer .data {
+  color: $text-color-main-dark;
 }
 
 /* prop name */

@@ -800,11 +800,17 @@ body.darkmode #reply-text {
 }
 
 #p-explorer .path {
-  background: #ccd;
+  background: #cfc;
   color: #000;
   padding: 0.5em;
   word-break: break-all;
-  border-bottom: 0.25em solid #800;
+  border-bottom: 0.25em solid #8c8;
+}
+
+body.darkmode #p-explorer .path {
+  background: #343;
+  color: #ccc;
+  border-color: #232;
 }
 
 #p-explorer .path .controls * {
@@ -812,6 +818,10 @@ body.darkmode #reply-text {
   cursor: pointer;
   width: 1em;
   height: 1em;
+}
+
+body.darkmode #p-explorer .path .controls * {
+  filter: invert(1);
 }
 
 #p-explorer .path .controls *:hover {
@@ -829,7 +839,7 @@ body.darkmode #reply-text {
 }
 
 #p-explorer .links > div {
-  background: #ddd;
+  background: #cfc;
   color: #000;
   word-break: break-all;
   text-decoration: none;
@@ -837,13 +847,29 @@ body.darkmode #reply-text {
   user-select: none;
 }
 
+body.darkmode #p-explorer .links > div {
+  background: #343;
+}
+
+body.darkmode #p-explorer .links > div > a {
+  color: #ccc;
+}
+
 #p-explorer .links > div:hover {
-  filter: invert(1);
+  background-color: #8c8;
+}
+
+body.darkmode #p-explorer .links > div:hover {
+  background-color: #232;
 }
 
 #p-explorer .links > div * {
   text-decoration: none;
   font-style: normal;
+}
+
+body.darkmode #p-explorer .data {
+  color: #ccc;
 }
 
 /* prop name */
