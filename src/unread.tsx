@@ -53,6 +53,9 @@ export async function init() {
     }
 
     card.classList.add('unread');
+    card.remove();
+    dom.id.activeChats.insertBefore(
+      card, dom.id.activeChats.firstElementChild);
   }
 
   if (!infos.length && !uids.length)
@@ -71,9 +74,7 @@ async function insertUserCard(info: UserInfo) {
 
   let chatman = await import('./chatman');
   let lastseen = await chatman.getLastSeenTime(info.uid);
-  if (lastseen)
-    card.setAttribute(
-      LAST_SSEN, lastseen.toJSON());
+  if (lastseen) card.setAttribute(LAST_SSEN, +lastseen + '');
 
   let next = findNextUserCardFor(card);
   container.insertBefore(card, next);

@@ -39,6 +39,8 @@ define(["require", "exports", "./page", "./config", "./dom", "./log", "./react",
                 card = await insertUserCard(info);
             }
             card.classList.add('unread');
+            card.remove();
+            dom.id.activeChats.insertBefore(card, dom.id.activeChats.firstElementChild);
         }
         if (!infos.length && !uids.length)
             page.root().textContent = 'No chats yet. Find someone on the map.';
@@ -55,7 +57,7 @@ define(["require", "exports", "./page", "./config", "./dom", "./log", "./react",
         let chatman = await new Promise((resolve_2, reject_2) => { require(['./chatman'], resolve_2, reject_2); });
         let lastseen = await chatman.getLastSeenTime(info.uid);
         if (lastseen)
-            card.setAttribute(LAST_SSEN, lastseen.toJSON());
+            card.setAttribute(LAST_SSEN, +lastseen + '');
         let next = findNextUserCardFor(card);
         container.insertBefore(card, next);
         return card;
