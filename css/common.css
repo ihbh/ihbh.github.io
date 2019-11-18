@@ -18,15 +18,14 @@ body {
 }
 
 body.darkmode {
-  filter: invert(1);
   background: #000;
 }
 
 .btn {
   font-size: 0.75em;
   padding: 1em;
-  background: #fff;
-  color: #000;
+  background: #242;
+  color: #fff;
   border: none;
   box-shadow: 0 0 1pt 1pt #000;
   user-select: none;
@@ -57,6 +56,11 @@ body.darkmode {
   height: 2rem;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+body.darkmode .btn-sq {
+  background-color: #444;
+  color: #ccc;
 }
 
 .btn-sq:focus {
@@ -206,6 +210,10 @@ body #page .ol-attribution * {
   font-size: 10pt;
 }
 
+body.darkmode .ol-viewport {
+  filter: invert(1);
+}
+
 /* page=profile */
 #p-profile {
   flex-direction: column;
@@ -219,6 +227,11 @@ body #page .ol-attribution * {
   padding: 0.5em;
   background: #cfc;
   border-bottom: 0.25em solid #8c8;
+}
+
+body.darkmode #p-profile .header {
+  background: #343;
+  border-bottom: 0.25em solid #232;
 }
 
 #p-profile .hard-exif {
@@ -275,6 +288,10 @@ body #page .ol-attribution * {
   white-space: nowrap;
 }
 
+body.darkmode #p-profile #reg-name {
+  color: #ccc;
+}
+
 #p-profile.self #reg-name:empty::before {
   content: "Your name";
   font-style: italic;
@@ -302,8 +319,13 @@ body #page .ol-attribution * {
 
 #p-profile .report {
   display: none;
-  background: #484;
   cursor: pointer;
+  background: #800;
+}
+
+body.darkmode #p-profile .report {
+  color: #ccc;
+  background: #400;
 }
 
 #p-profile .import {
@@ -343,6 +365,10 @@ body #page .ol-attribution * {
   display: flex;
 }
 
+body.darkmode #p-profile .details {
+  color: #888;
+}
+
 #p-profile .reason {
   display: none;
   font-size: 0.5em;
@@ -352,6 +378,10 @@ body #page .ol-attribution * {
   white-space: pre-wrap;
 }
 
+body.darkmode #p-profile .reason {
+  color: #888;
+}
+
 #p-profile .about {
   flex: 1;
   font-size: 0.5em;
@@ -359,6 +389,10 @@ body #page .ol-attribution * {
   overflow-y: scroll;
   overflow: auto;
   white-space: pre-wrap;
+}
+
+body.darkmode #p-profile .about {
+  color: #888;
 }
 
 #p-profile .about:focus {
@@ -389,6 +423,11 @@ body #page .ol-attribution * {
   align-items: center;
   background: #cfc;
   border-top: 0.25em solid #8c8;
+}
+
+body.darkmode #p-profile .footer {
+  background: #343;
+  border-top: 0.25em solid #232;
 }
 
 #p-profile .footer button {
@@ -432,6 +471,10 @@ body #page .ol-attribution * {
   text-align: right;
   width: 20%;
   color: #000;
+}
+
+body.darkmode #p-profile .details td:first-child {
+  color: #ccc;
 }
 
 /* page=map */
@@ -528,10 +571,15 @@ body #page .ol-attribution * {
 }
 
 #vtime-bar {
-  background: #800;
+  background: #8c8;
   color: #fff;
   padding: 1em;
   font-size: 0.5rem;
+}
+
+body.darkmode #vtime-bar {
+  color: #888;
+  background: #232;
 }
 
 #vtime-bar * {
@@ -550,6 +598,10 @@ body #page .ol-attribution * {
 #nearby-status:not(:empty) {
   font-size: 0.5rem;
   padding: 1em;
+}
+
+body.darkmode .fs-edit {
+  color: #888;
 }
 
 #p-nearby .fs-edit:empty::before {
@@ -595,6 +647,10 @@ body #page .ol-attribution * {
   word-break: break-word;
 }
 
+body.darkmode .user-cards span {
+  color: #888;
+}
+
 .user-cards .unread {
   font-weight: bold;
   color: #0ff;
@@ -613,6 +669,12 @@ body #page .ol-attribution * {
   padding: 0.5em;
   background: #cfc;
   border-bottom: 0.25em solid #8c8;
+}
+
+body.darkmode #u-header {
+  color: #ccc;
+  background: #343;
+  border-bottom: 0.25em solid #232;
 }
 
 #u-header img {
@@ -638,15 +700,29 @@ body #page .ol-attribution * {
   position: relative;
 }
 
+body.darkmode #messages .m {
+  border-color: #343;
+}
+
 #messages .y {
   margin-left: auto;
   background: #efe;
+}
+
+body.darkmode #messages .y {
+  color: #888;
+  background: #343;
 }
 
 #messages .t {
   margin-right: auto;
   background: #eef;
   word-break: break-all;
+}
+
+body.darkmode #messages .t {
+  color: #ccc;
+  background: #232;
 }
 
 #messages .mt {
@@ -692,6 +768,10 @@ body #page .ol-attribution * {
 
 #reply-text * {
   font-size: inherit;
+}
+
+body.darkmode #reply-text {
+  color: #ccc;
 }
 
 #reply-text:empty::before {

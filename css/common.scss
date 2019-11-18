@@ -1,3 +1,16 @@
+$theme-color: #cfc;
+$theme-color-dark: #343;
+$theme-color-2: #8c8;
+$theme-color-2-dark: #232;
+$theme-color-3: #484;
+$theme-color-4: #242;
+
+$text-color-main-dark: #ccc;
+$text-color-dark: #888;
+
+$button-red-bg-color: #800;
+$button-red-bg-color-dark: #400;
+
 * {
   font-size: 24pt;
 }
@@ -18,15 +31,14 @@ body {
 }
 
 body.darkmode {
-  filter: invert(1);
   background: #000;
 }
 
 .btn {
   font-size: 0.75em;
   padding: 1em;
-  background: #fff;
-  color: #000;
+  background: $theme-color-4;
+  color: #fff;
   border: none;
   box-shadow: 0 0 1pt 1pt #000;
   user-select: none;
@@ -57,6 +69,11 @@ body.darkmode {
   height: 2rem;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+body.darkmode .btn-sq {
+  background-color: #444;
+  color: #ccc;
 }
 
 .btn-sq:focus {
@@ -212,6 +229,10 @@ body #page .ol-attribution * {
   font-size: 10pt;
 }
 
+body.darkmode .ol-viewport {
+  filter: invert(1);
+}
+
 /* page=profile */
 
 #p-profile {
@@ -224,8 +245,13 @@ body #page .ol-attribution * {
   align-items: center;
   position: relative;
   padding: 0.5em;
-  background: #cfc;
-  border-bottom: 0.25em solid #8c8;
+  background: $theme-color;
+  border-bottom: 0.25em solid $theme-color-2;
+}
+
+body.darkmode #p-profile .header {
+  background: $theme-color-dark;
+  border-bottom: 0.25em solid $theme-color-2-dark;
 }
 
 #p-profile .hard-exif {
@@ -282,6 +308,10 @@ body #page .ol-attribution * {
   white-space: nowrap;
 }
 
+body.darkmode #p-profile #reg-name {
+  color: $text-color-main-dark;
+}
+
 #p-profile.self #reg-name:empty::before {
   content: 'Your name';
   font-style: italic;
@@ -309,8 +339,13 @@ body #page .ol-attribution * {
 
 #p-profile .report {
   display: none;
-  background: #484;
   cursor: pointer;
+  background: $button-red-bg-color;
+}
+
+body.darkmode #p-profile .report {
+  color: $text-color-main-dark;
+  background: $button-red-bg-color-dark;
 }
 
 #p-profile .import {
@@ -350,6 +385,10 @@ body #page .ol-attribution * {
   display: flex;
 }
 
+body.darkmode #p-profile .details {
+  color: $text-color-dark;
+}
+
 #p-profile .reason {
   display: none;
   font-size: 0.5em;
@@ -359,6 +398,10 @@ body #page .ol-attribution * {
   white-space: pre-wrap;
 }
 
+body.darkmode #p-profile .reason {
+  color: $text-color-dark;
+}
+
 #p-profile .about {
   flex: 1;
   font-size: 0.5em;
@@ -366,6 +409,10 @@ body #page .ol-attribution * {
   overflow-y: scroll;
   overflow: auto;
   white-space: pre-wrap;
+}
+
+body.darkmode #p-profile .about {
+  color: $text-color-dark;
 }
 
 #p-profile .about:focus {
@@ -394,8 +441,13 @@ body #page .ol-attribution * {
   flex-direction: row;
   padding: 0.5em;
   align-items: center;
-  background: #cfc;
-  border-top: 0.25em solid #8c8;
+  background: $theme-color;
+  border-top: 0.25em solid $theme-color-2;
+}
+
+body.darkmode #p-profile .footer {
+  background: $theme-color-dark;
+  border-top: 0.25em solid $theme-color-2-dark;
 }
 
 #p-profile .footer button {
@@ -439,6 +491,10 @@ body #page .ol-attribution * {
   text-align: right;
   width: 20%;
   color: #000;
+}
+
+body.darkmode #p-profile .details td:first-child {
+  color: $text-color-main-dark;
 }
 
 /* page=map */
@@ -538,10 +594,15 @@ body #page .ol-attribution * {
 }
 
 #vtime-bar {
-  background: #800;
+  background: $theme-color-2;
   color: #fff;
   padding: 1em;
   font-size: 0.5rem;
+}
+
+body.darkmode #vtime-bar {
+  color: $text-color-dark;
+  background: $theme-color-2-dark
 }
 
 #vtime-bar * {
@@ -560,6 +621,10 @@ body #page .ol-attribution * {
 #nearby-status:not(:empty) {
   font-size: 0.5rem;
   padding: 1em;
+}
+
+body.darkmode .fs-edit {
+  color: $text-color-dark;
 }
 
 #p-nearby .fs-edit:empty::before {
@@ -607,6 +672,10 @@ body #page .ol-attribution * {
   word-break: break-word;
 }
 
+body.darkmode .user-cards span {
+  color: $text-color-dark;
+}
+
 .user-cards .unread {
   font-weight: bold;
   color: #0ff;
@@ -624,8 +693,14 @@ body #page .ol-attribution * {
   flex-direction: row;
   align-items: center;
   padding: 0.5em;
-  background: #cfc;
-  border-bottom: 0.25em solid #8c8;
+  background: $theme-color;
+  border-bottom: 0.25em solid $theme-color-2;
+}
+
+body.darkmode #u-header {
+  color: $text-color-main-dark;
+  background: $theme-color-dark;
+  border-bottom: 0.25em solid $theme-color-2-dark;
 }
 
 #u-header img {
@@ -651,15 +726,29 @@ body #page .ol-attribution * {
   position: relative;
 }
 
+body.darkmode #messages .m {
+  border-color: $theme-color-dark;
+}
+
 #messages .y {
   margin-left: auto;
   background: #efe;
+}
+
+body.darkmode #messages .y {
+  color: $text-color-dark;
+  background: $theme-color-dark;
 }
 
 #messages .t {
   margin-right: auto;
   background: #eef;
   word-break: break-all;
+}
+
+body.darkmode #messages .t {
+  color: $text-color-main-dark;
+  background: $theme-color-2-dark;
 }
 
 #messages .mt {
@@ -705,6 +794,10 @@ body #page .ol-attribution * {
 
 #reply-text * {
   font-size: inherit;
+}
+
+body.darkmode #reply-text {
+  color: $text-color-main-dark;
 }
 
 #reply-text:empty::before {
