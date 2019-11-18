@@ -25,8 +25,8 @@ define(["require", "exports", "./page", "./config", "./dom", "./log", "./react",
             infos = await dbg.getDebugPeopleNearby();
         }
         log.i('Existing chats:', infos.length);
-        for (let info of infos)
-            await insertUserCard(info);
+        await Promise.all(infos.map(insertUserCard));
+        log.i('Existing chats rendered in', Date.now() - time, 'ms');
         log.i('Checking if there are new unread messages.');
         let uids = await getUnreadChats();
         if (!uids.length)
