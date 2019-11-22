@@ -63,7 +63,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./
         timer = timer || setTimeout(async () => {
             timer = 0;
             log.i('Opening place:', lastClickedTskey);
-            let page = await new Promise((resolve_1, reject_1) => { require(['./page'], resolve_1, reject_1); });
+            let page = await new Promise((resolve_1, reject_1) => { require(['page'], resolve_1, reject_1); });
             page.set('nearby', { tskey: lastClickedTskey });
         }, conf.PLACE_CLICK_TIMEOUT);
     }
@@ -87,9 +87,9 @@ define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./
     }
     async function addDebugMarkerAt({ lat, lon }) {
         log.i(`Creating a marker at lat=${lat} lon=${lon}`);
-        let loc = await new Promise((resolve_2, reject_2) => { require(['./loc'], resolve_2, reject_2); });
+        let loc = await new Promise((resolve_2, reject_2) => { require(['loc'], resolve_2, reject_2); });
         let tskey = await loc.shareLocation({ lat, lon, alt: 0 });
-        let page = await new Promise((resolve_3, reject_3) => { require(['./page'], resolve_3, reject_3); });
+        let page = await new Promise((resolve_3, reject_3) => { require(['page'], resolve_3, reject_3); });
         page.set('nearby', { tskey });
     }
 });

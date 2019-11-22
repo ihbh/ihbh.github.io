@@ -10,18 +10,18 @@ dom.whenLoaded().then(async () => {
   log.i('location.href:', location.href);
 
   log.i('Debug mode?', conf.DEBUG);
-  conf.DEBUG && import('./dbg')
+  conf.DEBUG && import('dbg')
     .then(dbg => dbg.init());
 
-  import('./darkmode')
+  import('darkmode')
     .then(dm => dm.init());
 
   await page.init();
   await showCorrectPage();
 
-  import('./pwa')
+  import('pwa')
     .then(pwa => pwa.init());
-  import('./startup')
+  import('startup')
     .then(su => su.run());
 }).catch(err => {
   log.e('failed:', err);

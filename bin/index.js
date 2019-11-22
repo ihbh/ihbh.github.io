@@ -5,12 +5,12 @@ define(["require", "exports", "./config", "./dom", "./log", "./page", "./usr"], 
     dom.whenLoaded().then(async () => {
         log.i('location.href:', location.href);
         log.i('Debug mode?', conf.DEBUG);
-        conf.DEBUG && new Promise((resolve_1, reject_1) => { require(['./dbg'], resolve_1, reject_1); }).then(dbg => dbg.init());
-        new Promise((resolve_2, reject_2) => { require(['./darkmode'], resolve_2, reject_2); }).then(dm => dm.init());
+        conf.DEBUG && new Promise((resolve_1, reject_1) => { require(['dbg'], resolve_1, reject_1); }).then(dbg => dbg.init());
+        new Promise((resolve_2, reject_2) => { require(['darkmode'], resolve_2, reject_2); }).then(dm => dm.init());
         await page.init();
         await showCorrectPage();
-        new Promise((resolve_3, reject_3) => { require(['./pwa'], resolve_3, reject_3); }).then(pwa => pwa.init());
-        new Promise((resolve_4, reject_4) => { require(['./startup'], resolve_4, reject_4); }).then(su => su.run());
+        new Promise((resolve_3, reject_3) => { require(['pwa'], resolve_3, reject_3); }).then(pwa => pwa.init());
+        new Promise((resolve_4, reject_4) => { require(['startup'], resolve_4, reject_4); }).then(su => su.run());
     }).catch(err => {
         log.e('failed:', err);
     }).then(() => {

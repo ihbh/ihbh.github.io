@@ -46,7 +46,7 @@ define(["require", "exports", "./config", "./log", "./react"], function (require
             let path = this.args.filepath();
             if (!path)
                 throw new Error('fs path not ready');
-            let vfs = await new Promise((resolve_1, reject_1) => { require(['./vfs'], resolve_1, reject_1); });
+            let vfs = await new Promise((resolve_1, reject_1) => { require(['vfs/vfs'], resolve_1, reject_1); });
             await vfs.root.set(path, text);
             log.d('Input saved to', path);
         }
@@ -54,7 +54,7 @@ define(["require", "exports", "./config", "./log", "./react"], function (require
             let path = this.args.filepath();
             if (!path)
                 return null;
-            let vfs = await new Promise((resolve_2, reject_2) => { require(['./vfs'], resolve_2, reject_2); });
+            let vfs = await new Promise((resolve_2, reject_2) => { require(['vfs/vfs'], resolve_2, reject_2); });
             let text = await vfs.root.get(path);
             return text;
         }

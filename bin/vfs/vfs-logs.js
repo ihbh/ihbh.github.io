@@ -1,4 +1,4 @@
-define(["require", "exports", "./logdb"], function (require, exports, logdb) {
+define(["require", "exports", "../logdb"], function (require, exports, logdb) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = new class {

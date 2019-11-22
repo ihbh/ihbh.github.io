@@ -1,4 +1,4 @@
-define(["require", "exports", "./buffer", "./config", "./error", "./log", "./rpc", "./vfs"], function (require, exports, buffer_1, conf, error_1, log_1, rpc, vfs_1) {
+define(["require", "exports", "./buffer", "./config", "./error", "./log", "./rpc", "./vfs/vfs"], function (require, exports, buffer_1, conf, error_1, log_1, rpc, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('rsync');

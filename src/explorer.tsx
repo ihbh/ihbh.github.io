@@ -3,7 +3,7 @@ import * as dom from './dom';
 import { TaggedLogger } from './log';
 import * as qargs from './qargs';
 import React from './react';
-import vfs from './vfs';
+import vfs from './vfs/vfs';
 
 const log = new TaggedLogger('explorer');
 

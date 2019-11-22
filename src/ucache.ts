@@ -42,7 +42,7 @@ export async function getUserInfo(uid: string, props?: PropName[]) {
 }
 
 async function getCachedInfo(uid: string) {
-  let { default: vfs } = await import('./vfs');
+  let { default: vfs } = await import('vfs/vfs');
   let dir = `~/users/${uid}`;
   let info: UserInfo = { uid };
   let fnames = Object.keys(PROPS);
@@ -68,15 +68,15 @@ async function syncFiles(dirCached: string, dirRemote: string, fnames: string[])
 }
 
 async function syncFile(fpathCached: string, fpathRemote: string) {
-  let rpc = await import('./rpc');
-  let { default: vfs } = await import('./vfs');
+  let rpc = await import('rpc');
+  let { default: vfs } = await import('vfs/vfs');
 
   let data = await vfs.get(fpathCached);
   let hash: string|null = null;
 
   if (data) {
-    let rsync = await import('./rsync');
-    let { default: Buffer } = await import('./buffer');
+    let rsync = await import('rsync');
+    let { default: Buffer } = await import('buffer');
     let json = JSON.stringify(data);
     let bytes = Buffer.from(json, 'utf8').toArray(Uint8Array).buffer;
     hash = await rsync.rhash(bytes);

@@ -1,7 +1,7 @@
-import * as conf from './config';
-import { DerivedError } from './error';
-import { TaggedLogger } from './log';
-import { AsyncProp } from './prop';
+import * as conf from '../config';
+import { DerivedError } from '../error';
+import { TaggedLogger } from '../log';
+import { AsyncProp } from '../prop';
 import { VFS } from './vfs-api';
 import handlers from './vfs-roots';
 

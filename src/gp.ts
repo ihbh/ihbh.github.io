@@ -1,7 +1,7 @@
 import * as conf from './config';
 import { TaggedLogger } from './log';
-import * as vfsconf from './vfs-conf';
-import vfsprop from './vfs-prop';
+import * as vfsconf from './vfs/vfs-conf';
+import vfsprop from './vfs/vfs-prop';
 
 const log = new TaggedLogger('gp');
 

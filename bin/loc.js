@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./vfs"], function (require, exports, conf, vfs_1) {
+define(["require", "exports", "./config", "./vfs/vfs"], function (require, exports, conf, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /** Distance in meters. */
@@ -42,13 +42,13 @@ define(["require", "exports", "./config", "./vfs"], function (require, exports, 
     }
     exports.shareLocation = shareLocation;
     async function gotoCommonPlace() {
-        let gp = await new Promise((resolve_1, reject_1) => { require(['./gp'], resolve_1, reject_1); });
+        let gp = await new Promise((resolve_1, reject_1) => { require(['gp'], resolve_1, reject_1); });
         let lat = await gp.commonPlaceLat.get();
         let lon = await gp.commonPlaceLon.get();
         let alt = 0;
-        let loc = await new Promise((resolve_2, reject_2) => { require(['./loc'], resolve_2, reject_2); });
+        let loc = await new Promise((resolve_2, reject_2) => { require(['loc'], resolve_2, reject_2); });
         let tskey = await loc.shareLocation({ lat, lon, alt });
-        let page = await new Promise((resolve_3, reject_3) => { require(['./page'], resolve_3, reject_3); });
+        let page = await new Promise((resolve_3, reject_3) => { require(['page'], resolve_3, reject_3); });
         page.set('nearby', { tskey });
     }
     exports.gotoCommonPlace = gotoCommonPlace;

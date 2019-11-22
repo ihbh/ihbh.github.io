@@ -1,10 +1,38 @@
 "use strict";
 (function init() {
+    const BASE_JS_DIR = '/bin';
     const modules = new Map();
     const modexps = {};
     window['mods'] = modexps;
     function log(...args) {
         console.debug('I [amd]', ...args);
+    }
+    const isAbsDep = (path) => path.startsWith('/') ||
+        /^\w+:\/\//.test(path) ||
+        /^\w+$/.test(path); // 'require', 'exports'
+    const isRelDep = (path) => path.startsWith('.');
+    function resolveDep(scriptUrl, rel) {
+        if (isAbsDep(rel))
+            return rel;
+        if (!isRelDep(rel))
+            return BASE_JS_DIR + '/' + rel;
+        let stack = scriptUrl.split('/');
+        stack.pop();
+        for (let name of rel.split('/')) {
+            if (name == '.') {
+                // no-op
+            }
+            else if (name == '..') {
+                stack.pop();
+            }
+            else {
+                stack.push(name);
+            }
+        }
+        let path = stack.join('/');
+        if (!path.endsWith('.js'))
+            path += '.js';
+        return path;
     }
     function define(deps, init) {
         if (!init) {
@@ -19,14 +47,7 @@
         if (mod.url)
             throw new Error('Module already defined: ' + url);
         mod.url = url;
-        mod.deps = deps.map(dep => {
-            if (!dep.startsWith('./'))
-                return dep;
-            let newdep = url.replace(/\/[^/]+$/, dep.slice(1));
-            if (!newdep.endsWith('.js'))
-                newdep += '.js';
-            return newdep;
-        });
+        mod.deps = deps.map(rel => resolveDep(url, rel));
         mod.init = init;
         log('define:', url, '<-', ...mod.deps);
     }
@@ -91,8 +112,11 @@
         return script;
     }
     function resolveScriptUrl(dep) {
-        return dep.startsWith('./') ?
-            'bin' + dep.slice(1) + '.js' : dep;
+        if (dep.startsWith('./'))
+            return BASE_JS_DIR + dep.slice(1) + '.js';
+        if (/^\w+(\/|$)/.test(dep))
+            return BASE_JS_DIR + '/' + dep + '.js';
+        return dep;
     }
     window['define'] = define;
     define.amd = true;

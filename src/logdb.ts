@@ -89,6 +89,6 @@ async function openLogTable(tname: string) {
 
 async function openLogDb() {
   if (db) return db;
-  let { DB } = await import('./idb');
+  let { DB } = await import('idb');
   return db = DB.open(conf.LOG_IDB_NAME);
 }

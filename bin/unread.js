@@ -1,4 +1,4 @@
-define(["require", "exports", "./page", "./config", "./dom", "./log", "./react", "./ucache", "./user", "./vfs"], function (require, exports, page, conf, dom, log_1, react_1, ucache_1, user, vfs_1) {
+define(["require", "exports", "./page", "./config", "./dom", "./log", "./react", "./ucache", "./user", "./vfs/vfs"], function (require, exports, page, conf, dom, log_1, react_1, ucache_1, user, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const LAST_SSEN = 'lastseen';
@@ -21,7 +21,7 @@ define(["require", "exports", "./page", "./config", "./dom", "./log", "./react",
             if (!conf.DEBUG)
                 throw err;
             log.e('Failed to get active chats:', err);
-            let dbg = await new Promise((resolve_1, reject_1) => { require(['./dbg'], resolve_1, reject_1); });
+            let dbg = await new Promise((resolve_1, reject_1) => { require(['dbg'], resolve_1, reject_1); });
             infos = await dbg.getDebugPeopleNearby();
         }
         log.i('Existing chats:', infos.length);
@@ -54,7 +54,7 @@ define(["require", "exports", "./page", "./config", "./dom", "./log", "./react",
         let container = dom.id.activeChats;
         card = renderUserCard(info);
         cards.set(info.uid, card);
-        let chatman = await new Promise((resolve_2, reject_2) => { require(['./chatman'], resolve_2, reject_2); });
+        let chatman = await new Promise((resolve_2, reject_2) => { require(['chatman'], resolve_2, reject_2); });
         let lastseen = await chatman.getLastSeenTime(info.uid);
         if (lastseen)
             card.setAttribute(LAST_SSEN, +lastseen + '');

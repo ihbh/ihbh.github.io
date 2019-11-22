@@ -1,5 +1,5 @@
 import { VFS } from './vfs-api';
-import { AsyncProp } from './prop';
+import { AsyncProp } from '../prop';
 
 interface Root {
   [dirname: string]: AsyncProp<VFS>;

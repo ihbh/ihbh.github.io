@@ -1,5 +1,5 @@
 import { VFS } from './vfs-api';
-import { TaggedLogger } from './log';
+import { TaggedLogger } from '../log';
 
 const log = new TaggedLogger('json-fs');
 

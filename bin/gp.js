@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./log", "./vfs-conf", "./vfs-prop"], function (require, exports, conf, log_1, vfsconf, vfs_prop_1) {
+define(["require", "exports", "./config", "./log", "./vfs/vfs-conf", "./vfs/vfs-prop"], function (require, exports, conf, log_1, vfsconf, vfs_prop_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('gp');

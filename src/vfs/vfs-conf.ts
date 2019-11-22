@@ -1,5 +1,5 @@
-import * as conf from './config';
-import { TaggedLogger } from './log';
+import * as conf from '../config';
+import { TaggedLogger } from '../log';
 import vfs from './vfs';
 import { VFS } from './vfs-api';
 import vfsprop from './vfs-prop';

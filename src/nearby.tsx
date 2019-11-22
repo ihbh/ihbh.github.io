@@ -70,7 +70,7 @@ export async function init() {
     } catch (err) {
       if (!conf.DEBUG) throw err;
       log.e('Failed to get visitors:', err);
-      let dbg = await import('./dbg');
+      let dbg = await import('dbg');
       infos = await dbg.getDebugPeopleNearby();
     }
 
@@ -145,7 +145,7 @@ function initUnvisitLink() {
     try {
       log.i('Unvisiting:', tskey);
       setStatus('Unvisiting this place.');
-      let { root: vfs } = await import('./vfs');
+      let { root: vfs } = await import('vfs/vfs');
       await Promise.all(
         allvisits.map(tskey =>
           vfs.rmdir(`${conf.VPLACES_DIR}/${tskey}`)));
@@ -154,7 +154,7 @@ function initUnvisitLink() {
       log.e('Failed to unvisit:', err);
     }
 
-    let page = await import('./page');
+    let page = await import('page');
     await page.set('places');
   };
 }

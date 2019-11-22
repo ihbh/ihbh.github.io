@@ -5,7 +5,7 @@ import { TaggedLogger } from './log';
 import React from './react';
 import { getUserInfo, UserInfo } from './ucache';
 import * as user from './user';
-import vfs from './vfs';
+import vfs from './vfs/vfs';
 
 const LAST_SSEN = 'lastseen';
 
@@ -30,7 +30,7 @@ export async function init() {
   } catch (err) {
     if (!conf.DEBUG) throw err;
     log.e('Failed to get active chats:', err);
-    let dbg = await import('./dbg');
+    let dbg = await import('dbg');
     infos = await dbg.getDebugPeopleNearby();
   }
 
@@ -73,7 +73,7 @@ async function insertUserCard(info: UserInfo) {
   card = renderUserCard(info);
   cards.set(info.uid, card);
 
-  let chatman = await import('./chatman');
+  let chatman = await import('chatman');
   let lastseen = await chatman.getLastSeenTime(info.uid);
   if (lastseen) card.setAttribute(LAST_SSEN, +lastseen + '');
 

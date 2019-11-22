@@ -2,7 +2,7 @@ import * as conf from './config';
 import * as dom from './dom';
 import * as gp from './gp';
 import * as gps from './gps';
-import * as vfs from './vfs';
+import * as vfs from './vfs/vfs';
 import { TaggedLogger } from './log';
 import { OSM } from './osm';
 import * as page from './page';
@@ -81,7 +81,7 @@ function initSettingsButton() {
 async function initChatButton() {
   let btn = dom.id.btnSeeChats;
   btn.onclick = () => page.set('unread');
-  let { hasUnreadChats } = await import('./chatman');
+  let { hasUnreadChats } = await import('chatman');
   if (await hasUnreadChats()) {
     log.i('Got unread messages.');
     btn.classList.add('unread');
@@ -96,7 +96,7 @@ async function initUserPic() {
   try {
     let button = dom.id.userPic;
     button.onclick = () => page.set('profile');
-    let usr = await import('./usr');
+    let usr = await import('usr');
     let name = await usr.getDisplayName();
     button.textContent = name;
     let photo = await usr.getPhotoUri();
@@ -207,7 +207,7 @@ async function initSendButton() {
 
   button.onclick = async () => {
     log.i('#send:click');
-    let pwa = await import('./pwa');
+    let pwa = await import('pwa');
     pwa.showInstallPrompt();
     button.disabled = true;
     let tskey: string | null = null;
@@ -226,7 +226,7 @@ async function initSendButton() {
 
 async function shareDisplayedLocation() {
   if (!bestPos) throw new Error('GPS not ready.');
-  let loc = await import('./loc');
+  let loc = await import('loc');
   let {
     latitude: lat,
     longitude: lon,

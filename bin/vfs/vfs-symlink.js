@@ -10,7 +10,7 @@ define(["require", "exports"], function (require, exports) {
         async invoke(fsop, path, ...args) {
             if (!path.startsWith('/'))
                 throw new Error('Bad path: ' + path);
-            let vfs = await new Promise((resolve_1, reject_1) => { require(['./vfs'], resolve_1, reject_1); });
+            let vfs = await new Promise((resolve_1, reject_1) => { require(['vfs/vfs'], resolve_1, reject_1); });
             let newPath = this.target + path;
             return vfs.root.invoke(fsop, newPath, ...args);
         }

@@ -101,7 +101,7 @@ export async function getDebugPeopleNearby() {
 }
 
 export async function getTestUserDetails(uid: string) {
-  let { default: text } = await import('./lorem');
+  let { default: text } = await import('lorem');
   return {
     photo: conf.DBG_TEST_USER_PHOTO,
     name: uid.slice(0, 8),

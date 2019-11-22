@@ -1,5 +1,5 @@
 import * as conf from './config';
-import vfs from './vfs';
+import vfs from './vfs/vfs';
 
 export interface Place {
   time: number; // Date.now()/1000
@@ -67,13 +67,13 @@ export async function shareLocation({ lat, lon, alt }: GpsCoords) {
 }
 
 export async function gotoCommonPlace() {
-  let gp = await import('./gp');
+  let gp = await import('gp');
   let lat = await gp.commonPlaceLat.get();
   let lon = await gp.commonPlaceLon.get();
   let alt = 0;
-  let loc = await import('./loc');
+  let loc = await import('loc');
   let tskey = await loc.shareLocation({ lat, lon, alt });
-  let page = await import('./page');
+  let page = await import('page');
   page.set('nearby', { tskey });  
 }
 

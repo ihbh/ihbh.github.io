@@ -8,7 +8,7 @@ import React from './react';
 import { recentTimeToStr } from './timestr';
 import * as ucache from './ucache';
 import * as user from './user';
-import vfs from './vfs';
+import vfs from './vfs/vfs';
 
 let log = new TaggedLogger('chat');
 

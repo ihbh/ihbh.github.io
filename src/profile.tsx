@@ -65,7 +65,7 @@ export async function render() {
 
 function initImportButton() {
   dom.id.regImport.onclick = async () => {
-    let { importData } = await import('./impexp');
+    let { importData } = await import('impexp');
     await importData();
     location.reload();
   };
@@ -75,7 +75,7 @@ function initRotateButton() {
   dom.id.upcRotate.onclick = async () => {
     log.i('Rotating image.');
     let time = Date.now();
-    let reg = await import('./reg');
+    let reg = await import('reg');
     let img = dom.id.regPhoto;
     let url = reg.rotatePhoto(img);
     img.src = url;
@@ -88,7 +88,7 @@ function initFlipButton() {
   dom.id.upcFlip.onclick = async () => {
     log.i('Flipping image.');
     let time = Date.now();
-    let reg = await import('./reg');
+    let reg = await import('reg');
     let img = dom.id.regPhoto;
     let url = reg.flipPhoto(img);
     img.src = url;
@@ -179,7 +179,7 @@ async function addEventListeners() {
       }
     };
   } else {
-    let reg = await import('./reg');
+    let reg = await import('reg');
     let resizing = false;
 
     dom.id.regPhoto.onclick = async () => {

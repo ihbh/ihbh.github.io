@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./vfs", "./log", "./osm", "./page", "./react"], function (require, exports, conf, dom, gp, gps, vfs, log_1, osm_1, page, react_1) {
+define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./vfs/vfs", "./log", "./osm", "./page", "./react"], function (require, exports, conf, dom, gp, gps, vfs, log_1, osm_1, page, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('map');
@@ -39,7 +39,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./vfs", "./
     async function initChatButton() {
         let btn = dom.id.btnSeeChats;
         btn.onclick = () => page.set('unread');
-        let { hasUnreadChats } = await new Promise((resolve_1, reject_1) => { require(['./chatman'], resolve_1, reject_1); });
+        let { hasUnreadChats } = await new Promise((resolve_1, reject_1) => { require(['chatman'], resolve_1, reject_1); });
         if (await hasUnreadChats()) {
             log.i('Got unread messages.');
             btn.classList.add('unread');
@@ -52,7 +52,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./vfs", "./
         try {
             let button = dom.id.userPic;
             button.onclick = () => page.set('profile');
-            let usr = await new Promise((resolve_2, reject_2) => { require(['./usr'], resolve_2, reject_2); });
+            let usr = await new Promise((resolve_2, reject_2) => { require(['usr'], resolve_2, reject_2); });
             let name = await usr.getDisplayName();
             button.textContent = name;
             let photo = await usr.getPhotoUri();
@@ -151,7 +151,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./vfs", "./
         button.disabled = true;
         button.onclick = async () => {
             log.i('#send:click');
-            let pwa = await new Promise((resolve_3, reject_3) => { require(['./pwa'], resolve_3, reject_3); });
+            let pwa = await new Promise((resolve_3, reject_3) => { require(['pwa'], resolve_3, reject_3); });
             pwa.showInstallPrompt();
             button.disabled = true;
             let tskey = null;
@@ -170,7 +170,7 @@ define(["require", "exports", "./config", "./dom", "./gp", "./gps", "./vfs", "./
     async function shareDisplayedLocation() {
         if (!bestPos)
             throw new Error('GPS not ready.');
-        let loc = await new Promise((resolve_4, reject_4) => { require(['./loc'], resolve_4, reject_4); });
+        let loc = await new Promise((resolve_4, reject_4) => { require(['loc'], resolve_4, reject_4); });
         let { latitude: lat, longitude: lon, altitude: alt, } = bestPos;
         return loc.shareLocation({ lat, lon, alt: alt });
     }

@@ -1,5 +1,5 @@
 import { VFS } from './vfs-api';
-import * as logdb from './logdb';
+import * as logdb from '../logdb';
 
 export default new class implements VFS {
   async dir(path: string) {

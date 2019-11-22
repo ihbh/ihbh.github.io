@@ -20,7 +20,7 @@ define(["require", "exports", "./dom", "./log", "./qargs", "./config"], function
         stopCurrentPage();
         let id = get();
         log.i('Loading page:', id);
-        cpm = await new Promise((resolve_1, reject_1) => { require(['./' + id], resolve_1, reject_1); });
+        cpm = await new Promise((resolve_1, reject_1) => { require(['' + id], resolve_1, reject_1); });
         if (conf.DEBUG)
             window[conf.DBG_CPM_NAME] = cpm;
         log.i('Rendering page.');

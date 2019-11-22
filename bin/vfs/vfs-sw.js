@@ -1,10 +1,10 @@
-define(["require", "exports", "./prop", "./hub-fs"], function (require, exports, prop_1, hub_fs_1) {
+define(["require", "exports", "../prop", "./hub-fs"], function (require, exports, prop_1, hub_fs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = new hub_fs_1.default({
         cache: new prop_1.AsyncProp(async () => {
-            let { default: JsonFS } = await new Promise((resolve_1, reject_1) => { require(['./json-fs'], resolve_1, reject_1); });
-            let pwa = await new Promise((resolve_2, reject_2) => { require(['./pwa'], resolve_2, reject_2); });
+            let { default: JsonFS } = await new Promise((resolve_1, reject_1) => { require(['json-fs'], resolve_1, reject_1); });
+            let pwa = await new Promise((resolve_2, reject_2) => { require(['pwa'], resolve_2, reject_2); });
             return new JsonFS({
                 keys: async () => {
                     let keys = await pwa.invoke('cache.keys');

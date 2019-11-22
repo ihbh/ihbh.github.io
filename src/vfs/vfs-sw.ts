@@ -1,10 +1,10 @@
-import { AsyncProp } from './prop';
+import { AsyncProp } from '../prop';
 import HubFS from './hub-fs';
 
 export default new HubFS({
   cache: new AsyncProp(async () => {
-    let { default: JsonFS } = await import('./json-fs');
-    let pwa = await import('./pwa');
+    let { default: JsonFS } = await import('json-fs');
+    let pwa = await import('pwa');
 
     return new JsonFS({
       keys: async () => {

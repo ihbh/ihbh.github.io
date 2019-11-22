@@ -9,7 +9,7 @@ export class SymLinkFS implements VFS {
   async invoke(fsop: keyof VFS, path: string, ...args) {
     if (!path.startsWith('/'))
       throw new Error('Bad path: ' + path);
-    let vfs = await import('./vfs');
+    let vfs = await import('vfs/vfs');
     let newPath = this.target + path;
     return vfs.root.invoke(fsop, newPath, ...args);
   }

@@ -1,6 +1,6 @@
-import { NotImplementedError } from './error';
+import { NotImplementedError } from '../error';
 import { VFS } from './vfs-api';
-import * as rpc from './rpc';
+import * as rpc from '../rpc';
 
 class SrvFS implements VFS {
   async dir(path: string): Promise<string[]> {

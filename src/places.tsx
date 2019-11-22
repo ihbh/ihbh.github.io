@@ -76,7 +76,7 @@ function handleClick(id) {
   timer = timer || setTimeout(async () => {
     timer = 0;
     log.i('Opening place:', lastClickedTskey);
-    let page = await import('./page');
+    let page = await import('page');
     page.set('nearby', { tskey: lastClickedTskey });
   }, conf.PLACE_CLICK_TIMEOUT);
 }
@@ -106,8 +106,8 @@ async function getBBox(places: loc.Place[]) {
 
 async function addDebugMarkerAt({ lat, lon }) {
   log.i(`Creating a marker at lat=${lat} lon=${lon}`);
-  let loc = await import('./loc');
+  let loc = await import('loc');
   let tskey = await loc.shareLocation({ lat, lon, alt: 0 });
-  let page = await import('./page');
+  let page = await import('page');
   page.set('nearby', { tskey });
 }

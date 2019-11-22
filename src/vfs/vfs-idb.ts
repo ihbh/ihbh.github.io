@@ -1,8 +1,8 @@
 // IDBFS path: /<db-name>/<table-name>/<record-key>
 
 import { VFS } from './vfs-api';
-import { DB } from './idb';
-import { TaggedLogger } from './log';
+import { DB } from '../idb';
+import { TaggedLogger } from '../log';
 
 const log = new TaggedLogger('idbfs');
 
@@ -67,7 +67,7 @@ async function getTableFS(dbname: string, tname: string) {
 
 async function createTableFS(dbname: string, tname: string) {
   log.d('Creating a new jsonfs:', dbname + '/' + tname);
-  let { default: JsonFS } = await import('./json-fs');
+  let { default: JsonFS } = await import('vfs/json-fs');
   let db = DB.open(dbname);
   let t = db.open(tname);
 

@@ -82,7 +82,7 @@ define(["require", "exports", "./config"], function (require, exports, conf) {
     async function openLogDb() {
         if (db)
             return db;
-        let { DB } = await new Promise((resolve_1, reject_1) => { require(['./idb'], resolve_1, reject_1); });
+        let { DB } = await new Promise((resolve_1, reject_1) => { require(['idb'], resolve_1, reject_1); });
         return db = DB.open(conf.LOG_IDB_NAME);
     }
 });

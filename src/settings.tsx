@@ -40,11 +40,11 @@ export async function render() {
 
 export async function init() {
   dom.id.exportDB.addEventListener('click', async () => {
-    let { exportData } = await import('./impexp');
+    let { exportData } = await import('impexp');
     await exportData();
   });
   dom.id.importDB.addEventListener('click', async () => {
-    let { importData } = await import('./impexp');
+    let { importData } = await import('impexp');
     await importData();
   });
 }

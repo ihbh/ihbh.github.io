@@ -1,4 +1,4 @@
-import { AsyncProp } from "./prop";
+import { AsyncProp } from "../prop";
 import vfs from './vfs';
 
 function prop<T>(path: string, defval: T|null = null) {
@@ -14,7 +14,7 @@ function prop<T>(path: string, defval: T|null = null) {
 
     async set(value: T) {
       await vfs.set(path, value);
-      let rsync = await import('./rsync');
+      let rsync = await import('rsync');
       await rsync.reset(path);
     },
   });

@@ -35,8 +35,8 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
     exports.getRemoteDir = (ruid, tsid) => `${conf.SHARED_DIR}/chats/${ruid}/${tsid}`;
     exports.getLocalDir = (ruid, tsid) => `${conf.LOCAL_DIR}/chats/${ruid}/${tsid}`;
     async function hasUnreadChats() {
-        let vfs = await new Promise((resolve_1, reject_1) => { require(['./vfs'], resolve_1, reject_1); });
-        let user = await new Promise((resolve_2, reject_2) => { require(['./user'], resolve_2, reject_2); });
+        let vfs = await new Promise((resolve_1, reject_1) => { require(['vfs/vfs'], resolve_1, reject_1); });
+        let user = await new Promise((resolve_2, reject_2) => { require(['user'], resolve_2, reject_2); });
         let uid = await user.uid.get();
         let dir = await vfs.root.dir(`/srv/users/${uid}/unread`);
         return dir && dir.length > 0;
@@ -51,14 +51,14 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
         };
         return new prop_1.AsyncProp({
             async get() {
-                let vfs = await new Promise((resolve_3, reject_3) => { require(['./vfs'], resolve_3, reject_3); });
+                let vfs = await new Promise((resolve_3, reject_3) => { require(['vfs/vfs'], resolve_3, reject_3); });
                 let text = await vfs.root.get(path());
                 return text || '';
             },
             async set(text) {
                 if (text == prev)
                     return;
-                let vfs = await new Promise((resolve_4, reject_4) => { require(['./vfs'], resolve_4, reject_4); });
+                let vfs = await new Promise((resolve_4, reject_4) => { require(['vfs/vfs'], resolve_4, reject_4); });
                 if (text)
                     await vfs.root.set(path(), text);
                 else
@@ -72,7 +72,7 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
         try {
             if (tsids && !tsids.length)
                 return {};
-            let vfs = await new Promise((resolve_5, reject_5) => { require(['./vfs'], resolve_5, reject_5); });
+            let vfs = await new Promise((resolve_5, reject_5) => { require(['vfs/vfs'], resolve_5, reject_5); });
             let messages = {};
             if (!tsids)
                 tsids = (await vfs.root.dir(dir)) || [];
@@ -92,8 +92,8 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
     }
     exports.getMessageTexts = getMessageTexts;
     async function getMessageText(dir, tsid, ruid) {
-        let vfs = await new Promise((resolve_6, reject_6) => { require(['./vfs'], resolve_6, reject_6); });
-        let rsync = await new Promise((resolve_7, reject_7) => { require(['./rsync'], resolve_7, reject_7); });
+        let vfs = await new Promise((resolve_6, reject_6) => { require(['vfs/vfs'], resolve_6, reject_6); });
+        let rsync = await new Promise((resolve_7, reject_7) => { require(['rsync'], resolve_7, reject_7); });
         let path = `${dir}/${tsid}/text`;
         let pathEnc = `${dir}/${tsid}/${conf.CHAT_AES_NAME}`;
         let [text, textEnc, status] = await Promise.all([
@@ -126,14 +126,14 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
         log.i('Sending message to', ruid);
         if (!conf.RX_USERID.test(ruid))
             throw new Error('Invalid uid: ' + ruid);
-        let user = await new Promise((resolve_8, reject_8) => { require(['./user'], resolve_8, reject_8); });
+        let user = await new Promise((resolve_8, reject_8) => { require(['user'], resolve_8, reject_8); });
         let uid = await user.uid.get();
         let message = {
             user: uid,
             text: text,
             date: new Date,
         };
-        let vfs = await new Promise((resolve_9, reject_9) => { require(['./vfs'], resolve_9, reject_9); });
+        let vfs = await new Promise((resolve_9, reject_9) => { require(['vfs/vfs'], resolve_9, reject_9); });
         let tsid = exports.date2tsid(message.date);
         let remoteDir = exports.getRemoteDir(ruid, tsid);
         let localDir = exports.getLocalDir(ruid, tsid);
@@ -153,7 +153,7 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
             await vfs.root.set(`${remoteDir}/text`, text);
         }
         log.d('Syncing the messages.');
-        let rsync = await new Promise((resolve_10, reject_10) => { require(['./rsync'], resolve_10, reject_10); });
+        let rsync = await new Promise((resolve_10, reject_10) => { require(['rsync'], resolve_10, reject_10); });
         rsync.start();
         log.i('Message sent to', ruid, 'in', Date.now() - time, 'ms');
         return message;
@@ -168,7 +168,7 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
             return false;
         log.d('Running AES.');
         let iv = await getInitVector(ruid, tsid);
-        let aes = await new Promise((resolve_11, reject_11) => { require(['./aes'], resolve_11, reject_11); });
+        let aes = await new Promise((resolve_11, reject_11) => { require(['aes'], resolve_11, reject_11); });
         let aesdata = await aes.encrypt(text, aeskey, iv);
         await setAesData(ruid, tsid, aesdata);
         return true;
@@ -179,14 +179,14 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
             return null;
         log.d('Running AES.');
         let iv = await getInitVector(ruid, tsid);
-        let aes = await new Promise((resolve_12, reject_12) => { require(['./aes'], resolve_12, reject_12); });
+        let aes = await new Promise((resolve_12, reject_12) => { require(['aes'], resolve_12, reject_12); });
         let data = buffer_1.default.from(base64, 'base64').toArray(Uint8Array);
         let text = await aes.decrypt(data, aeskey, iv);
         return text;
     }
     async function isAesEnabled() {
         log.d('Checking if encryption is enabled.');
-        let gp = await new Promise((resolve_13, reject_13) => { require(['./gp'], resolve_13, reject_13); });
+        let gp = await new Promise((resolve_13, reject_13) => { require(['gp'], resolve_13, reject_13); });
         let enabled = await gp.chatEncrypt.get();
         if (!enabled)
             log.d('Encryption disabled in the settings.');
@@ -200,14 +200,14 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
     }
     async function deriveSharedKey(ruid) {
         log.d('Getting pubkey from', ruid);
-        let ucache = await new Promise((resolve_14, reject_14) => { require(['./ucache'], resolve_14, reject_14); });
+        let ucache = await new Promise((resolve_14, reject_14) => { require(['ucache'], resolve_14, reject_14); });
         let remote = await ucache.getUserInfo(ruid, ['pubkey']);
         if (!remote.pubkey) {
             log.d(ruid, 'doesnt have pubkey, so cant encrypt the message.');
             return null;
         }
         log.d('Deriving a shared 256 bit secret with', ruid);
-        let user = await new Promise((resolve_15, reject_15) => { require(['./user'], resolve_15, reject_15); });
+        let user = await new Promise((resolve_15, reject_15) => { require(['user'], resolve_15, reject_15); });
         let secret = await user.deriveSharedSecret(remote.pubkey);
         log.d('The shared secret:', secret);
         let aeskey = await hash_1.sha256(secret);
@@ -216,11 +216,11 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
     }
     async function setAesData(ruid, tsid, data) {
         log.d('Saving the encrypted text:', data);
-        let vfs = await new Promise((resolve_16, reject_16) => { require(['./vfs'], resolve_16, reject_16); });
+        let vfs = await new Promise((resolve_16, reject_16) => { require(['vfs/vfs'], resolve_16, reject_16); });
         await vfs.root.set(exports.getRemoteDir(ruid, tsid) + '/' + conf.CHAT_AES_NAME, new buffer_1.default(data).toString('base64'));
     }
     async function getInitVector(ruid, tsid) {
-        let user = await new Promise((resolve_17, reject_17) => { require(['./user'], resolve_17, reject_17); });
+        let user = await new Promise((resolve_17, reject_17) => { require(['user'], resolve_17, reject_17); });
         let suid = await user.uid.get();
         let hs = await Promise.all([
             hash_1.sha256(suid),
@@ -238,13 +238,13 @@ define(["require", "exports", "./buffer", "./config", "./hash", "./log", "./prop
     }
     async function setLastSeenTime(ruid, time = new Date) {
         let path = `~/chats/${ruid}/time`;
-        let vfs = await new Promise((resolve_18, reject_18) => { require(['./vfs'], resolve_18, reject_18); });
+        let vfs = await new Promise((resolve_18, reject_18) => { require(['vfs/vfs'], resolve_18, reject_18); });
         await vfs.root.set(path, time.toJSON());
     }
     exports.setLastSeenTime = setLastSeenTime;
     async function getLastSeenTime(ruid) {
         let path = `~/chats/${ruid}/time`;
-        let vfs = await new Promise((resolve_19, reject_19) => { require(['./vfs'], resolve_19, reject_19); });
+        let vfs = await new Promise((resolve_19, reject_19) => { require(['vfs/vfs'], resolve_19, reject_19); });
         let time = await vfs.root.get(path);
         return time ? new Date(time) : null;
     }

@@ -3,7 +3,7 @@ import * as conf from './config';
 import { DerivedError } from "./error";
 import { TaggedLogger } from "./log";
 import * as rpc from './rpc';
-import vfs, { abspath } from './vfs';
+import vfs, { abspath } from './vfs/vfs';
 
 const log = new TaggedLogger('rsync');
 

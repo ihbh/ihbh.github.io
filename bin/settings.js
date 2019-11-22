@@ -13,11 +13,11 @@ define(["require", "exports", "./dom", "./page", "./react"], function (require, 
     exports.render = render;
     async function init() {
         dom.id.exportDB.addEventListener('click', async () => {
-            let { exportData } = await new Promise((resolve_1, reject_1) => { require(['./impexp'], resolve_1, reject_1); });
+            let { exportData } = await new Promise((resolve_1, reject_1) => { require(['impexp'], resolve_1, reject_1); });
             await exportData();
         });
         dom.id.importDB.addEventListener('click', async () => {
-            let { importData } = await new Promise((resolve_2, reject_2) => { require(['./impexp'], resolve_2, reject_2); });
+            let { importData } = await new Promise((resolve_2, reject_2) => { require(['impexp'], resolve_2, reject_2); });
             await importData();
         });
     }

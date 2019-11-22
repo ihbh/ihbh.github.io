@@ -14,13 +14,13 @@ export async function sendFeedback(text: string) {
     .replace(/\..+$/, '')
     .replace(/[^\d]/g, '-');
   let path = `${conf.SHARED_DIR}/feedbacks/${time}`;
-  let vfs = await import('./vfs');
+  let vfs = await import('vfs/vfs');
   await vfs.root.set(path, text);
   log.i('Feedback recorded.');
 }
 
 export async function isRegistered() {
-  let gp = await import('./gp');
+  let gp = await import('gp');
   let name = await gp.username.get();
   return !!name;
 }
@@ -28,12 +28,12 @@ export async function isRegistered() {
 export async function getPhotoUri(uid = '') {
   if (uid) {
     verifyUserId(uid);
-    let ucache = await import('./ucache');
+    let ucache = await import('ucache');
     let info = await ucache.getUserInfo(uid);
     return info.photo;
   } else {
     let time = Date.now();
-    let gp = await import('./gp');
+    let gp = await import('gp');
     let datauri = await gp.userimg.get();
     if (!datauri) return null;
     let blob = dataUriToBlob(datauri);
@@ -46,22 +46,22 @@ export async function getPhotoUri(uid = '') {
 export async function getDisplayName(uid = '') {
   if (uid) {
     verifyUserId(uid);
-    let ucache = await import('./ucache');
+    let ucache = await import('ucache');
     let info = await ucache.getUserInfo(uid);
     return info.name || null;
   } else {
-    let gp = await import('./gp');
+    let gp = await import('gp');
     return gp.username.get();
   }
 }
 
 export async function getAbout(uid = '') {
   if (uid) {
-    let ucache = await import('./ucache');
+    let ucache = await import('ucache');
     let info = await ucache.getUserInfo(uid);
     return info.about || null;
   } else {
-    let gp = await import('./gp');
+    let gp = await import('gp');
     return gp.userinfo.get();
   }
 }
@@ -70,7 +70,7 @@ export async function setAbuseReport(uid: string, text: string) {
   if (!text) throw new Error('Abuse report cannot be empty.');
   verifyUserId(uid);
 
-  let vfs = await import('./vfs');
+  let vfs = await import('vfs/vfs');
   let dir = conf.REPORTS_DIR + '/' + uid;
   await vfs.root.set(dir, text);
 }
@@ -78,7 +78,7 @@ export async function setAbuseReport(uid: string, text: string) {
 export async function getAbuseReport(uid: string) {
   verifyUserId(uid);
 
-  let vfs = await import('./vfs');
+  let vfs = await import('vfs/vfs');
   let dir = conf.REPORTS_DIR + '/' + uid;
   let text = await vfs.root.get(dir);
 

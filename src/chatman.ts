@@ -65,8 +65,8 @@ export const getLocalDir = (ruid: string, tsid: string) =>
   `${conf.LOCAL_DIR}/chats/${ruid}/${tsid}`;
 
 export async function hasUnreadChats() {
-  let vfs = await import('./vfs');
-  let user = await import('./user');
+  let vfs = await import('vfs/vfs');
+  let user = await import('user');
   let uid = await user.uid.get();
   let dir = await vfs.root.dir(`/srv/users/${uid}/unread`);
   return dir && dir.length > 0;
@@ -81,14 +81,14 @@ export function makeSaveDraftProp(uid: () => string) {
 
   return new AsyncProp<string>({
     async get() {
-      let vfs = await import('./vfs');
+      let vfs = await import('vfs/vfs');
       let text = await vfs.root.get(path());
       return text || '';
     },
 
     async set(text: string) {
       if (text == prev) return;
-      let vfs = await import('./vfs');
+      let vfs = await import('vfs/vfs');
       if (text)
         await vfs.root.set(path(), text);
       else
@@ -102,7 +102,7 @@ export async function getMessageTexts(dir: string, tsids?: string[], ruid?: stri
   try {
     if (tsids && !tsids.length)
       return {};
-    let vfs = await import('./vfs');
+    let vfs = await import('vfs/vfs');
     let messages: RemoteMessages = {};
     if (!tsids) tsids = (await vfs.root.dir(dir)) || [];
     log.i(`Getting ${tsids.length} messages from ${dir}/*/text`);
@@ -121,8 +121,8 @@ export async function getMessageTexts(dir: string, tsids?: string[], ruid?: stri
 async function getMessageText(dir: string, tsid: string, ruid: string | null)
   : Promise<null | RemoteMessage> {
 
-  let vfs = await import('./vfs');
-  let rsync = await import('./rsync');
+  let vfs = await import('vfs/vfs');
+  let rsync = await import('rsync');
   let path = `${dir}/${tsid}/text`;
   let pathEnc = `${dir}/${tsid}/${conf.CHAT_AES_NAME}`;
 
@@ -160,7 +160,7 @@ export async function sendMessage(ruid: string, text: string) {
   if (!conf.RX_USERID.test(ruid))
     throw new Error('Invalid uid: ' + ruid);
 
-  let user = await import('./user');
+  let user = await import('user');
   let uid = await user.uid.get();
   let message: ChatMessage = {
     user: uid,
@@ -168,7 +168,7 @@ export async function sendMessage(ruid: string, text: string) {
     date: new Date,
   };
 
-  let vfs = await import('./vfs');
+  let vfs = await import('vfs/vfs');
   let tsid = date2tsid(message.date);
 
   let remoteDir = getRemoteDir(ruid, tsid);
@@ -193,7 +193,7 @@ export async function sendMessage(ruid: string, text: string) {
   }
 
   log.d('Syncing the messages.');
-  let rsync = await import('./rsync');
+  let rsync = await import('rsync');
   rsync.start();
   log.i('Message sent to', ruid, 'in', Date.now() - time, 'ms');
   return message;
@@ -208,7 +208,7 @@ async function encryptMessage(ruid: string, text: string, tsid: string) {
 
   log.d('Running AES.');
   let iv = await getInitVector(ruid, tsid);
-  let aes = await import('./aes');
+  let aes = await import('aes');
   let aesdata = await aes.encrypt(text, aeskey, iv);
 
   await setAesData(ruid, tsid, aesdata);
@@ -220,7 +220,7 @@ async function decryptMessage(ruid: string, base64: string, tsid: string) {
   if (!aeskey) return null;
   log.d('Running AES.');
   let iv = await getInitVector(ruid, tsid);
-  let aes = await import('./aes');
+  let aes = await import('aes');
   let data = Buffer.from(base64, 'base64').toArray(Uint8Array);
   let text = await aes.decrypt(data, aeskey, iv);
   return text;
@@ -228,7 +228,7 @@ async function decryptMessage(ruid: string, base64: string, tsid: string) {
 
 async function isAesEnabled() {
   log.d('Checking if encryption is enabled.');
-  let gp = await import('./gp');
+  let gp = await import('gp');
   let enabled = await gp.chatEncrypt.get();
   if (!enabled) log.d('Encryption disabled in the settings.');
   return enabled;
@@ -243,7 +243,7 @@ async function getAesKey(ruid: string) {
 
 async function deriveSharedKey(ruid: string) {
   log.d('Getting pubkey from', ruid);
-  let ucache = await import('./ucache');
+  let ucache = await import('ucache');
   let remote = await ucache.getUserInfo(ruid, ['pubkey']);
 
   if (!remote.pubkey) {
@@ -252,7 +252,7 @@ async function deriveSharedKey(ruid: string) {
   }
 
   log.d('Deriving a shared 256 bit secret with', ruid);
-  let user = await import('./user');
+  let user = await import('user');
   let secret = await user.deriveSharedSecret(remote.pubkey);
   log.d('The shared secret:', secret);
 
@@ -263,14 +263,14 @@ async function deriveSharedKey(ruid: string) {
 
 async function setAesData(ruid: string, tsid: string, data: Uint8Array) {
   log.d('Saving the encrypted text:', data);
-  let vfs = await import('./vfs');
+  let vfs = await import('vfs/vfs');
   await vfs.root.set(
     getRemoteDir(ruid, tsid) + '/' + conf.CHAT_AES_NAME,
     new Buffer(data).toString('base64'));
 }
 
 async function getInitVector(ruid: string, tsid: string) {
-  let user = await import('./user');
+  let user = await import('user');
   let suid = await user.uid.get();
 
   let hs = await Promise.all([
@@ -293,13 +293,13 @@ async function getInitVector(ruid: string, tsid: string) {
 
 export async function setLastSeenTime(ruid: string, time = new Date) {
   let path = `~/chats/${ruid}/time`;
-  let vfs = await import('./vfs');
+  let vfs = await import('vfs/vfs');
   await vfs.root.set(path, time.toJSON());
 }
 
 export async function getLastSeenTime(ruid: string) {
   let path = `~/chats/${ruid}/time`;
-  let vfs = await import('./vfs');
+  let vfs = await import('vfs/vfs');
   let time = await vfs.root.get(path);
   return time ? new Date(time) : null;
 }

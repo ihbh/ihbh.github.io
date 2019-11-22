@@ -61,7 +61,7 @@ export default class FsEdit implements UXComp {
   private async write(text: string) {
     let path = this.args.filepath();
     if (!path) throw new Error('fs path not ready');
-    let vfs = await import('./vfs');
+    let vfs = await import('vfs/vfs');
     await vfs.root.set(path, text);
     log.d('Input saved to', path);
   }
@@ -69,7 +69,7 @@ export default class FsEdit implements UXComp {
   private async read() {
     let path = this.args.filepath();
     if (!path) return null;
-    let vfs = await import('./vfs');
+    let vfs = await import('vfs/vfs');
     let text = await vfs.root.get(path);
     return text;
   }

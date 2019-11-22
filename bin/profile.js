@@ -41,7 +41,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
     exports.render = render;
     function initImportButton() {
         dom.id.regImport.onclick = async () => {
-            let { importData } = await new Promise((resolve_1, reject_1) => { require(['./impexp'], resolve_1, reject_1); });
+            let { importData } = await new Promise((resolve_1, reject_1) => { require(['impexp'], resolve_1, reject_1); });
             await importData();
             location.reload();
         };
@@ -50,7 +50,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
         dom.id.upcRotate.onclick = async () => {
             log.i('Rotating image.');
             let time = Date.now();
-            let reg = await new Promise((resolve_2, reject_2) => { require(['./reg'], resolve_2, reject_2); });
+            let reg = await new Promise((resolve_2, reject_2) => { require(['reg'], resolve_2, reject_2); });
             let img = dom.id.regPhoto;
             let url = reg.rotatePhoto(img);
             img.src = url;
@@ -61,7 +61,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
         dom.id.upcFlip.onclick = async () => {
             log.i('Flipping image.');
             let time = Date.now();
-            let reg = await new Promise((resolve_3, reject_3) => { require(['./reg'], resolve_3, reject_3); });
+            let reg = await new Promise((resolve_3, reject_3) => { require(['reg'], resolve_3, reject_3); });
             let img = dom.id.regPhoto;
             let url = reg.flipPhoto(img);
             img.src = url;
@@ -143,7 +143,7 @@ define(["require", "exports", "./dom", "./log", "./page", "./qargs", "./react", 
             };
         }
         else {
-            let reg = await new Promise((resolve_4, reject_4) => { require(['./reg'], resolve_4, reject_4); });
+            let reg = await new Promise((resolve_4, reject_4) => { require(['reg'], resolve_4, reject_4); });
             let resizing = false;
             dom.id.regPhoto.onclick = async () => {
                 if (resizing)

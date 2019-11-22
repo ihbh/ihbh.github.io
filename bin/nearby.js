@@ -41,7 +41,7 @@ define(["require", "exports", "./page", "./config", "./dom", "./gp", "./loc", ".
                 if (!conf.DEBUG)
                     throw err;
                 log.e('Failed to get visitors:', err);
-                let dbg = await new Promise((resolve_1, reject_1) => { require(['./dbg'], resolve_1, reject_1); });
+                let dbg = await new Promise((resolve_1, reject_1) => { require(['dbg'], resolve_1, reject_1); });
                 infos = await dbg.getDebugPeopleNearby();
             }
             if (infos.length > 0) {
@@ -108,14 +108,14 @@ define(["require", "exports", "./page", "./config", "./dom", "./gp", "./loc", ".
             try {
                 log.i('Unvisiting:', tskey);
                 setStatus('Unvisiting this place.');
-                let { root: vfs } = await new Promise((resolve_2, reject_2) => { require(['./vfs'], resolve_2, reject_2); });
+                let { root: vfs } = await new Promise((resolve_2, reject_2) => { require(['vfs/vfs'], resolve_2, reject_2); });
                 await Promise.all(allvisits.map(tskey => vfs.rmdir(`${conf.VPLACES_DIR}/${tskey}`)));
                 setStatus(`This place has been unvisited. Others won't see you here anymore.`);
             }
             catch (err) {
                 log.e('Failed to unvisit:', err);
             }
-            let page = await new Promise((resolve_3, reject_3) => { require(['./page'], resolve_3, reject_3); });
+            let page = await new Promise((resolve_3, reject_3) => { require(['page'], resolve_3, reject_3); });
             await page.set('places');
         };
     }

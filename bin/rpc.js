@@ -23,7 +23,7 @@ define(["require", "exports", "./config", "./log", "./prop", "./qargs"], functio
     exports.invoke = invoke;
     async function invokeInternal(name, args, reqid) {
         log.i(reqid, name, JSON.stringify(args));
-        let user = await new Promise((resolve_1, reject_1) => { require(['./user'], resolve_1, reject_1); });
+        let user = await new Promise((resolve_1, reject_1) => { require(['user'], resolve_1, reject_1); });
         let path = '/rpc/' + name;
         let url = (await rpcurl.get()) + path;
         let body = JSON.stringify(args);
@@ -149,7 +149,7 @@ define(["require", "exports", "./config", "./log", "./prop", "./qargs"], functio
     let rpcurl = new prop_1.AsyncProp(async () => {
         let url = qargs.get('rpc');
         if (!url) {
-            let gp = await new Promise((resolve_2, reject_2) => { require(['./gp'], resolve_2, reject_2); });
+            let gp = await new Promise((resolve_2, reject_2) => { require(['gp'], resolve_2, reject_2); });
             url = await gp.rpcurl.get();
         }
         if (url.indexOf('://') < 0) {

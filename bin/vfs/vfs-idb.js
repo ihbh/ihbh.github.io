@@ -1,5 +1,5 @@
 // IDBFS path: /<db-name>/<table-name>/<record-key>
-define(["require", "exports", "./idb", "./log"], function (require, exports, idb_1, log_1) {
+define(["require", "exports", "../idb", "../log"], function (require, exports, idb_1, log_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('idbfs');
@@ -57,7 +57,7 @@ define(["require", "exports", "./idb", "./log"], function (require, exports, idb
     }
     async function createTableFS(dbname, tname) {
         log.d('Creating a new jsonfs:', dbname + '/' + tname);
-        let { default: JsonFS } = await new Promise((resolve_1, reject_1) => { require(['./json-fs'], resolve_1, reject_1); });
+        let { default: JsonFS } = await new Promise((resolve_1, reject_1) => { require(['vfs/json-fs'], resolve_1, reject_1); });
         let db = idb_1.DB.open(dbname);
         let t = db.open(tname);
         return new JsonFS({

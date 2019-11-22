@@ -121,7 +121,7 @@ export async function invoke(name: string, args) {
 
 async function invokeInternal(name: string, args, reqid: string) {
   log.i(reqid, name, JSON.stringify(args));
-  let user = await import('./user');
+  let user = await import('user');
   let path = '/rpc/' + name;
   let url = (await rpcurl.get()) + path;
   let body = JSON.stringify(args);
@@ -271,7 +271,7 @@ let rpcurl = new AsyncProp<string>(async () => {
   let url = qargs.get('rpc');
 
   if (!url) {
-    let gp = await import('./gp');
+    let gp = await import('gp');
     url = await gp.rpcurl.get();
   }
 

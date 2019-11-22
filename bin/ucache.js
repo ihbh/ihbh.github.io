@@ -27,7 +27,7 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
     }
     exports.getUserInfo = getUserInfo;
     async function getCachedInfo(uid) {
-        let { default: vfs } = await new Promise((resolve_1, reject_1) => { require(['./vfs'], resolve_1, reject_1); });
+        let { default: vfs } = await new Promise((resolve_1, reject_1) => { require(['vfs/vfs'], resolve_1, reject_1); });
         let dir = `~/users/${uid}`;
         let info = { uid };
         let fnames = Object.keys(PROPS);
@@ -45,13 +45,13 @@ define(["require", "exports", "./log"], function (require, exports, log_1) {
         }
     }
     async function syncFile(fpathCached, fpathRemote) {
-        let rpc = await new Promise((resolve_2, reject_2) => { require(['./rpc'], resolve_2, reject_2); });
-        let { default: vfs } = await new Promise((resolve_3, reject_3) => { require(['./vfs'], resolve_3, reject_3); });
+        let rpc = await new Promise((resolve_2, reject_2) => { require(['rpc'], resolve_2, reject_2); });
+        let { default: vfs } = await new Promise((resolve_3, reject_3) => { require(['vfs/vfs'], resolve_3, reject_3); });
         let data = await vfs.get(fpathCached);
         let hash = null;
         if (data) {
-            let rsync = await new Promise((resolve_4, reject_4) => { require(['./rsync'], resolve_4, reject_4); });
-            let { default: Buffer } = await new Promise((resolve_5, reject_5) => { require(['./buffer'], resolve_5, reject_5); });
+            let rsync = await new Promise((resolve_4, reject_4) => { require(['rsync'], resolve_4, reject_4); });
+            let { default: Buffer } = await new Promise((resolve_5, reject_5) => { require(['buffer'], resolve_5, reject_5); });
             let json = JSON.stringify(data);
             let bytes = Buffer.from(json, 'utf8').toArray(Uint8Array).buffer;
             hash = await rsync.rhash(bytes);

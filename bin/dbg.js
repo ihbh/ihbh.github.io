@@ -83,7 +83,7 @@ define(["require", "exports", "./config", "./dom", "./log", "./logdb", "./qargs"
     }
     exports.getDebugPeopleNearby = getDebugPeopleNearby;
     async function getTestUserDetails(uid) {
-        let { default: text } = await new Promise((resolve_1, reject_1) => { require(['./lorem'], resolve_1, reject_1); });
+        let { default: text } = await new Promise((resolve_1, reject_1) => { require(['lorem'], resolve_1, reject_1); });
         return {
             photo: conf.DBG_TEST_USER_PHOTO,
             name: uid.slice(0, 8),

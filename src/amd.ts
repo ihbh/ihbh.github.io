@@ -1,4 +1,6 @@
 (function init() {
+  const BASE_JS_DIR = '/bin';
+
   interface ModuleDef {
     url?: string;
     deps?: string[];
@@ -15,6 +17,39 @@
     console.debug('I [amd]', ...args);
   }
 
+  const isAbsDep = (path: string) =>
+    path.startsWith('/') ||
+    /^\w+:\/\//.test(path) ||
+    /^\w+$/.test(path); // 'require', 'exports'
+
+  const isRelDep = (path: string) =>
+    path.startsWith('.');
+
+  function resolveDep(scriptUrl: string, rel: string) {
+    if (isAbsDep(rel))
+      return rel;
+    if (!isRelDep(rel))
+      return BASE_JS_DIR + '/' + rel;
+
+    let stack = scriptUrl.split('/');
+    stack.pop();
+
+    for (let name of rel.split('/')) {
+      if (name == '.') {
+        // no-op
+      } else if (name == '..') {
+        stack.pop();
+      } else {
+        stack.push(name);
+      }
+    }
+
+    let path = stack.join('/');
+    if (!path.endsWith('.js'))
+      path += '.js';
+    return path;
+  }
+
   function define(deps: string[], init: (...deps) => void) {
     if (!init) {
       init = deps as any;
@@ -29,12 +64,8 @@
     if (mod.url)
       throw new Error('Module already defined: ' + url);
     mod.url = url;
-    mod.deps = deps.map(dep => {
-      if (!dep.startsWith('./')) return dep;
-      let newdep = url.replace(/\/[^/]+$/, dep.slice(1));
-      if (!newdep.endsWith('.js')) newdep += '.js';
-      return newdep;
-    });
+    mod.deps = deps.map(
+      rel => resolveDep(url, rel));
     mod.init = init;
     log('define:', url, '<-', ...mod.deps);
   }
@@ -105,8 +136,11 @@
   }
 
   function resolveScriptUrl(dep: string) {
-    return dep.startsWith('./') ?
-      'bin' + dep.slice(1) + '.js' : dep;
+    if (dep.startsWith('./'))
+      return BASE_JS_DIR + dep.slice(1) + '.js';
+    if (/^\w+(\/|$)/.test(dep))
+      return BASE_JS_DIR + '/' + dep + '.js';
+    return dep;
   }
 
   window['define'] = define;
