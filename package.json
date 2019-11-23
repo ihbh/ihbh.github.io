@@ -1,10 +1,11 @@
 {
   "scripts": {
-    "build": "npm run css && npm run cp-libs && tsc && npm run cp-sw",
+    "build": "npm run build-stats && npm run css && npm run cp-libs && tsc && npm run cp-sw",
     "css": "sass css/common.scss css/common.css",
     "cp-libs": "npm run cp-wasm",
     "cp-wasm": "mkdir -p bin/ed25519; rsync -avc --exclude='*.json' node_modules/ed25519.wasm/* bin/ed25519",
     "cp-sw": "cp -f bin/sw.js sw.js",
+    "build-stats": "tsc --project stats",
     "webfsd": "killall -q webfsd; echo 'Open http://localhost:8080/'; webfsd -F -l - -p 8080 -r . -f index.html"
   },
   "devDependencies": {

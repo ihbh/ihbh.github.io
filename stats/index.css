@@ -1,0 +1,28 @@
+body {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 10pt;
+  font-family: Ubuntu, Arial, sans-serif;
+}
+
+.stat {
+  margin: 5pt;
+  padding: 5pt;
+  width: 150pt;
+}
+
+.stat > svg {
+  width: 150pt;
+  height: 150pt;
+}
+
+.stat > a {
+  word-wrap: break-word;
+  color: #444;
+  text-decoration: none;
+  margin-bottom: 1em;
+}
+
+.stat > a:hover {
+  text-decoration: underline;
+}
