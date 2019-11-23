@@ -1,6 +1,6 @@
-import * as conf from "./config";
-import { TaggedLogger } from "./log";
-import React from './react';
+import * as conf from "../config";
+import { TaggedLogger } from "../log";
+import React from '../react';
 import UXComp from "./uxcomp";
 
 const log = new TaggedLogger('fsedit');

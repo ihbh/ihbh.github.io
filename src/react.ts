@@ -1,4 +1,4 @@
-import UXComp, { UXCompCtor } from "./uxcomp";
+import UXComp, { UXCompCtor } from "uxc/uxcomp";
 
 const cache = new WeakMap<HTMLElement, UXComp>();
 const isValidNode = x => !!x;

@@ -1,4 +1,4 @@
-define(["require", "exports", "./dom", "./page", "./react"], function (require, exports, dom, page, react_1) {
+define(["require", "exports", "../dom", "../page", "../react"], function (require, exports, dom, page, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     async function render() {

@@ -1,9 +1,9 @@
-import * as page from './page';
-import * as dom from './dom';
-import { TaggedLogger } from './log';
-import * as qargs from './qargs';
-import React from './react';
-import vfs from './vfs/vfs';
+import * as page from '../page';
+import * as dom from '../dom';
+import { TaggedLogger } from '../log';
+import * as qargs from '../qargs';
+import React from '../react';
+import vfs from 'vfs/vfs';
 
 const log = new TaggedLogger('explorer');
 

@@ -1,11 +1,11 @@
-import * as page from './page';
-import * as conf from './config';
-import * as dom from './dom';
-import { TaggedLogger } from './log';
-import React from './react';
-import { getUserInfo, UserInfo } from './ucache';
-import * as user from './user';
-import vfs from './vfs/vfs';
+import * as page from '../page';
+import * as conf from '../config';
+import * as dom from '../dom';
+import { TaggedLogger } from '../log';
+import React from '../react';
+import { getUserInfo, UserInfo } from '../ucache';
+import * as user from '../user';
+import vfs from 'vfs/vfs';
 
 const LAST_SSEN = 'lastseen';
 

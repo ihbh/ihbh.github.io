@@ -1,4 +1,4 @@
-define(["require", "exports", "./page", "./dom", "./log", "./qargs", "./react", "./vfs/vfs"], function (require, exports, page, dom, log_1, qargs, react_1, vfs_1) {
+define(["require", "exports", "../page", "../dom", "../log", "../qargs", "../react", "vfs/vfs"], function (require, exports, page, dom, log_1, qargs, react_1, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('explorer');

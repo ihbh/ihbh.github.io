@@ -1,4 +1,4 @@
-define(["require", "exports", "./page", "./config", "./dom", "./gp", "./loc", "./log", "./osm", "./qargs", "./react", "./rpc", "./timestr", "./ucache", "./user", "./fsedit"], function (require, exports, page, conf, dom, gp, loc, log_1, osm_1, qargs, react_1, rpc, tts, ucache_1, user, fsedit_1) {
+define(["require", "exports", "../page", "../config", "../dom", "../gp", "../loc", "../log", "../osm", "../qargs", "../react", "../rpc", "../timestr", "../ucache", "../user", "./fsedit"], function (require, exports, page, conf, dom, gp, loc, log_1, osm_1, qargs, react_1, rpc, tts, ucache_1, user, fsedit_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('nearby');

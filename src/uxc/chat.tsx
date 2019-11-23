@@ -1,14 +1,14 @@
-import * as chatman from './chatman';
-import * as conf from './config';
-import * as dom from './dom';
-import { TaggedLogger } from './log';
-import * as page from './page';
-import * as qargs from './qargs';
-import React from './react';
-import { recentTimeToStr } from './timestr';
-import * as ucache from './ucache';
-import * as user from './user';
-import vfs from './vfs/vfs';
+import * as chatman from '../chatman';
+import * as conf from '../config';
+import * as dom from '../dom';
+import { TaggedLogger } from '../log';
+import * as page from '../page';
+import * as qargs from '../qargs';
+import React from '../react';
+import { recentTimeToStr } from '../timestr';
+import * as ucache from '../ucache';
+import * as user from '../user';
+import vfs from 'vfs/vfs';
 
 let log = new TaggedLogger('chat');
 

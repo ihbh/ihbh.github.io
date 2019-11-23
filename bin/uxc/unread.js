@@ -1,4 +1,4 @@
-define(["require", "exports", "./page", "./config", "./dom", "./log", "./react", "./ucache", "./user", "./vfs/vfs"], function (require, exports, page, conf, dom, log_1, react_1, ucache_1, user, vfs_1) {
+define(["require", "exports", "../page", "../config", "../dom", "../log", "../react", "../ucache", "../user", "vfs/vfs"], function (require, exports, page, conf, dom, log_1, react_1, ucache_1, user, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const LAST_SSEN = 'lastseen';

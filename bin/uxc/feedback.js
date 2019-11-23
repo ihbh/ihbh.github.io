@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./gp", "./log", "./page", "./react", "./usr"], function (require, exports, conf, dom, gp, log_1, page, react_1, usr) {
+define(["require", "exports", "../config", "../dom", "../gp", "../log", "../page", "../react", "../usr"], function (require, exports, conf, dom, gp, log_1, page, react_1, usr) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('feedback');

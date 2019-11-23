@@ -49,7 +49,7 @@ export async function refresh() {
   stopCurrentPage();
   let id = get();
   log.i('Loading page:', id);
-  cpm = await import('' + id);
+  cpm = await import(conf.UXC_DIR + '/' + id);
   if (conf.DEBUG)
     window[conf.DBG_CPM_NAME] = cpm;
 

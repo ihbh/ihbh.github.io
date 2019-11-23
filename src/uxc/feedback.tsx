@@ -1,10 +1,10 @@
-import * as conf from './config';
-import * as dom from './dom';
-import * as gp from './gp';
-import { TaggedLogger } from "./log";
-import * as page from './page';
-import React from './react';
-import * as usr from './usr';
+import * as conf from '../config';
+import * as dom from '../dom';
+import * as gp from '../gp';
+import { TaggedLogger } from "../log";
+import * as page from '../page';
+import React from '../react';
+import * as usr from '../usr';
 
 const log = new TaggedLogger('feedback');
 

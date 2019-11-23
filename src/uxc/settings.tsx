@@ -1,6 +1,6 @@
-import * as dom from './dom';
-import * as page from './page';
-import React from './react';
+import * as dom from '../dom';
+import * as page from '../page';
+import React from '../react';
 
 export async function render() {
   return <div id="p-settings"

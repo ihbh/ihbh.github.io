@@ -1,4 +1,4 @@
-define(["require", "exports", "./chatman", "./config", "./dom", "./log", "./page", "./qargs", "./react", "./timestr", "./ucache", "./user", "./vfs/vfs"], function (require, exports, chatman, conf, dom, log_1, page, qargs, react_1, timestr_1, ucache, user, vfs_1) {
+define(["require", "exports", "../chatman", "../config", "../dom", "../log", "../page", "../qargs", "../react", "../timestr", "../ucache", "../user", "vfs/vfs"], function (require, exports, chatman, conf, dom, log_1, page, qargs, react_1, timestr_1, ucache, user, vfs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let log = new log_1.TaggedLogger('chat');

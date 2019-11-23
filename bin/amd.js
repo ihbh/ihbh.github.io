@@ -8,14 +8,18 @@
         console.debug('I [amd]', ...args);
     }
     const isAbsDep = (path) => path.startsWith('/') ||
-        /^\w+:\/\//.test(path) ||
+        /^\w+:\/\//.test(path) || // http://...
         /^\w+$/.test(path); // 'require', 'exports'
     const isRelDep = (path) => path.startsWith('.');
     function resolveDep(scriptUrl, rel) {
         if (isAbsDep(rel))
             return rel;
-        if (!isRelDep(rel))
-            return BASE_JS_DIR + '/' + rel;
+        if (!isRelDep(rel)) {
+            let path = BASE_JS_DIR + '/' + rel;
+            if (!path.endsWith('.js'))
+                path += '.js';
+            return path;
+        }
         let stack = scriptUrl.split('/');
         stack.pop();
         for (let name of rel.split('/')) {

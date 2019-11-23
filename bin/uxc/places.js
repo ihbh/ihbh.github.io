@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./dom", "./gp", "./loc", "./log", "./osm", "./react"], function (require, exports, conf, dom, gp, loc, log_1, osm_1, react_1) {
+define(["require", "exports", "../config", "../dom", "../gp", "../loc", "../log", "../osm", "../react"], function (require, exports, conf, dom, gp, loc, log_1, osm_1, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('places');

@@ -1,12 +1,12 @@
-import * as conf from './config';
-import * as dom from './dom';
-import * as gp from './gp';
-import * as gps from './gps';
-import * as vfs from './vfs/vfs';
-import { TaggedLogger } from './log';
-import { OSM } from './osm';
-import * as page from './page';
-import React from './react';
+import * as conf from '../config';
+import * as dom from '../dom';
+import * as gp from '../gp';
+import * as gps from '../gps';
+import * as vfs from 'vfs/vfs';
+import { TaggedLogger } from '../log';
+import { OSM } from '../osm';
+import * as page from '../page';
+import React from '../react';
 
 declare const PositionError;
 

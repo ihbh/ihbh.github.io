@@ -1,4 +1,4 @@
-define(["require", "exports", "./config", "./log", "./react"], function (require, exports, conf, log_1, react_1) {
+define(["require", "exports", "../config", "../log", "../react"], function (require, exports, conf, log_1, react_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const log = new log_1.TaggedLogger('fsedit');

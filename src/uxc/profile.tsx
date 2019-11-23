@@ -1,9 +1,9 @@
-import * as dom from './dom';
-import { TaggedLogger } from "./log";
-import * as page from './page';
-import * as qargs from './qargs';
-import React from './react';
-import * as usr from './usr';
+import * as dom from '../dom';
+import { TaggedLogger } from "../log";
+import * as page from '../page';
+import * as qargs from '../qargs';
+import React from '../react';
+import * as usr from '../usr';
 
 const log = new TaggedLogger('reg');
 

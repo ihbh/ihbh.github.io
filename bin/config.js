@@ -10,6 +10,7 @@ define(["require", "exports"], function (require, exports) {
     exports.DBG_MAX_SHOW_LOGS = 500;
     exports.DBG_MAX_LOG_ARG_LEN = 100;
     exports.DBG_CPM_NAME = 'pmod'; // import() for the current page
+    exports.UXC_DIR = 'uxc';
     exports.LOG_MAXLEN = 64;
     exports.PAGE_DEFAULT = 'map';
     exports.CONF_DARK_MODE = 'conf.ui.dark-mode';

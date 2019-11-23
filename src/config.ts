@@ -8,6 +8,7 @@ export const DBG_MAX_SHOW_LOGS = 500;
 export const DBG_MAX_LOG_ARG_LEN = 100;
 export const DBG_CPM_NAME = 'pmod'; // import() for the current page
 
+export const UXC_DIR = 'uxc';
 export const LOG_MAXLEN = 64;
 export const PAGE_DEFAULT = 'map';
 export const CONF_DARK_MODE = 'conf.ui.dark-mode';
